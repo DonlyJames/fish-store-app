@@ -1,465 +1,1159 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#1D9E75">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Fish Store">
-  <meta name="description" content="Mama's Fish Business Tracker">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icons/icon-192.png">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <title>Mama's Fish Store</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap');
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    :root {
-      --teal: #1D9E75; --teal-light: #E1F5EE; --teal-dark: #085041;
-      --amber: #BA7517; --amber-light: #FAEEDA; --amber-dark: #633806;
-      --red: #E24B4A; --red-light: #FCEBEB;
-      --green: #3B6D11; --green-light: #EAF3DE;
-      --blue: #185FA5; --blue-light: #E6F1FB;
-      --bg: #F5F5F0; --surface: #FFFFFF;
-      --border: rgba(0,0,0,0.1); --border-strong: rgba(0,0,0,0.18);
-      --text: #1a1a1a; --text-2: #555; --text-3: #888;
-      --radius: 12px; --radius-sm: 8px; --radius-pill: 20px;
-      --font: 'DM Sans', sans-serif;
-    }
-    html, body { height: 100%; overflow: hidden; font-family: var(--font); background: var(--bg); color: var(--text); font-size: 16px; }
-    #app { height: 100dvh; display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; background: var(--bg); position: relative; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#1D9E75" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Fish Store" />
+    <meta name="description" content="Mama's Fish Business Tracker" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <title>Mama's Fish Store</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap");
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+      :root {
+        --teal: #1d9e75;
+        --teal-light: #e1f5ee;
+        --teal-dark: #085041;
+        --amber: #ba7517;
+        --amber-light: #faeeda;
+        --amber-dark: #633806;
+        --red: #e24b4a;
+        --red-light: #fcebeb;
+        --green: #3b6d11;
+        --green-light: #eaf3de;
+        --blue: #185fa5;
+        --blue-light: #e6f1fb;
+        --bg: #f5f5f0;
+        --surface: #ffffff;
+        --border: rgba(0, 0, 0, 0.1);
+        --border-strong: rgba(0, 0, 0, 0.18);
+        --text: #1a1a1a;
+        --text-2: #555;
+        --text-3: #888;
+        --radius: 12px;
+        --radius-sm: 8px;
+        --radius-pill: 20px;
+        --font: "DM Sans", sans-serif;
+      }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 16px;
+      }
+      #app {
+        height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        max-width: 430px;
+        margin: 0 auto;
+        background: var(--bg);
+        position: relative;
+      }
 
-    /* HEADER */
-    .header { background: var(--surface); border-bottom: 0.5px solid var(--border); padding: 14px 16px 10px; flex-shrink: 0; }
-    .header-row { display: flex; align-items: center; justify-content: space-between; }
-    .app-name { font-size: 18px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; }
-    .app-name span { font-size: 22px; }
-    .app-date { font-size: 12px; color: var(--text-3); margin-top: 1px; }
-    .header-badge { background: var(--teal-light); color: var(--teal-dark); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: var(--radius-pill); }
+      /* HEADER */
+      .header {
+        background: var(--surface);
+        border-bottom: 0.5px solid var(--border);
+        padding: 14px 16px 10px;
+        flex-shrink: 0;
+      }
+      .header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .app-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .app-name span {
+        font-size: 22px;
+      }
+      .app-date {
+        font-size: 12px;
+        color: var(--text-3);
+        margin-top: 1px;
+      }
+      .header-badge {
+        background: var(--teal-light);
+        color: var(--teal-dark);
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+      }
 
-    /* NAV */
-    .nav { display: flex; background: var(--surface); border-top: 0.5px solid var(--border); flex-shrink: 0; order: 10; }
-    .nav-btn { flex: 1; border: none; background: none; cursor: pointer; padding: 8px 2px 10px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-family: var(--font); color: var(--text-3); transition: color 0.15s; }
-    .nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-    .nav-btn.active { color: var(--teal); }
-    .nav-btn.active svg { stroke-width: 2.2; }
+      /* NAV */
+      .nav {
+        display: flex;
+        background: var(--surface);
+        border-top: 0.5px solid var(--border);
+        flex-shrink: 0;
+        order: 10;
+      }
+      .nav-btn {
+        flex: 1;
+        border: none;
+        background: none;
+        cursor: pointer;
+        padding: 8px 2px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        font-size: 10px;
+        font-family: var(--font);
+        color: var(--text-3);
+        transition: color 0.15s;
+      }
+      .nav-btn svg {
+        width: 22px;
+        height: 22px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .nav-btn.active {
+        color: var(--teal);
+      }
+      .nav-btn.active svg {
+        stroke-width: 2.2;
+      }
 
-    /* CONTENT */
-    .content { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 12px; }
-    .screen { display: none; }
-    .screen.active { display: block; }
+      /* CONTENT */
+      .content {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding: 12px;
+      }
+      .screen {
+        display: none;
+      }
+      .screen.active {
+        display: block;
+      }
 
-    /* CARDS */
-    .card { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); padding: 14px 16px; margin-bottom: 10px; }
-    .card-title { font-size: 12px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-    .card-title svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+      /* CARDS */
+      .card {
+        background: var(--surface);
+        border-radius: var(--radius);
+        border: 0.5px solid var(--border);
+        padding: 14px 16px;
+        margin-bottom: 10px;
+      }
+      .card-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-3);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .card-title svg {
+        width: 15px;
+        height: 15px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
 
-    /* STATS */
-    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-    .stat { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); padding: 12px 14px; }
-    .stat-label { font-size: 11px; color: var(--text-3); font-weight: 500; }
-    .stat-val { font-size: 22px; font-weight: 600; margin-top: 2px; }
-    .c-teal { color: var(--teal); }
-    .c-red { color: var(--red); }
-    .c-amber { color: var(--amber); }
+      /* STATS */
+      .stat-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .stat {
+        background: var(--surface);
+        border-radius: var(--radius);
+        border: 0.5px solid var(--border);
+        padding: 12px 14px;
+      }
+      .stat-label {
+        font-size: 11px;
+        color: var(--text-3);
+        font-weight: 500;
+      }
+      .stat-val {
+        font-size: 22px;
+        font-weight: 600;
+        margin-top: 2px;
+      }
+      .c-teal {
+        color: var(--teal);
+      }
+      .c-red {
+        color: var(--red);
+      }
+      .c-amber {
+        color: var(--amber);
+      }
 
-    /* FORM */
-    .form-group { margin-bottom: 12px; }
-    .form-label { font-size: 13px; font-weight: 500; color: var(--text-2); display: block; margin-bottom: 5px; }
-    .form-input { width: 100%; font-size: 15px; font-family: var(--font); padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); outline: none; transition: border-color 0.15s; -webkit-appearance: none; }
-    .form-input:focus { border-color: var(--teal); }
-    .form-input[readonly] { background: var(--bg); color: var(--teal); font-weight: 600; }
-    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .total-display { background: var(--teal-light); border: 1px solid rgba(29,158,117,0.3); border-radius: var(--radius-sm); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .total-label { font-size: 13px; color: var(--teal-dark); font-weight: 500; }
-    .total-amount { font-size: 20px; font-weight: 700; color: var(--teal); }
+      /* FORM */
+      .form-group {
+        margin-bottom: 12px;
+      }
+      .form-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-2);
+        display: block;
+        margin-bottom: 5px;
+      }
+      .form-input {
+        width: 100%;
+        font-size: 15px;
+        font-family: var(--font);
+        padding: 10px 12px;
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-sm);
+        background: var(--surface);
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.15s;
+        -webkit-appearance: none;
+      }
+      .form-input:focus {
+        border-color: var(--teal);
+      }
+      .form-input[readonly] {
+        background: var(--bg);
+        color: var(--teal);
+        font-weight: 600;
+      }
+      .row2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .total-display {
+        background: var(--teal-light);
+        border: 1px solid rgba(29, 158, 117, 0.3);
+        border-radius: var(--radius-sm);
+        padding: 10px 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .total-label {
+        font-size: 13px;
+        color: var(--teal-dark);
+        font-weight: 500;
+      }
+      .total-amount {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--teal);
+      }
 
-    /* BUTTONS */
-    .btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 12px; border-radius: var(--radius-sm); font-size: 15px; font-family: var(--font); font-weight: 600; cursor: pointer; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); transition: all 0.15s; }
-    .btn:active { transform: scale(0.98); }
-    .btn.primary { background: var(--teal); color: #fff; border-color: var(--teal); }
-    .btn.primary:active { background: var(--teal-dark); }
-    .btn.danger { border-color: var(--red); color: var(--red); }
-    .btn.sm { padding: 7px 12px; font-size: 12px; width: auto; border-radius: var(--radius-pill); }
-    .btn-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-    .btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+      /* BUTTONS */
+      .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+        padding: 12px;
+        border-radius: var(--radius-sm);
+        font-size: 15px;
+        font-family: var(--font);
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid var(--border-strong);
+        background: var(--surface);
+        color: var(--text);
+        transition: all 0.15s;
+      }
+      .btn:active {
+        transform: scale(0.98);
+      }
+      .btn.primary {
+        background: var(--teal);
+        color: #fff;
+        border-color: var(--teal);
+      }
+      .btn.primary:active {
+        background: var(--teal-dark);
+      }
+      .btn.danger {
+        border-color: var(--red);
+        color: var(--red);
+      }
+      .btn.sm {
+        padding: 7px 12px;
+        font-size: 12px;
+        width: auto;
+        border-radius: var(--radius-pill);
+      }
+      .btn-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
+      .btn svg {
+        width: 18px;
+        height: 18px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
 
-    /* PILLS */
-    .pill { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: var(--radius-pill); display: inline-block; }
-    .pill.fresh { background: var(--blue-light); color: var(--blue); }
-    .pill.drying { background: var(--amber-light); color: var(--amber-dark); }
-    .pill.ready { background: var(--teal-light); color: var(--teal-dark); }
-    .pill.collected { background: #f0f0f0; color: var(--text-2); }
-    .pill.paid { background: var(--green-light); color: var(--green); }
-    .pill.debt { background: var(--red-light); color: var(--red); }
+      /* PILLS */
+      .pill {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 9px;
+        border-radius: var(--radius-pill);
+        display: inline-block;
+      }
+      .pill.fresh {
+        background: var(--blue-light);
+        color: var(--blue);
+      }
+      .pill.drying {
+        background: var(--amber-light);
+        color: var(--amber-dark);
+      }
+      .pill.ready {
+        background: var(--teal-light);
+        color: var(--teal-dark);
+      }
+      .pill.collected {
+        background: #f0f0f0;
+        color: var(--text-2);
+      }
+      .pill.paid {
+        background: var(--green-light);
+        color: var(--green);
+      }
+      .pill.debt {
+        background: var(--red-light);
+        color: var(--red);
+      }
 
-    /* ITEM ROWS */
-    .item-row { display: flex; align-items: flex-start; justify-content: space-between; padding: 12px 0; border-bottom: 0.5px solid var(--border); cursor: pointer; }
-    .item-row:last-child { border-bottom: none; padding-bottom: 0; }
-    .item-row:first-child { padding-top: 0; }
-    .item-name { font-size: 14px; font-weight: 600; color: var(--text); }
-    .item-meta { font-size: 12px; color: var(--text-3); margin-top: 3px; line-height: 1.5; }
-    .item-right { text-align: right; flex-shrink: 0; margin-left: 10px; }
-    .item-amount { font-size: 15px; font-weight: 600; color: var(--text); }
+      /* ITEM ROWS */
+      .item-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 0.5px solid var(--border);
+        cursor: pointer;
+      }
+      .item-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      .item-row:first-child {
+        padding-top: 0;
+      }
+      .item-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+      }
+      .item-meta {
+        font-size: 12px;
+        color: var(--text-3);
+        margin-top: 3px;
+        line-height: 1.5;
+      }
+      .item-right {
+        text-align: right;
+        flex-shrink: 0;
+        margin-left: 10px;
+      }
+      .item-amount {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text);
+      }
 
-    /* ALERT BAR */
-    .alert-bar { display: flex; align-items: center; gap: 10px; background: var(--amber-light); border: 0.5px solid #FAC775; border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px; }
-    .alert-bar svg { width: 20px; height: 20px; stroke: var(--amber); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
-    .alert-text { font-size: 13px; color: var(--amber-dark); font-weight: 500; }
+      /* ALERT BAR */
+      .alert-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--amber-light);
+        border: 0.5px solid #fac775;
+        border-radius: var(--radius);
+        padding: 12px 14px;
+        margin-bottom: 10px;
+      }
+      .alert-bar svg {
+        width: 20px;
+        height: 20px;
+        stroke: var(--amber);
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        flex-shrink: 0;
+      }
+      .alert-text {
+        font-size: 13px;
+        color: var(--amber-dark);
+        font-weight: 500;
+      }
 
-    /* TABS */
-    .tab-row { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px; }
-    .tab-row::-webkit-scrollbar { display: none; }
-    .tab { padding: 7px 14px; border: 1px solid var(--border-strong); border-radius: var(--radius-pill); background: var(--surface); font-size: 13px; font-family: var(--font); font-weight: 500; cursor: pointer; color: var(--text-2); white-space: nowrap; transition: all 0.15s; }
-    .tab.active { background: var(--teal); border-color: var(--teal); color: #fff; }
+      /* TABS */
+      .tab-row {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 12px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+      .tab-row::-webkit-scrollbar {
+        display: none;
+      }
+      .tab {
+        padding: 7px 14px;
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-pill);
+        background: var(--surface);
+        font-size: 13px;
+        font-family: var(--font);
+        font-weight: 500;
+        cursor: pointer;
+        color: var(--text-2);
+        white-space: nowrap;
+        transition: all 0.15s;
+      }
+      .tab.active {
+        background: var(--teal);
+        border-color: var(--teal);
+        color: #fff;
+      }
 
-    /* MODAL */
-    .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 50; align-items: flex-end; justify-content: center; }
-    .modal-bg.open { display: flex; }
-    .modal { background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; padding: 20px 16px 32px; width: 100%; max-width: 430px; max-height: 85dvh; overflow-y: auto; }
-    .modal-handle { width: 36px; height: 4px; background: var(--border-strong); border-radius: 2px; margin: 0 auto 16px; }
-    .modal-title { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
-    .modal-close { float: right; background: none; border: none; font-size: 13px; font-family: var(--font); cursor: pointer; color: var(--text-3); padding: 2px 6px; border: 1px solid var(--border); border-radius: var(--radius-pill); }
-    .detail-table { width: 100%; font-size: 14px; border-collapse: collapse; }
-    .detail-table td { padding: 8px 0; border-bottom: 0.5px solid var(--border); }
-    .detail-table tr:last-child td { border-bottom: none; }
-    .detail-table .dt-label { color: var(--text-3); font-weight: 500; width: 40%; }
-    .detail-table .dt-val { text-align: right; font-weight: 500; }
+      /* MODAL */
+      .modal-bg {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 50;
+        align-items: flex-end;
+        justify-content: center;
+      }
+      .modal-bg.open {
+        display: flex;
+      }
+      .modal {
+        background: var(--surface);
+        border-radius: var(--radius) var(--radius) 0 0;
+        padding: 20px 16px 32px;
+        width: 100%;
+        max-width: 430px;
+        max-height: 85dvh;
+        overflow-y: auto;
+      }
+      .modal-handle {
+        width: 36px;
+        height: 4px;
+        background: var(--border-strong);
+        border-radius: 2px;
+        margin: 0 auto 16px;
+      }
+      .modal-title {
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 14px;
+      }
+      .modal-close {
+        float: right;
+        background: none;
+        border: none;
+        font-size: 13px;
+        font-family: var(--font);
+        cursor: pointer;
+        color: var(--text-3);
+        padding: 2px 6px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-pill);
+      }
+      .detail-table {
+        width: 100%;
+        font-size: 14px;
+        border-collapse: collapse;
+      }
+      .detail-table td {
+        padding: 8px 0;
+        border-bottom: 0.5px solid var(--border);
+      }
+      .detail-table tr:last-child td {
+        border-bottom: none;
+      }
+      .detail-table .dt-label {
+        color: var(--text-3);
+        font-weight: 500;
+        width: 40%;
+      }
+      .detail-table .dt-val {
+        text-align: right;
+        font-weight: 500;
+      }
 
-    /* EMPTY */
-    .empty { text-align: center; padding: 40px 20px; }
-    .empty svg { width: 40px; height: 40px; stroke: var(--text-3); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; margin-bottom: 10px; opacity: 0.5; }
-    .empty p { font-size: 13px; color: var(--text-3); line-height: 1.6; }
+      /* EMPTY */
+      .empty {
+        text-align: center;
+        padding: 40px 20px;
+      }
+      .empty svg {
+        width: 40px;
+        height: 40px;
+        stroke: var(--text-3);
+        fill: none;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        margin-bottom: 10px;
+        opacity: 0.5;
+      }
+      .empty p {
+        font-size: 13px;
+        color: var(--text-3);
+        line-height: 1.6;
+      }
 
-    /* TOAST */
-    .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(10px); background: #1a1a1a; color: #fff; padding: 10px 18px; border-radius: var(--radius-pill); font-size: 13px; font-weight: 500; z-index: 100; opacity: 0; transition: all 0.25s; pointer-events: none; white-space: nowrap; max-width: 90%; text-align: center; }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+      /* TOAST */
+      .toast {
+        position: fixed;
+        bottom: 90px;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        background: #1a1a1a;
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: var(--radius-pill);
+        font-size: 13px;
+        font-weight: 500;
+        z-index: 100;
+        opacity: 0;
+        transition: all 0.25s;
+        pointer-events: none;
+        white-space: nowrap;
+        max-width: 90%;
+        text-align: center;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
 
-    /* SECTION LABEL */
-    .section-label { font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin: 16px 0 8px; }
+      /* SECTION LABEL */
+      .section-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-3);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin: 16px 0 8px;
+      }
 
-    /* DEBT CARD */
-    .debt-card { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); padding: 14px 16px; margin-bottom: 10px; }
-    .debt-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-    .debt-name { font-size: 15px; font-weight: 700; }
-    .debt-amount { font-size: 18px; font-weight: 700; color: var(--red); }
-    .debt-meta { font-size: 12px; color: var(--text-3); margin-top: 2px; }
-    .debt-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+      /* DEBT CARD */
+      .debt-card {
+        background: var(--surface);
+        border-radius: var(--radius);
+        border: 0.5px solid var(--border);
+        padding: 14px 16px;
+        margin-bottom: 10px;
+      }
+      .debt-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+      }
+      .debt-name {
+        font-size: 15px;
+        font-weight: 700;
+      }
+      .debt-amount {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--red);
+      }
+      .debt-meta {
+        font-size: 12px;
+        color: var(--text-3);
+        margin-top: 2px;
+      }
+      .debt-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
 
-    select.form-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
-  </style>
-</head>
-<body>
-<div id="app">
-  <header class="header">
-    <div class="header-row">
-      <div>
-        <div class="app-name"><span>🐟</span> Mama's Fish Store</div>
-        <div class="app-date" id="header-date"></div>
+      select.form-input {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 32px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <header class="header">
+        <div class="header-row">
+          <div>
+            <div class="app-name"><span>🐟</span> Mummy J's Fish Store</div>
+            <div class="app-date" id="header-date"></div>
+          </div>
+          <div class="header-badge" id="debt-badge" style="display: none"></div>
+        </div>
+      </header>
+
+      <div class="content">
+        <!-- HOME -->
+        <section class="screen active" id="screen-home">
+          <div id="home-alerts"></div>
+          <div class="stat-grid">
+            <div class="stat">
+              <div class="stat-label">In stock</div>
+              <div class="stat-val c-teal" id="s-stock">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Total debts</div>
+              <div class="stat-val c-red" id="s-debts">₦0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Ready to collect</div>
+              <div class="stat-val c-amber" id="s-ready">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Sales today</div>
+              <div class="stat-val c-teal" id="s-today">₦0</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+              Recent activity
+            </div>
+            <div id="home-recent"></div>
+          </div>
+        </section>
+
+        <!-- ADD INTAKE -->
+        <section class="screen" id="screen-intake">
+          <div class="card">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              New intake
+            </div>
+            <div class="form-group">
+              <label class="form-label">Customer / supplier name *</label>
+              <input
+                class="form-input"
+                id="in-name"
+                type="text"
+                placeholder="e.g. Alhaji Musa"
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone number</label>
+              <input
+                class="form-input"
+                id="in-phone"
+                type="tel"
+                placeholder="e.g. 08012345678"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Product *</label>
+              <select class="form-input" id="in-type">
+                <option value="">Select product...</option>
+                <optgroup label="🐟 Fresh Fish">
+                  <option>Catfish (fresh)</option>
+                  <option>Tilapia (fresh)</option>
+                  <option>Croaker (fresh)</option>
+                  <option>Mackerel (fresh)</option>
+                  <option>Sardine (fresh)</option>
+                  <option>Carp (fresh)</option>
+                </optgroup>
+                <optgroup label="🥩 Meat">
+                  <option>Goat meat</option>
+                  <option>Beef</option>
+                  <option>Chicken</option>
+                  <option>Turkey</option>
+                  <option>Pork</option>
+                </optgroup>
+                <optgroup label="🐠 Dried/Smoked">
+                  <option>Smoked catfish</option>
+                  <option>Smoked mackerel</option>
+                  <option>Dried stockfish</option>
+                  <option>Dried prawns</option>
+                </optgroup>
+                <optgroup label="🛒 Foodstuff">
+                  <option>Crayfish</option>
+                  <option>Pepper</option>
+                  <option>Palm oil</option>
+                  <option>Tomatoes</option>
+                  <option>Onions</option>
+                  <option>Other foodstuff</option>
+                </optgroup>
+                <option value="Other">Other (specify below)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                >Custom name (if "Other" or to add detail)</label
+              >
+              <input
+                class="form-input"
+                id="in-custom"
+                type="text"
+                placeholder="e.g. Eja Abo, Kote..."
+              />
+            </div>
+            <div class="row2">
+              <div class="form-group">
+                <label class="form-label">Weight (kg)</label>
+                <input
+                  class="form-input"
+                  id="in-weight"
+                  type="number"
+                  placeholder="0.0"
+                  step="0.1"
+                  min="0"
+                  inputmode="decimal"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Count (pcs)</label>
+                <input
+                  class="form-input"
+                  id="in-count"
+                  type="number"
+                  placeholder="0"
+                  min="0"
+                  inputmode="numeric"
+                />
+              </div>
+            </div>
+            <div class="row2">
+              <div class="form-group">
+                <label class="form-label">Price per kg (₦)</label>
+                <input
+                  class="form-input"
+                  id="in-price"
+                  type="number"
+                  placeholder="0"
+                  min="0"
+                  inputmode="numeric"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Discount (₦)</label>
+                <input
+                  class="form-input"
+                  id="in-discount"
+                  type="number"
+                  placeholder="0"
+                  min="0"
+                  inputmode="numeric"
+                />
+              </div>
+            </div>
+            <div class="total-display">
+              <span class="total-label">Total amount</span>
+              <span class="total-amount" id="in-total">₦0</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status on arrival</label>
+              <select class="form-input" id="in-status">
+                <option value="fresh">Fresh — in stock</option>
+                <option value="drying">Straight to drying</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Notes</label>
+              <textarea
+                class="form-input"
+                id="in-notes"
+                rows="2"
+                placeholder="Any extra info..."
+              ></textarea>
+            </div>
+            <button class="btn primary" onclick="addItem()">
+              <svg viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Save intake
+            </button>
+          </div>
+        </section>
+
+        <!-- INVENTORY -->
+        <section class="screen" id="screen-inventory">
+          <div class="tab-row">
+            <button class="tab active" onclick="filterInv('all', this)">
+              All
+            </button>
+            <button class="tab" onclick="filterInv('fresh', this)">
+              Fresh
+            </button>
+            <button class="tab" onclick="filterInv('drying', this)">
+              Drying
+            </button>
+            <button class="tab" onclick="filterInv('ready', this)">
+              Ready
+            </button>
+          </div>
+          <div id="inv-list"></div>
+        </section>
+
+        <!-- TRANSACTIONS -->
+        <section class="screen" id="screen-transactions">
+          <div class="stat-grid">
+            <div class="stat">
+              <div class="stat-label">Total collected</div>
+              <div class="stat-val c-teal" id="tx-coll">₦0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Outstanding</div>
+              <div class="stat-val c-red" id="tx-out">₦0</div>
+            </div>
+          </div>
+          <div class="section-label">Transaction history</div>
+          <div id="tx-list"></div>
+        </section>
+
+        <!-- DEBTS -->
+        <section class="screen" id="screen-debts">
+          <div id="debt-alert-bar"></div>
+          <div id="debt-list"></div>
+        </section>
       </div>
-      <div class="header-badge" id="debt-badge" style="display:none"></div>
-    </div>
-  </header>
 
-  <div class="content">
-
-    <!-- HOME -->
-    <section class="screen active" id="screen-home">
-      <div id="home-alerts"></div>
-      <div class="stat-grid">
-        <div class="stat"><div class="stat-label">In stock</div><div class="stat-val c-teal" id="s-stock">0</div></div>
-        <div class="stat"><div class="stat-label">Total debts</div><div class="stat-val c-red" id="s-debts">₦0</div></div>
-        <div class="stat"><div class="stat-label">Ready to collect</div><div class="stat-val c-amber" id="s-ready">0</div></div>
-        <div class="stat"><div class="stat-label">Sales today</div><div class="stat-val c-teal" id="s-today">₦0</div></div>
-      </div>
-      <div class="card">
-        <div class="card-title">
-          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-          Recent activity
-        </div>
-        <div id="home-recent"></div>
-      </div>
-    </section>
-
-    <!-- ADD INTAKE -->
-    <section class="screen" id="screen-intake">
-      <div class="card">
-        <div class="card-title">
-          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          New intake
-        </div>
-        <div class="form-group">
-          <label class="form-label">Customer / supplier name *</label>
-          <input class="form-input" id="in-name" type="text" placeholder="e.g. Alhaji Musa" autocomplete="off">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Phone number</label>
-          <input class="form-input" id="in-phone" type="tel" placeholder="e.g. 08012345678">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Product *</label>
-          <select class="form-input" id="in-type">
-            <option value="">Select product...</option>
-            <optgroup label="🐟 Fresh Fish">
-              <option>Catfish (fresh)</option><option>Tilapia (fresh)</option>
-              <option>Croaker (fresh)</option><option>Mackerel (fresh)</option>
-              <option>Sardine (fresh)</option><option>Carp (fresh)</option>
-            </optgroup>
-            <optgroup label="🥩 Meat">
-              <option>Goat meat</option><option>Beef</option>
-              <option>Chicken</option><option>Turkey</option><option>Pork</option>
-            </optgroup>
-            <optgroup label="🐠 Dried/Smoked">
-              <option>Smoked catfish</option><option>Smoked mackerel</option>
-              <option>Dried stockfish</option><option>Dried prawns</option>
-            </optgroup>
-            <optgroup label="🛒 Foodstuff">
-              <option>Crayfish</option><option>Pepper</option><option>Palm oil</option>
-              <option>Tomatoes</option><option>Onions</option><option>Other foodstuff</option>
-            </optgroup>
-            <option value="Other">Other (specify below)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Custom name (if "Other" or to add detail)</label>
-          <input class="form-input" id="in-custom" type="text" placeholder="e.g. Eja Abo, Kote...">
-        </div>
-        <div class="row2">
-          <div class="form-group">
-            <label class="form-label">Weight (kg)</label>
-            <input class="form-input" id="in-weight" type="number" placeholder="0.0" step="0.1" min="0" inputmode="decimal">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Count (pcs)</label>
-            <input class="form-input" id="in-count" type="number" placeholder="0" min="0" inputmode="numeric">
-          </div>
-        </div>
-        <div class="row2">
-          <div class="form-group">
-            <label class="form-label">Price per kg (₦)</label>
-            <input class="form-input" id="in-price" type="number" placeholder="0" min="0" inputmode="numeric">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Discount (₦)</label>
-            <input class="form-input" id="in-discount" type="number" placeholder="0" min="0" inputmode="numeric">
-          </div>
-        </div>
-        <div class="total-display">
-          <span class="total-label">Total amount</span>
-          <span class="total-amount" id="in-total">₦0</span>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Status on arrival</label>
-          <select class="form-input" id="in-status">
-            <option value="fresh">Fresh — in stock</option>
-            <option value="drying">Straight to drying</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Notes</label>
-          <textarea class="form-input" id="in-notes" rows="2" placeholder="Any extra info..."></textarea>
-        </div>
-        <button class="btn primary" onclick="addItem()">
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          Save intake
+      <nav class="nav">
+        <button class="nav-btn active" onclick="showScreen('home')">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          Home
         </button>
+        <button class="nav-btn" onclick="showScreen('intake')">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+          Add
+        </button>
+        <button class="nav-btn" onclick="showScreen('inventory')">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+            ></path>
+          </svg>
+          Stock
+        </button>
+        <button class="nav-btn" onclick="showScreen('transactions')">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+            ></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          Sales
+        </button>
+        <button class="nav-btn" onclick="showScreen('debts')">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          Debts
+        </button>
+      </nav>
+    </div>
+
+    <div class="modal-bg" id="modal-bg" onclick="handleModalClick(event)">
+      <div class="modal" id="modal-inner">
+        <div class="modal-handle"></div>
+        <div id="modal-body"></div>
       </div>
-    </section>
+    </div>
 
-    <!-- INVENTORY -->
-    <section class="screen" id="screen-inventory">
-      <div class="tab-row">
-        <button class="tab active" onclick="filterInv('all',this)">All</button>
-        <button class="tab" onclick="filterInv('fresh',this)">Fresh</button>
-        <button class="tab" onclick="filterInv('drying',this)">Drying</button>
-        <button class="tab" onclick="filterInv('ready',this)">Ready</button>
-      </div>
-      <div id="inv-list"></div>
-    </section>
+    <div class="toast" id="toast"></div>
 
-    <!-- TRANSACTIONS -->
-    <section class="screen" id="screen-transactions">
-      <div class="stat-grid">
-        <div class="stat"><div class="stat-label">Total collected</div><div class="stat-val c-teal" id="tx-coll">₦0</div></div>
-        <div class="stat"><div class="stat-label">Outstanding</div><div class="stat-val c-red" id="tx-out">₦0</div></div>
-      </div>
-      <div class="section-label">Transaction history</div>
-      <div id="tx-list"></div>
-    </section>
+    <script>
+      // ── STATE & STORAGE ────────────────────────────────────────────────────────
+      let state = { items: [], nextId: 1 };
 
-    <!-- DEBTS -->
-    <section class="screen" id="screen-debts">
-      <div id="debt-alert-bar"></div>
-      <div id="debt-list"></div>
-    </section>
+      function save() {
+        try {
+          localStorage.setItem("fishstore_v1", JSON.stringify(state));
+        } catch (e) {}
+      }
+      function load() {
+        try {
+          const d = localStorage.getItem("fishstore_v1");
+          if (d) state = JSON.parse(d);
+        } catch (e) {}
+      }
+      load();
 
-  </div>
+      // ── HELPERS ────────────────────────────────────────────────────────────────
+      const fmt = (n) => "₦" + Math.round(n).toLocaleString("en-NG");
+      const statusLabel = (s) =>
+        ({
+          fresh: "In stock",
+          drying: "Drying",
+          ready: "Ready to collect",
+          collected: "Collected",
+        })[s] || s;
+      function timeAgo(iso) {
+        const s = (Date.now() - new Date(iso)) / 1000;
+        if (s < 60) return "just now";
+        if (s < 3600) return Math.floor(s / 60) + "m ago";
+        if (s < 86400) return Math.floor(s / 3600) + "h ago";
+        return Math.floor(s / 86400) + "d ago";
+      }
+      function todayStr() {
+        return new Date().toLocaleDateString("en-NG", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+      }
+      function shortDate(iso) {
+        return new Date(iso).toLocaleDateString("en-NG", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+      }
 
-  <nav class="nav">
-    <button class="nav-btn active" onclick="showScreen('home')">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-      Home
-    </button>
-    <button class="nav-btn" onclick="showScreen('intake')">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-      Add
-    </button>
-    <button class="nav-btn" onclick="showScreen('inventory')">
-      <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-      Stock
-    </button>
-    <button class="nav-btn" onclick="showScreen('transactions')">
-      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-      Sales
-    </button>
-    <button class="nav-btn" onclick="showScreen('debts')">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-      Debts
-    </button>
-  </nav>
-</div>
+      document.getElementById("header-date").textContent = todayStr();
 
-<div class="modal-bg" id="modal-bg" onclick="handleModalClick(event)">
-  <div class="modal" id="modal-inner">
-    <div class="modal-handle"></div>
-    <div id="modal-body"></div>
-  </div>
-</div>
+      // ── CALC TOTAL ─────────────────────────────────────────────────────────────
+      ["in-weight", "in-price", "in-discount"].forEach((id) => {
+        document.getElementById(id).addEventListener("input", calcTotal);
+      });
+      function calcTotal() {
+        const w = parseFloat(document.getElementById("in-weight").value) || 0;
+        const p = parseFloat(document.getElementById("in-price").value) || 0;
+        const d = parseFloat(document.getElementById("in-discount").value) || 0;
+        document.getElementById("in-total").textContent = fmt(
+          Math.max(0, w * p - d),
+        );
+      }
 
-<div class="toast" id="toast"></div>
+      // ── NAV ────────────────────────────────────────────────────────────────────
+      function showScreen(name) {
+        document
+          .querySelectorAll(".screen")
+          .forEach((s) => s.classList.remove("active"));
+        document
+          .querySelectorAll(".nav-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document.getElementById("screen-" + name).classList.add("active");
+        const idx = [
+          "home",
+          "intake",
+          "inventory",
+          "transactions",
+          "debts",
+        ].indexOf(name);
+        document.querySelectorAll(".nav-btn")[idx].classList.add("active");
+        const renders = {
+          home: renderHome,
+          inventory: () => renderInventory("all"),
+          transactions: renderTransactions,
+          debts: renderDebts,
+        };
+        if (renders[name]) renders[name]();
+      }
 
-<script>
-// ── STATE & STORAGE ────────────────────────────────────────────────────────
-let state = { items: [], nextId: 1 };
+      // ── ADD ITEM ───────────────────────────────────────────────────────────────
+      function addItem() {
+        const name = document.getElementById("in-name").value.trim();
+        const phone = document.getElementById("in-phone").value.trim();
+        const typeSelect = document.getElementById("in-type").value;
+        const typeCustom = document.getElementById("in-custom").value.trim();
+        const type = typeCustom || typeSelect;
+        const weight =
+          parseFloat(document.getElementById("in-weight").value) || 0;
+        const count = parseInt(document.getElementById("in-count").value) || 0;
+        const price =
+          parseFloat(document.getElementById("in-price").value) || 0;
+        const discount =
+          parseFloat(document.getElementById("in-discount").value) || 0;
+        const status = document.getElementById("in-status").value;
+        const notes = document.getElementById("in-notes").value.trim();
+        if (!name) {
+          showToast("Please enter the customer name");
+          return;
+        }
+        if (!type) {
+          showToast("Please select a product");
+          return;
+        }
+        const total = Math.max(0, weight * price - discount);
+        const item = {
+          id: state.nextId++,
+          name,
+          phone,
+          type,
+          weight,
+          count,
+          price,
+          discount,
+          total,
+          status,
+          notes,
+          createdAt: new Date().toISOString(),
+          collectedAt: null,
+          paidAt: null,
+          paid: false,
+        };
+        state.items.unshift(item);
+        save();
+        [
+          "in-name",
+          "in-phone",
+          "in-custom",
+          "in-weight",
+          "in-count",
+          "in-price",
+          "in-discount",
+          "in-notes",
+        ].forEach((id) => (document.getElementById(id).value = ""));
+        document.getElementById("in-type").value = "";
+        document.getElementById("in-status").value = "fresh";
+        document.getElementById("in-total").textContent = "₦0";
+        showToast("✓ Intake saved for " + name);
+        showScreen("inventory");
+      }
 
-function save() { try { localStorage.setItem('fishstore_v1', JSON.stringify(state)); } catch(e){} }
-function load() {
-  try {
-    const d = localStorage.getItem('fishstore_v1');
-    if(d) state = JSON.parse(d);
-  } catch(e) {}
-}
-load();
-
-// ── HELPERS ────────────────────────────────────────────────────────────────
-const fmt = n => '₦' + Math.round(n).toLocaleString('en-NG');
-const statusLabel = s => ({fresh:'In stock',drying:'Drying',ready:'Ready to collect',collected:'Collected'}[s]||s);
-function timeAgo(iso) {
-  const s = (Date.now() - new Date(iso)) / 1000;
-  if(s < 60) return 'just now';
-  if(s < 3600) return Math.floor(s/60) + 'm ago';
-  if(s < 86400) return Math.floor(s/3600) + 'h ago';
-  return Math.floor(s/86400) + 'd ago';
-}
-function todayStr() {
-  return new Date().toLocaleDateString('en-NG', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
-}
-function shortDate(iso) {
-  return new Date(iso).toLocaleDateString('en-NG', {day:'numeric', month:'short', year:'numeric'});
-}
-
-document.getElementById('header-date').textContent = todayStr();
-
-// ── CALC TOTAL ─────────────────────────────────────────────────────────────
-['in-weight','in-price','in-discount'].forEach(id => {
-  document.getElementById(id).addEventListener('input', calcTotal);
-});
-function calcTotal() {
-  const w = parseFloat(document.getElementById('in-weight').value) || 0;
-  const p = parseFloat(document.getElementById('in-price').value) || 0;
-  const d = parseFloat(document.getElementById('in-discount').value) || 0;
-  document.getElementById('in-total').textContent = fmt(Math.max(0, w * p - d));
-}
-
-// ── NAV ────────────────────────────────────────────────────────────────────
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
-  const idx = ['home','intake','inventory','transactions','debts'].indexOf(name);
-  document.querySelectorAll('.nav-btn')[idx].classList.add('active');
-  const renders = { home: renderHome, inventory: () => renderInventory('all'), transactions: renderTransactions, debts: renderDebts };
-  if(renders[name]) renders[name]();
-}
-
-// ── ADD ITEM ───────────────────────────────────────────────────────────────
-function addItem() {
-  const name = document.getElementById('in-name').value.trim();
-  const phone = document.getElementById('in-phone').value.trim();
-  const typeSelect = document.getElementById('in-type').value;
-  const typeCustom = document.getElementById('in-custom').value.trim();
-  const type = typeCustom || typeSelect;
-  const weight = parseFloat(document.getElementById('in-weight').value) || 0;
-  const count = parseInt(document.getElementById('in-count').value) || 0;
-  const price = parseFloat(document.getElementById('in-price').value) || 0;
-  const discount = parseFloat(document.getElementById('in-discount').value) || 0;
-  const status = document.getElementById('in-status').value;
-  const notes = document.getElementById('in-notes').value.trim();
-  if(!name) { showToast('Please enter the customer name'); return; }
-  if(!type) { showToast('Please select a product'); return; }
-  const total = Math.max(0, weight * price - discount);
-  const item = {
-    id: state.nextId++, name, phone, type, weight, count,
-    price, discount, total, status, notes,
-    createdAt: new Date().toISOString(),
-    collectedAt: null, paidAt: null, paid: false
-  };
-  state.items.unshift(item);
-  save();
-  ['in-name','in-phone','in-custom','in-weight','in-count','in-price','in-discount','in-notes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('in-type').value = '';
-  document.getElementById('in-status').value = 'fresh';
-  document.getElementById('in-total').textContent = '₦0';
-  showToast('✓ Intake saved for ' + name);
-  showScreen('inventory');
-}
-
-// ── HOME ───────────────────────────────────────────────────────────────────
-function renderHome() {
-  const inStock = state.items.filter(i => i.status === 'fresh' || i.status === 'drying').length;
-  const ready = state.items.filter(i => i.status === 'ready').length;
-  const debts = state.items.filter(i => i.status === 'collected' && !i.paid).reduce((a,i) => a + i.total, 0);
-  const todayDate = new Date().toDateString();
-  const todaySales = state.items.filter(i => i.paidAt && new Date(i.paidAt).toDateString() === todayDate).reduce((a,i) => a + i.total, 0);
-  document.getElementById('s-stock').textContent = inStock;
-  document.getElementById('s-ready').textContent = ready;
-  document.getElementById('s-debts').textContent = fmt(debts);
-  document.getElementById('s-today').textContent = fmt(todaySales);
-  const debtCount = state.items.filter(i => i.status === 'collected' && !i.paid).length;
-  const badge = document.getElementById('debt-badge');
-  if(debtCount > 0) { badge.style.display = ''; badge.textContent = debtCount + ' debt' + (debtCount > 1 ? 's' : ''); }
-  else badge.style.display = 'none';
-  const alerts = document.getElementById('home-alerts');
-  alerts.innerHTML = '';
-  if(debtCount > 0) alerts.innerHTML = `<div class="alert-bar"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="alert-text">${debtCount} customer${debtCount>1?'s':''} owe payment — check the Debts tab</div></div>`;
-  if(ready > 0) alerts.innerHTML += `<div class="alert-bar" style="background:var(--teal-light);border-color:rgba(29,158,117,0.3)"><svg viewBox="0 0 24 24" style="stroke:var(--teal)"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg><div class="alert-text" style="color:var(--teal-dark)">${ready} item${ready>1?'s':''} ready — notify customers to collect</div></div>`;
-  const recent = document.getElementById('home-recent');
-  if(!state.items.length) { recent.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><p>No activity yet.<br>Tap Add to record your first intake!</p></div>'; return; }
-  recent.innerHTML = state.items.slice(0, 6).map(i => `
+      // ── HOME ───────────────────────────────────────────────────────────────────
+      function renderHome() {
+        const inStock = state.items.filter(
+          (i) => i.status === "fresh" || i.status === "drying",
+        ).length;
+        const ready = state.items.filter((i) => i.status === "ready").length;
+        const debts = state.items
+          .filter((i) => i.status === "collected" && !i.paid)
+          .reduce((a, i) => a + i.total, 0);
+        const todayDate = new Date().toDateString();
+        const todaySales = state.items
+          .filter(
+            (i) => i.paidAt && new Date(i.paidAt).toDateString() === todayDate,
+          )
+          .reduce((a, i) => a + i.total, 0);
+        document.getElementById("s-stock").textContent = inStock;
+        document.getElementById("s-ready").textContent = ready;
+        document.getElementById("s-debts").textContent = fmt(debts);
+        document.getElementById("s-today").textContent = fmt(todaySales);
+        const debtCount = state.items.filter(
+          (i) => i.status === "collected" && !i.paid,
+        ).length;
+        const badge = document.getElementById("debt-badge");
+        if (debtCount > 0) {
+          badge.style.display = "";
+          badge.textContent = debtCount + " debt" + (debtCount > 1 ? "s" : "");
+        } else badge.style.display = "none";
+        const alerts = document.getElementById("home-alerts");
+        alerts.innerHTML = "";
+        if (debtCount > 0)
+          alerts.innerHTML = `<div class="alert-bar"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="alert-text">${debtCount} customer${debtCount > 1 ? "s" : ""} owe payment — check the Debts tab</div></div>`;
+        if (ready > 0)
+          alerts.innerHTML += `<div class="alert-bar" style="background:var(--teal-light);border-color:rgba(29,158,117,0.3)"><svg viewBox="0 0 24 24" style="stroke:var(--teal)"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg><div class="alert-text" style="color:var(--teal-dark)">${ready} item${ready > 1 ? "s" : ""} ready — notify customers to collect</div></div>`;
+        const recent = document.getElementById("home-recent");
+        if (!state.items.length) {
+          recent.innerHTML =
+            '<div class="empty"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><p>No activity yet.<br>Tap Add to record your first intake!</p></div>';
+          return;
+        }
+        recent.innerHTML = state.items
+          .slice(0, 6)
+          .map(
+            (i) => `
     <div class="item-row" onclick="openItem(${i.id})">
       <div>
         <div class="item-name">${i.name} — ${i.type}</div>
         <div class="item-meta">${timeAgo(i.createdAt)} · <span class="pill ${i.status}">${statusLabel(i.status)}</span></div>
       </div>
       <div class="item-right"><div class="item-amount">${fmt(i.total)}</div></div>
-    </div>`).join('');
-}
+    </div>`,
+          )
+          .join("");
+      }
 
-// ── INVENTORY ──────────────────────────────────────────────────────────────
-function renderInventory(filter) {
-  let items = state.items.filter(i => i.status !== 'collected');
-  if(filter !== 'all') items = items.filter(i => i.status === filter);
-  const el = document.getElementById('inv-list');
-  if(!items.length) { el.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg><p>Nothing here yet</p></div>'; return; }
-  el.innerHTML = items.map(i => `
+      // ── INVENTORY ──────────────────────────────────────────────────────────────
+      function renderInventory(filter) {
+        let items = state.items.filter((i) => i.status !== "collected");
+        if (filter !== "all") items = items.filter((i) => i.status === filter);
+        const el = document.getElementById("inv-list");
+        if (!items.length) {
+          el.innerHTML =
+            '<div class="empty"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg><p>Nothing here yet</p></div>';
+          return;
+        }
+        el.innerHTML = items
+          .map(
+            (i) => `
     <div class="card" style="cursor:pointer" onclick="openItem(${i.id})">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div style="flex:1;min-width:0">
           <div class="item-name">${i.type}</div>
-          <div class="item-meta">From: ${i.name}${i.phone ? ' · ' + i.phone : ''}</div>
-          <div class="item-meta">${i.weight ? i.weight + 'kg' : ''} ${i.count ? i.count + 'pcs' : ''} ${i.discount ? '· Disc: ' + fmt(i.discount) : ''}</div>
+          <div class="item-meta">From: ${i.name}${i.phone ? " · " + i.phone : ""}</div>
+          <div class="item-meta">${i.weight ? i.weight + "kg" : ""} ${i.count ? i.count + "pcs" : ""} ${i.discount ? "· Disc: " + fmt(i.discount) : ""}</div>
           <div style="margin-top:6px"><span class="pill ${i.status}">${statusLabel(i.status)}</span></div>
         </div>
         <div style="text-align:right;margin-left:10px;flex-shrink:0">
@@ -467,148 +1161,187 @@ function renderInventory(filter) {
           <div class="item-meta">${timeAgo(i.createdAt)}</div>
         </div>
       </div>
-    </div>`).join('');
-}
+    </div>`,
+          )
+          .join("");
+      }
 
-function filterInv(f, btn) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  renderInventory(f);
-}
+      function filterInv(f, btn) {
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.remove("active"));
+        btn.classList.add("active");
+        renderInventory(f);
+      }
 
-// ── TRANSACTIONS ───────────────────────────────────────────────────────────
-function renderTransactions() {
-  const collected = state.items.filter(i => i.status === 'collected');
-  document.getElementById('tx-coll').textContent = fmt(collected.filter(i => i.paid).reduce((a,i) => a+i.total, 0));
-  document.getElementById('tx-out').textContent = fmt(collected.filter(i => !i.paid).reduce((a,i) => a+i.total, 0));
-  const el = document.getElementById('tx-list');
-  if(!collected.length) { el.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg><p>No transactions yet</p></div>'; return; }
-  el.innerHTML = collected.map(i => `
+      // ── TRANSACTIONS ───────────────────────────────────────────────────────────
+      function renderTransactions() {
+        const collected = state.items.filter((i) => i.status === "collected");
+        document.getElementById("tx-coll").textContent = fmt(
+          collected.filter((i) => i.paid).reduce((a, i) => a + i.total, 0),
+        );
+        document.getElementById("tx-out").textContent = fmt(
+          collected.filter((i) => !i.paid).reduce((a, i) => a + i.total, 0),
+        );
+        const el = document.getElementById("tx-list");
+        if (!collected.length) {
+          el.innerHTML =
+            '<div class="empty"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg><p>No transactions yet</p></div>';
+          return;
+        }
+        el.innerHTML = collected
+          .map(
+            (i) => `
     <div class="card" style="cursor:pointer" onclick="openItem(${i.id})">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div>
           <div class="item-name">${i.name}</div>
-          <div class="item-meta">${i.type}${i.weight ? ' · ' + i.weight + 'kg' : ''}</div>
-          <div class="item-meta">Collected: ${i.collectedAt ? shortDate(i.collectedAt) : '—'}</div>
-          ${i.paid ? '<div class="item-meta" style="color:var(--green)">Paid: ' + (i.paidAt ? shortDate(i.paidAt) : '—') + '</div>' : ''}
+          <div class="item-meta">${i.type}${i.weight ? " · " + i.weight + "kg" : ""}</div>
+          <div class="item-meta">Collected: ${i.collectedAt ? shortDate(i.collectedAt) : "—"}</div>
+          ${i.paid ? '<div class="item-meta" style="color:var(--green)">Paid: ' + (i.paidAt ? shortDate(i.paidAt) : "—") + "</div>" : ""}
         </div>
         <div style="text-align:right">
-          <span class="pill ${i.paid ? 'paid' : 'debt'}">${i.paid ? 'Paid' : 'Unpaid'}</span>
+          <span class="pill ${i.paid ? "paid" : "debt"}">${i.paid ? "Paid" : "Unpaid"}</span>
           <div class="item-amount" style="margin-top:6px">${fmt(i.total)}</div>
         </div>
       </div>
-    </div>`).join('');
-}
+    </div>`,
+          )
+          .join("");
+      }
 
-// ── DEBTS ──────────────────────────────────────────────────────────────────
-function renderDebts() {
-  const debts = state.items.filter(i => i.status === 'collected' && !i.paid);
-  const alertEl = document.getElementById('debt-alert-bar');
-  alertEl.innerHTML = debts.length ? `<div class="alert-bar"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="alert-text">${debts.length} customer${debts.length>1?'s':''} owe you — call and remind them!</div></div>` : '';
-  const el = document.getElementById('debt-list');
-  if(!debts.length) { el.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg><p>No outstanding debts!<br>All payments received 🎉</p></div>'; return; }
-  const total = debts.reduce((a,i) => a+i.total, 0);
-  el.innerHTML = `<div style="background:var(--red-light);border-radius:var(--radius);padding:12px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:var(--red);font-weight:500">Total owed</span><span style="font-size:20px;font-weight:700;color:var(--red)">${fmt(total)}</span></div>` +
-    debts.map(i => `
+      // ── DEBTS ──────────────────────────────────────────────────────────────────
+      function renderDebts() {
+        const debts = state.items.filter(
+          (i) => i.status === "collected" && !i.paid,
+        );
+        const alertEl = document.getElementById("debt-alert-bar");
+        alertEl.innerHTML = debts.length
+          ? `<div class="alert-bar"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="alert-text">${debts.length} customer${debts.length > 1 ? "s" : ""} owe you — call and remind them!</div></div>`
+          : "";
+        const el = document.getElementById("debt-list");
+        if (!debts.length) {
+          el.innerHTML =
+            '<div class="empty"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg><p>No outstanding debts!<br>All payments received 🎉</p></div>';
+          return;
+        }
+        const total = debts.reduce((a, i) => a + i.total, 0);
+        el.innerHTML =
+          `<div style="background:var(--red-light);border-radius:var(--radius);padding:12px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:var(--red);font-weight:500">Total owed</span><span style="font-size:20px;font-weight:700;color:var(--red)">${fmt(total)}</span></div>` +
+          debts
+            .map(
+              (i) => `
     <div class="debt-card">
       <div class="debt-header">
-        <div><div class="debt-name">${i.name}</div><div class="debt-meta">${i.type}${i.weight?' · '+i.weight+'kg':''}</div><div class="debt-meta">Since: ${i.collectedAt ? shortDate(i.collectedAt) : shortDate(i.createdAt)}</div></div>
+        <div><div class="debt-name">${i.name}</div><div class="debt-meta">${i.type}${i.weight ? " · " + i.weight + "kg" : ""}</div><div class="debt-meta">Since: ${i.collectedAt ? shortDate(i.collectedAt) : shortDate(i.createdAt)}</div></div>
         <div class="debt-amount">${fmt(i.total)}</div>
       </div>
       <div class="debt-actions">
-        ${i.phone ? `<button class="btn sm" onclick="callCustomer('${i.phone}','${i.name}')"><svg viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.36 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>` : ''}
+        ${i.phone ? `<button class="btn sm" onclick="callCustomer('${i.phone}','${i.name}')"><svg viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.36 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>` : ""}
         <button class="btn sm primary" onclick="markPaid(${i.id})"><svg viewBox="0 0 24 24" style="width:14px;height:14px"><polyline points="20 6 9 17 4 12"></polyline></svg> Mark paid</button>
         <button class="btn sm" onclick="openItem(${i.id})">View details</button>
       </div>
-    </div>`).join('');
-}
+    </div>`,
+            )
+            .join("");
+      }
 
-// ── ITEM DETAIL MODAL ──────────────────────────────────────────────────────
-function openItem(id) {
-  const i = state.items.find(x => x.id === id);
-  if(!i) return;
-  const actions = getActions(i);
-  document.getElementById('modal-body').innerHTML = `
+      // ── ITEM DETAIL MODAL ──────────────────────────────────────────────────────
+      function openItem(id) {
+        const i = state.items.find((x) => x.id === id);
+        if (!i) return;
+        const actions = getActions(i);
+        document.getElementById("modal-body").innerHTML = `
     <button class="modal-close" onclick="closeModal()">Close</button>
     <div class="modal-title">${i.name}</div>
     <table class="detail-table">
       <tr><td class="dt-label">Product</td><td class="dt-val">${i.type}</td></tr>
-      <tr><td class="dt-label">Weight</td><td class="dt-val">${i.weight ? i.weight + ' kg' : '—'}</td></tr>
-      <tr><td class="dt-label">Count</td><td class="dt-val">${i.count ? i.count + ' pcs' : '—'}</td></tr>
+      <tr><td class="dt-label">Weight</td><td class="dt-val">${i.weight ? i.weight + " kg" : "—"}</td></tr>
+      <tr><td class="dt-label">Count</td><td class="dt-val">${i.count ? i.count + " pcs" : "—"}</td></tr>
       <tr><td class="dt-label">Price/kg</td><td class="dt-val">${fmt(i.price)}</td></tr>
-      ${i.discount ? `<tr><td class="dt-label">Discount</td><td class="dt-val" style="color:var(--red)">- ${fmt(i.discount)}</td></tr>` : ''}
+      ${i.discount ? `<tr><td class="dt-label">Discount</td><td class="dt-val" style="color:var(--red)">- ${fmt(i.discount)}</td></tr>` : ""}
       <tr><td class="dt-label" style="font-weight:600">Total</td><td class="dt-val" style="font-size:18px;font-weight:700;color:var(--teal)">${fmt(i.total)}</td></tr>
       <tr><td class="dt-label">Status</td><td class="dt-val"><span class="pill ${i.status}">${statusLabel(i.status)}</span></td></tr>
-      ${i.phone ? `<tr><td class="dt-label">Phone</td><td class="dt-val" style="color:var(--teal)">${i.phone}</td></tr>` : ''}
+      ${i.phone ? `<tr><td class="dt-label">Phone</td><td class="dt-val" style="color:var(--teal)">${i.phone}</td></tr>` : ""}
       <tr><td class="dt-label">Added</td><td class="dt-val">${shortDate(i.createdAt)}</td></tr>
-      ${i.collectedAt ? `<tr><td class="dt-label">Collected</td><td class="dt-val">${shortDate(i.collectedAt)}</td></tr>` : ''}
-      ${i.paidAt ? `<tr><td class="dt-label">Paid</td><td class="dt-val" style="color:var(--green)">${shortDate(i.paidAt)}</td></tr>` : ''}
-      ${i.notes ? `<tr><td class="dt-label">Notes</td><td class="dt-val">${i.notes}</td></tr>` : ''}
+      ${i.collectedAt ? `<tr><td class="dt-label">Collected</td><td class="dt-val">${shortDate(i.collectedAt)}</td></tr>` : ""}
+      ${i.paidAt ? `<tr><td class="dt-label">Paid</td><td class="dt-val" style="color:var(--green)">${shortDate(i.paidAt)}</td></tr>` : ""}
+      ${i.notes ? `<tr><td class="dt-label">Notes</td><td class="dt-val">${i.notes}</td></tr>` : ""}
     </table>
     <div style="margin-top:14px">${actions}</div>`;
-  document.getElementById('modal-bg').classList.add('open');
-}
+        document.getElementById("modal-bg").classList.add("open");
+      }
 
-function getActions(i) {
-  let html = '';
-  if(i.status === 'fresh') html += `<button class="btn" style="margin-top:8px" onclick="changeStatus(${i.id},'drying')"><svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg> Mark as drying</button>`;
-  if(i.status === 'drying') html += `<button class="btn primary" style="margin-top:8px" onclick="changeStatus(${i.id},'ready')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Mark as ready to collect</button>`;
-  if(i.status === 'ready') {
-    html += `<button class="btn primary" style="margin-top:8px" onclick="changeStatus(${i.id},'collected')"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg> Mark as collected</button>`;
-    if(i.phone) html += `<button class="btn" style="margin-top:8px" onclick="callCustomer('${i.phone}','${i.name}')"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.36 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call to notify ready</button>`;
-  }
-  if(i.status === 'collected' && !i.paid) {
-    html += `<button class="btn primary" style="margin-top:8px" onclick="markPaid(${i.id})"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> Record payment received</button>`;
-    if(i.phone) html += `<button class="btn" style="margin-top:8px" onclick="callCustomer('${i.phone}','${i.name}')"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.36 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call to remind payment</button>`;
-  }
-  return html;
-}
+      function getActions(i) {
+        let html = "";
+        if (i.status === "fresh")
+          html += `<button class="btn" style="margin-top:8px" onclick="changeStatus(${i.id},'drying')"><svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg> Mark as drying</button>`;
+        if (i.status === "drying")
+          html += `<button class="btn primary" style="margin-top:8px" onclick="changeStatus(${i.id},'ready')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Mark as ready to collect</button>`;
+        if (i.status === "ready") {
+          html += `<button class="btn primary" style="margin-top:8px" onclick="changeStatus(${i.id},'collected')"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg> Mark as collected</button>`;
+          if (i.phone)
+            html += `<button class="btn" style="margin-top:8px" onclick="callCustomer('${i.phone}','${i.name}')"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.36 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call to notify ready</button>`;
+        }
+        if (i.status === "collected" && !i.paid) {
+          html += `<button class="btn primary" style="margin-top:8px" onclick="markPaid(${i.id})"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> Record payment received</button>`;
+          if (i.phone)
+            html += `<button class="btn" style="margin-top:8px" onclick="callCustomer('${i.phone}','${i.name}')"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.36 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call to remind payment</button>`;
+        }
+        return html;
+      }
 
-function changeStatus(id, newStatus) {
-  const i = state.items.find(x => x.id === id);
-  if(!i) return;
-  i.status = newStatus;
-  if(newStatus === 'collected') i.collectedAt = new Date().toISOString();
-  save();
-  closeModal();
-  showToast('Updated: ' + statusLabel(newStatus));
-  renderHome();
-}
+      function changeStatus(id, newStatus) {
+        const i = state.items.find((x) => x.id === id);
+        if (!i) return;
+        i.status = newStatus;
+        if (newStatus === "collected") i.collectedAt = new Date().toISOString();
+        save();
+        closeModal();
+        showToast("Updated: " + statusLabel(newStatus));
+        renderHome();
+      }
 
-function markPaid(id) {
-  const i = state.items.find(x => x.id === id);
-  if(!i) return;
-  i.paid = true;
-  i.paidAt = new Date().toISOString();
-  save();
-  closeModal();
-  showToast('Payment recorded for ' + i.name);
-  renderHome();
-  renderDebts();
-}
+      function markPaid(id) {
+        const i = state.items.find((x) => x.id === id);
+        if (!i) return;
+        i.paid = true;
+        i.paidAt = new Date().toISOString();
+        save();
+        closeModal();
+        showToast("Payment recorded for " + i.name);
+        renderHome();
+        renderDebts();
+      }
 
-function callCustomer(phone, name) {
-  showToast('Calling ' + name + '...');
-  setTimeout(() => { window.location.href = 'tel:' + phone; }, 300);
-}
+      function callCustomer(phone, name) {
+        showToast("Calling " + name + "...");
+        setTimeout(() => {
+          window.location.href = "tel:" + phone;
+        }, 300);
+      }
 
-function handleModalClick(e) { if(e.target === document.getElementById('modal-bg')) closeModal(); }
-function closeModal() { document.getElementById('modal-bg').classList.remove('open'); }
+      function handleModalClick(e) {
+        if (e.target === document.getElementById("modal-bg")) closeModal();
+      }
+      function closeModal() {
+        document.getElementById("modal-bg").classList.remove("open");
+      }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 2800);
-}
+      function showToast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => t.classList.remove("show"), 2800);
+      }
 
-// ── SERVICE WORKER ─────────────────────────────────────────────────────────
-if('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
+      // ── SERVICE WORKER ─────────────────────────────────────────────────────────
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js").catch(() => {});
+      }
 
-renderHome();
-</script>
-</body>
+      renderHome();
+    </script>
+  </body>
 </html>
