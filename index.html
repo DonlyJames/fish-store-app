@@ -1071,7 +1071,7 @@
             <div class="app-name">
               🐟 Mummy J's
               <span style="font-size: 10px; color: var(--t3); font-weight: 400"
-                >v2.3</span
+                >v2.4</span
               >
             </div>
             <div class="app-date" id="hdr-date"></div>
@@ -1717,61 +1717,93 @@
       }
       async function syncNow() {
         if (!gToken || isSyncing) return;
+
         isSyncing = true;
+
         setSyncStatus("syncing", "Syncing...");
+
         try {
+          // ─── FIND EXISTING DRIVE FILE ─────────────────────
           if (!gFileId) {
             const list = await gFetch(
               `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id)`,
             );
+
             if (list.files?.length) {
               gFileId = list.files[0].id;
-              const remote = await gFetch(
-                `https://www.googleapis.com/drive/v3/files/${gFileId}?alt=media`,
-              );
-              mergeRemote(remote);
-              renderHome();
             }
           }
+
+          // ─── ALWAYS PULL REMOTE DATA FIRST ───────────────
+          if (gFileId) {
+            const remote = await gFetch(
+              `https://www.googleapis.com/drive/v3/files/${gFileId}?alt=media`,
+            );
+
+            mergeRemote(remote);
+
+            renderHome();
+          }
+
+          // ─── SAVE MERGED STATE ───────────────────────────
           const body = JSON.stringify(state);
+
+          // ─── UPDATE EXISTING FILE ────────────────────────
           if (gFileId) {
             await gFetchRaw(
               `https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`,
               {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                  "Content-Type": "application/json",
+                },
                 body,
               },
             );
           } else {
+            // ─── CREATE NEW DRIVE FILE ─────────────────────
             const meta = await gFetch(
               "https://www.googleapis.com/drive/v3/files",
               {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                  "Content-Type": "application/json",
+                },
                 body: JSON.stringify({
                   name: DRIVE_FILE_NAME,
                   parents: ["appDataFolder"],
                 }),
               },
             );
+
             gFileId = meta.id;
+
             await gFetchRaw(
               `https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`,
               {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                  "Content-Type": "application/json",
+                },
                 body,
               },
             );
           }
+
+          // ─── SAVE LOCAL COPY ─────────────────────────────
           lsave();
+
           setSyncStatus("synced", "Synced ✓");
+
           renderHome();
         } catch (e) {
+          console.error(e);
+
           setSyncStatus("", "Retry sync");
+
           showToast("Sync failed — check connection");
         }
+
         isSyncing = false;
       }
       function mergeRemote(remote) {
