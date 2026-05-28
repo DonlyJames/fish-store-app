@@ -1307,7 +1307,7 @@
         </section>
       </div>
 
-      <nav class="nav" style="min-height: 56x">
+      <nav class="nav" style="min-height: 56px">
         <button class="nb active" onclick="showScreen('home')">
           <svg viewBox="0 0 24 24">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -1533,19 +1533,19 @@
           });
         initFishRows();
         renderHome();
-        if (
-          GOOGLE_CLIENT_ID !==
-          "544090940321-n25niaqnn9pobbv2a91j4tsha807pv22.apps.googleusercontent.com"
-        ) {
-          // Wait for Google script to load then silently sign in
+
+        // ─── AUTO GOOGLE SIGN IN ─────────────────────
+        if (GOOGLE_CLIENT_ID) {
           const tryAutoSignIn = () => {
             if (window.google) {
-              if (localStorage.getItem("fd_gsignin") === "1")
+              if (localStorage.getItem("fd_gsignin") === "1") {
                 signInGoogle(true);
+              }
             } else {
               setTimeout(tryAutoSignIn, 500);
             }
           };
+
           setTimeout(tryAutoSignIn, 800);
         }
       }
