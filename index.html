@@ -1071,7 +1071,7 @@
             <div class="app-name">
               🐟 Mummy J's
               <span style="font-size: 10px; color: var(--t3); font-weight: 400"
-                >v2.6</span
+                >v2.7</span
               >
             </div>
             <div class="app-date" id="hdr-date"></div>
@@ -1686,10 +1686,7 @@
         document.getElementById("sync-label").textContent = lbl;
       }
       function handleSyncClick() {
-        if (
-          GOOGLE_CLIENT_ID ===
-          "544090940321-n25niaqnn9pobbv2a91j4tsha807pv22.apps.googleusercontent.com"
-        ) {
+        if (GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID_HERE") {
           showToast("Add your Google Client ID to enable sync");
           return;
         }
