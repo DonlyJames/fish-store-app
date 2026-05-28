@@ -1046,7 +1046,7 @@
     <!-- NAME SETUP -->
     <div class="setup-overlay" id="setup-overlay">
       <div class="setup-emoji">🐟</div>
-      <div class="setup-title">Welcome to Fish Dryer</div>
+      <div class="setup-title">Welcome to Mummy J's Fish Dryer App</div>
       <div class="setup-sub">
         What's your name? This will be saved on records you add.
       </div>
@@ -1055,7 +1055,7 @@
           class="fi"
           id="setup-name"
           type="text"
-          placeholder="e.g. Mama J, James..."
+          placeholder="e.g. Mama J..."
           style="margin-bottom: 12px; font-size: 16px"
         />
         <button class="btn primary" onclick="saveSetupName()">
@@ -1068,7 +1068,12 @@
       <header class="hdr">
         <div class="hdr-row">
           <div>
-            <div class="app-name">🐟 Fish Dryer</div>
+            <div class="app-name">
+              🐟 Mummy J's Fish Dryer
+              <span style="font-size: 10px; color: var(--t3); font-weight: 400"
+                >v2.0</span
+              >
+            </div>
             <div class="app-date" id="hdr-date"></div>
           </div>
           <div class="hdr-btns">
@@ -1477,7 +1482,8 @@
     <script src="https://accounts.google.com/gsi/client" async></script>
     <script>
       // ─── GOOGLE DRIVE CONFIG ───────────────────────────────────────────────────
-      const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE";
+      const GOOGLE_CLIENT_ID =
+        "544090940321-n25niaqnn9pobbv2a91j4tsha807pv22.apps.googleusercontent.com";
       const DRIVE_FILE_NAME = "fishdryer-data.json";
       const SCOPES = "https://www.googleapis.com/auth/drive.appdata";
       let gToken = null,
@@ -1507,7 +1513,11 @@
       // ─── SETUP ─────────────────────────────────────────────────────────────────
       function initApp() {
         userName = localStorage.getItem("fd_user") || "";
-        darkMode = localStorage.getItem("fd_dark") === "1";
+        const savedDark = localStorage.getItem("fd_dark");
+        darkMode =
+          savedDark !== null
+            ? savedDark === "1"
+            : window.matchMedia("(prefers-color-scheme: dark)").matches;
         if (darkMode) document.documentElement.classList.add("dark");
         updateDarkBtn();
         if (!userName) {
