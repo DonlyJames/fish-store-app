@@ -1533,7 +1533,10 @@
           });
         initFishRows();
         renderHome();
-        if (GOOGLE_CLIENT_ID !== "YOUR_GOOGLE_CLIENT_ID_HERE") {
+        if (
+          GOOGLE_CLIENT_ID !==
+          "544090940321-n25niaqnn9pobbv2a91j4tsha807pv22.apps.googleusercontent.com"
+        ) {
           // Wait for Google script to load then silently sign in
           const tryAutoSignIn = () => {
             if (window.google) {
