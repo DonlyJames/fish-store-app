@@ -1071,7 +1071,7 @@
             <div class="app-name">
               🐟 Mummy J's
               <span style="font-size: 10px; color: var(--t3); font-weight: 400"
-                >v2.4</span
+                >v2.5</span
               >
             </div>
             <div class="app-date" id="hdr-date"></div>
@@ -1693,6 +1693,37 @@
         if (gToken) syncNow();
         else signInGoogle();
       }
+
+      async function pullLatestFromDrive() {
+        if (!gToken) return;
+
+        try {
+          // get file id if missing
+          if (!gFileId) {
+            const list = await gFetch(
+              `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id)`,
+            );
+
+            if (list.files?.length) {
+              gFileId = list.files[0].id;
+            }
+          }
+
+          // always fetch latest data
+          if (gFileId) {
+            const remote = await gFetch(
+              `https://www.googleapis.com/drive/v3/files/${gFileId}?alt=media`,
+            );
+
+            mergeRemote(remote);
+            renderHome();
+            lsave();
+          }
+        } catch (e) {
+          console.log("Pull failed", e);
+        }
+      }
+
       function signInGoogle(silent = false) {
         if (!window.google) {
           if (!silent) showToast("Loading Google... try again in a moment");
@@ -1708,6 +1739,8 @@
               return;
             }
             gToken = r.access_token;
+
+            await pullLatestFromDrive();
             localStorage.setItem("fd_gsignin", "1");
             setSyncStatus("syncing", "Syncing...");
             await syncNow();
@@ -1715,6 +1748,7 @@
         });
         client.requestAccessToken();
       }
+
       async function syncNow() {
         if (!gToken || isSyncing) return;
 
