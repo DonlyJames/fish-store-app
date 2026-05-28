@@ -1071,7 +1071,7 @@
             <div class="app-name">
               🐟 Mummy J's
               <span style="font-size: 10px; color: var(--t3); font-weight: 400"
-                >v2.7</span
+                >v2.8</span
               >
             </div>
             <div class="app-date" id="hdr-date"></div>
@@ -1724,8 +1724,70 @@
         }
       }
 
+      async function syncNow() {
+        if (!gToken || isSyncing) return;
+        isSyncing = true;
+        setSyncStatus("syncing", "Syncing...");
+        try {
+          if (!gFileId) {
+            const list = await gFetch(
+              `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id)`,
+            );
+            if (list.files?.length) gFileId = list.files[0].id;
+          }
+          if (gFileId) {
+            const remote = await gFetch(
+              `https://www.googleapis.com/drive/v3/files/${gFileId}?alt=media`,
+            );
+            mergeRemote(remote);
+            renderHome();
+          }
+          const body = JSON.stringify(state);
+          if (gFileId) {
+            await gFetchRaw(
+              `https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`,
+              {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body,
+              },
+            );
+          } else {
+            const meta = await gFetch(
+              "https://www.googleapis.com/drive/v3/files",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  name: DRIVE_FILE_NAME,
+                  parents: ["appDataFolder"],
+                }),
+              },
+            );
+            gFileId = meta.id;
+            await gFetchRaw(
+              `https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`,
+              {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body,
+              },
+            );
+          }
+          lsave();
+          setSyncStatus("synced", "Synced ✓");
+          renderHome();
+        } catch (e) {
+          console.error(e);
+          setSyncStatus("", "Retry sync");
+          showToast("Sync failed — check connection");
+        }
+        isSyncing = false;
+      }
+
       let gTokenClient = null;
       let gTokenExpiry = 0;
+      let silentSignInTimer = null;
 
       function signInGoogle(silent = false) {
         if (!window.google) {
@@ -1754,6 +1816,12 @@
               scheduleTokenRefresh(r.expires_in - 60);
             },
           });
+        }
+
+        if (silent) {
+          silentSignInTimer = setTimeout(() => {
+            setSyncStatus("", "sign in");
+          }, 5000);
         }
         // silent = skip account picker but user must still have active Google session
         gTokenClient.requestAccessToken({
