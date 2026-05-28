@@ -1,4 +1,4 @@
-const CACHE = "fishdryer-v2.8";
+const CACHE = "fishdryer-v2.9";
 const ASSETS = ["/", "/index.html", "/manifest.json"];
 
 self.addEventListener("install", (e) => {

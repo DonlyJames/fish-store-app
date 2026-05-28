@@ -1071,7 +1071,7 @@
             <div class="app-name">
               🐟 Mummy J's
               <span style="font-size: 10px; color: var(--t3); font-weight: 400"
-                >v2.8</span
+                >v2.9</span
               >
             </div>
             <div class="app-date" id="hdr-date"></div>
@@ -1545,10 +1545,19 @@
             } else {
               setTimeout(tryAutoSignIn, 500);
             }
-          }; // ✅ this closes the arrow function
-          setTimeout(tryAutoSignIn, 1000); // ✅ one call, 1000ms
+          };
+          setTimeout(tryAutoSignIn, 1000);
         }
-      } // ✅ closes the if block
+
+        // ─── BACKGROUND POLLING AUTO-REFRESH ──────────
+        // Periodically pulls changes down from the cloud every 60 seconds
+        setInterval(() => {
+          if (isTokenValid() && !isSyncing) {
+            console.log("Checking cloud for data changes...");
+            pullLatestFromDrive();
+          }
+        }, 60000);
+      }
 
       function saveSetupName() {
         const n = document.getElementById("setup-name").value.trim();
@@ -1685,13 +1694,22 @@
         btn.className = "sync-btn" + (cls ? " " + cls : "");
         document.getElementById("sync-label").textContent = lbl;
       }
-      function handleSyncClick() {
+      async function handleSyncClick() {
         if (GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID_HERE") {
           showToast("Add your Google Client ID to enable sync");
           return;
         }
-        if (isTokenValid()) syncNow();
-        else signInGoogle(false);
+
+        if (isTokenValid()) {
+          setSyncStatus("syncing", "Fetching latest...");
+          // 1. Force fetch whatever is currently sitting on the cloud
+          await pullLatestFromDrive();
+          // 2. Resolve timestamps and upload any pending local states
+          await syncNow();
+          showToast("✓ App data updated");
+        } else {
+          signInGoogle(false);
+        }
       }
 
       async function pullLatestFromDrive() {
@@ -1716,8 +1734,17 @@
             );
 
             mergeRemote(remote);
-            renderHome();
             lsave();
+
+            // Dynamically refresh the layout currently visible to the user
+            const activeScreen = document.querySelector(".screen.active")?.id;
+            if (activeScreen === "screen-home") {
+              renderHome();
+            } else if (activeScreen === "screen-inventory") {
+              renderInventory("all");
+            } else if (activeScreen === "screen-transactions") {
+              renderTransactions();
+            }
           }
         } catch (e) {
           console.log("Pull failed", e);
