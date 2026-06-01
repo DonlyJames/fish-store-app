@@ -6,13 +6,13 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <meta name="theme-color" content="#1D9E75" id="theme-meta" />
+    <meta name="theme-color" content="#1D9E75" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Fish Dryer" />
     <link rel="manifest" href="manifest.json" />
     <link rel="icon" href="icons/icon-192.png" />
-    <title>Fish Dryer</title>
+    <title>Fish Dryer v3.0</title>
     <style>
       @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap");
       *,
@@ -23,7 +23,6 @@
         padding: 0;
         -webkit-tap-highlight-color: transparent;
       }
-
       :root {
         --teal: #1d9e75;
         --teal-l: #e1f5ee;
@@ -37,6 +36,8 @@
         --green-l: #eaf3de;
         --blue: #185fa5;
         --blue-l: #e6f1fb;
+        --purple: #6b3fa0;
+        --purple-l: #f0eaf9;
         --bg: #f5f5f0;
         --surf: #ffffff;
         --surf2: #f9f9f7;
@@ -66,8 +67,8 @@
         --red-l: rgba(226, 75, 74, 0.15);
         --green-l: rgba(59, 109, 17, 0.15);
         --blue-l: rgba(24, 95, 165, 0.15);
+        --purple-l: rgba(107, 63, 160, 0.15);
       }
-
       html,
       body {
         height: 100%;
@@ -75,9 +76,6 @@
         font-family: var(--f);
         background: var(--bg);
         color: var(--t1);
-        transition:
-          background 0.2s,
-          color 0.2s;
       }
       #app {
         height: 100dvh;
@@ -87,8 +85,6 @@
         margin: 0 auto;
         background: var(--bg);
       }
-
-      /* HEADER */
       .hdr {
         background: var(--surf);
         border-bottom: 0.5px solid var(--bdr);
@@ -105,6 +101,11 @@
         font-size: 17px;
         font-weight: 600;
         color: var(--t1);
+      }
+      .app-ver {
+        font-size: 10px;
+        color: var(--t3);
+        font-weight: 400;
       }
       .app-date {
         font-size: 11px;
@@ -167,8 +168,6 @@
         background: currentColor;
         flex-shrink: 0;
       }
-
-      /* UPDATE BANNER */
       .update-banner {
         background: var(--blue);
         color: #fff;
@@ -197,14 +196,13 @@
         cursor: pointer;
         color: #fff;
       }
-
-      /* NAV */
       .nav {
         display: flex;
         background: var(--surf);
         border-top: 0.5px solid var(--bdr);
         flex-shrink: 0;
         order: 10;
+        min-height: 56px;
       }
       .nb {
         flex: 1;
@@ -248,8 +246,6 @@
         border-radius: 10px;
         line-height: 1.4;
       }
-
-      /* CONTENT */
       .content {
         flex: 1;
         overflow-y: auto;
@@ -263,8 +259,6 @@
       .screen.active {
         display: block;
       }
-
-      /* CARDS */
       .card {
         background: var(--surf);
         border-radius: var(--r);
@@ -292,8 +286,6 @@
         stroke-linecap: round;
         stroke-linejoin: round;
       }
-
-      /* STATS */
       .sgrid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -312,7 +304,7 @@
         font-weight: 500;
       }
       .stat-val {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 600;
         margin-top: 2px;
       }
@@ -325,8 +317,9 @@
       .ca {
         color: var(--amber);
       }
-
-      /* FORM */
+      .cp {
+        color: var(--purple);
+      }
       .fg {
         margin-bottom: 10px;
       }
@@ -404,8 +397,6 @@
         font-weight: 700;
         color: var(--teal);
       }
-
-      /* FISH ROWS */
       .fish-rows {
         margin-bottom: 10px;
       }
@@ -415,7 +406,6 @@
         border-radius: var(--rsm);
         padding: 10px 12px;
         margin-bottom: 8px;
-        position: relative;
       }
       .fish-row-header {
         display: flex;
@@ -477,8 +467,6 @@
         stroke-linecap: round;
         stroke-linejoin: round;
       }
-
-      /* BUTTONS */
       .btn {
         display: flex;
         align-items: center;
@@ -529,8 +517,6 @@
         stroke-linecap: round;
         stroke-linejoin: round;
       }
-
-      /* PILLS */
       .pill {
         font-size: 10px;
         font-weight: 600;
@@ -566,8 +552,14 @@
         background: var(--red-l);
         color: var(--red);
       }
-
-      /* ROWS */
+      .pill.cash {
+        background: var(--green-l);
+        color: var(--green);
+      }
+      .pill.credit {
+        background: var(--amber-l);
+        color: var(--amber-d);
+      }
       .itr {
         display: flex;
         align-items: flex-start;
@@ -604,8 +596,6 @@
         font-weight: 600;
         color: var(--t1);
       }
-
-      /* ALERTS */
       .abar {
         display: flex;
         align-items: center;
@@ -631,8 +621,6 @@
         color: var(--amber-d);
         font-weight: 500;
       }
-
-      /* TABS */
       .tabs {
         display: flex;
         gap: 6px;
@@ -660,8 +648,6 @@
         border-color: var(--teal);
         color: #fff;
       }
-
-      /* MODAL */
       .mbg {
         display: none;
         position: fixed;
@@ -738,8 +724,6 @@
         background: var(--bdr);
         margin: 12px 0;
       }
-
-      /* PAYMENT */
       .pay-row {
         display: flex;
         justify-content: space-between;
@@ -773,8 +757,6 @@
         background: var(--green-l);
         border-color: rgba(59, 109, 17, 0.2);
       }
-
-      /* CUSTOMER */
       .cust-card {
         background: var(--surf);
         border-radius: var(--r);
@@ -807,8 +789,6 @@
         font-weight: 500;
         color: var(--t2);
       }
-
-      /* ANALYTICS */
       .bar-wrap {
         margin-bottom: 10px;
       }
@@ -837,8 +817,6 @@
         background: var(--teal);
         transition: width 0.5s;
       }
-
-      /* SUMMARY */
       .sum-period {
         display: flex;
         gap: 6px;
@@ -868,8 +846,6 @@
       .sum-row .sv {
         font-weight: 600;
       }
-
-      /* SEARCH */
       .search-wrap {
         position: relative;
         margin-bottom: 11px;
@@ -901,8 +877,6 @@
       .search-input:focus {
         border-color: var(--teal);
       }
-
-      /* CONFIRM */
       .cfm {
         display: none;
         position: fixed;
@@ -942,8 +916,6 @@
       .cfm-btns .btn {
         flex: 1;
       }
-
-      /* NAME SETUP */
       .setup-overlay {
         display: none;
         position: fixed;
@@ -958,26 +930,6 @@
       .setup-overlay.show {
         display: flex;
       }
-      .setup-emoji {
-        font-size: 48px;
-        margin-bottom: 16px;
-      }
-      .setup-title {
-        font-size: 22px;
-        font-weight: 700;
-        margin-bottom: 8px;
-        color: var(--t1);
-        text-align: center;
-      }
-      .setup-sub {
-        font-size: 14px;
-        color: var(--t2);
-        margin-bottom: 24px;
-        text-align: center;
-        line-height: 1.6;
-      }
-
-      /* TOAST */
       .toast {
         position: fixed;
         bottom: 86px;
@@ -1040,22 +992,103 @@
         color: var(--t3);
         margin-top: 2px;
       }
+      .suggestion-item {
+        padding: 10px 12px;
+        font-size: 14px;
+        cursor: pointer;
+        border-bottom: 0.5px solid var(--bdr);
+        color: var(--t1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .suggestion-item:last-child {
+        border-bottom: none;
+      }
+      .suggestion-name {
+        font-weight: 600;
+      }
+      .suggestion-phone {
+        font-size: 11px;
+        color: var(--t3);
+      }
+      .stock-hero {
+        background: linear-gradient(135deg, #1d9e75, #085041);
+        border-radius: var(--r);
+        padding: 20px;
+        margin-bottom: 10px;
+        color: #fff;
+      }
+      .stock-hero-val {
+        font-size: 36px;
+        font-weight: 700;
+      }
+      .stock-hero-label {
+        font-size: 13px;
+        opacity: 0.8;
+        margin-top: 2px;
+      }
+      .stock-hero-sub {
+        font-size: 12px;
+        opacity: 0.7;
+        margin-top: 8px;
+      }
+      .profit-box {
+        border-radius: var(--r);
+        padding: 16px;
+        margin-bottom: 10px;
+      }
+      .profit-box.positive {
+        background: var(--green-l);
+        border: 0.5px solid rgba(59, 109, 17, 0.2);
+      }
+      .profit-box.negative {
+        background: var(--red-l);
+        border: 0.5px solid rgba(226, 75, 74, 0.2);
+      }
+      .profit-label {
+        font-size: 12px;
+        font-weight: 600;
+        opacity: 0.8;
+      }
+      .profit-val {
+        font-size: 28px;
+        font-weight: 700;
+        margin-top: 4px;
+      }
     </style>
   </head>
   <body>
-    <!-- NAME SETUP -->
     <div class="setup-overlay" id="setup-overlay">
-      <div class="setup-emoji">🐟</div>
-      <div class="setup-title">Welcome to Mummy J's Fish Dryer App</div>
-      <div class="setup-sub">
-        What's your name? This will be saved on records you add.
+      <div style="font-size: 48px; margin-bottom: 16px">🐟</div>
+      <div
+        style="
+          font-size: 22px;
+          font-weight: 700;
+          margin-bottom: 8px;
+          color: var(--t1);
+          text-align: center;
+        "
+      >
+        Welcome to Mummy J's Fish Dryer
+      </div>
+      <div
+        style="
+          font-size: 14px;
+          color: var(--t2);
+          margin-bottom: 24px;
+          text-align: center;
+          line-height: 1.6;
+        "
+      >
+        What's your name? This will show on records you add.
       </div>
       <div style="width: 100%; max-width: 300px">
         <input
           class="fi"
           id="setup-name"
           type="text"
-          placeholder="e.g. Mama J..."
+          placeholder="e.g. Mummy J..."
           style="margin-bottom: 12px; font-size: 16px"
         />
         <button class="btn primary" onclick="saveSetupName()">
@@ -1069,20 +1102,12 @@
         <div class="hdr-row">
           <div>
             <div class="app-name">
-              🐟 Mummy J's
-              <span style="font-size: 10px; color: var(--t3); font-weight: 400"
-                >v2.9</span
-              >
+              🐟 Mummy J's <span class="app-ver">v3.0</span>
             </div>
             <div class="app-date" id="hdr-date"></div>
           </div>
           <div class="hdr-btns">
-            <button
-              class="icon-btn"
-              onclick="toggleDark()"
-              title="Dark mode"
-              id="dark-btn"
-            >
+            <button class="icon-btn" onclick="toggleDark()" id="dark-btn">
               <svg viewBox="0 0 24 24">
                 <path
                   d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
@@ -1090,13 +1115,11 @@
               </svg>
             </button>
             <button class="sync-btn" id="sync-btn" onclick="handleSyncClick()">
-              <span class="sync-dot"></span>
-              <span id="sync-label">Sign in</span>
+              <span class="sync-dot"></span><span id="sync-label">Sign in</span>
             </button>
           </div>
         </div>
       </header>
-
       <div class="update-banner" id="update-banner">
         <span>🆕 New update available</span>
         <button onclick="applyUpdate()">Update now</button>
@@ -1108,20 +1131,20 @@
           <div id="home-alerts"></div>
           <div class="sgrid">
             <div class="stat">
-              <div class="stat-label">Drying now</div>
+              <div class="stat-label">Drying (service)</div>
               <div class="stat-val ca" id="s-dry">0</div>
             </div>
             <div class="stat">
-              <div class="stat-label">Total debts</div>
-              <div class="stat-val cr" id="s-debt">₦0</div>
+              <div class="stat-label">Dry stock (kg)</div>
+              <div class="stat-val ct" id="s-stock">0</div>
             </div>
             <div class="stat">
-              <div class="stat-label">Ready to collect</div>
-              <div class="stat-val ct" id="s-ready">0</div>
+              <div class="stat-label">Owed to you</div>
+              <div class="stat-val cr" id="s-owedto">₦0</div>
             </div>
             <div class="stat">
-              <div class="stat-label">This week</div>
-              <div class="stat-val ct" id="s-week">₦0</div>
+              <div class="stat-label">You owe</div>
+              <div class="stat-val ca" id="s-youowe">₦0</div>
             </div>
           </div>
           <div class="card">
@@ -1136,7 +1159,7 @@
           </div>
         </section>
 
-        <!-- ADD/EDIT -->
+        <!-- INTAKE -->
         <section class="screen" id="screen-intake">
           <div class="card">
             <div class="card-title">
@@ -1148,14 +1171,35 @@
             <input type="hidden" id="edit-id" />
             <div class="fg">
               <label class="fl">Customer name *</label>
-              <div class="irow">
-                <input
-                  class="fi"
-                  id="in-name"
-                  type="text"
-                  placeholder="e.g. Joy"
-                  autocomplete="off"
-                />
+              <div class="irow" style="position: relative">
+                <div style="flex: 1; position: relative">
+                  <input
+                    class="fi"
+                    id="in-name"
+                    type="text"
+                    placeholder="e.g. Joy"
+                    autocomplete="off"
+                    oninput="showNameSuggestions()"
+                    onblur="setTimeout(hideNameSuggestions, 200)"
+                  />
+                  <div
+                    id="name-suggestions"
+                    style="
+                      display: none;
+                      position: absolute;
+                      top: 100%;
+                      left: 0;
+                      right: 0;
+                      background: var(--surf);
+                      border: 1px solid var(--bdr2);
+                      border-radius: var(--rsm);
+                      z-index: 30;
+                      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                      max-height: 160px;
+                      overflow-y: auto;
+                    "
+                  ></div>
+                </div>
                 <button
                   class="cb"
                   onclick="pickContact()"
@@ -1186,20 +1230,20 @@
                 <option value="drying" selected>Straight to drying</option>
               </select>
             </div>
-
-            <!-- FISH ROWS -->
             <div class="fish-rows" id="fish-rows"></div>
             <button class="add-fish-btn" onclick="addFishRow()">
               <svg viewBox="0 0 24 24">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              Add fish type
+                <line x1="5" y1="12" x2="19" y2="12"></line></svg
+              >Add fish type
             </button>
-
             <div class="total-box">
               <span class="total-label">Visit total</span
               ><span class="total-amt" id="in-total">₦0</span>
+            </div>
+            <div class="fg">
+              <label class="fl">Date received</label
+              ><input class="fi" id="in-date" type="date" />
             </div>
             <div class="fg">
               <label class="fl">Notes</label
@@ -1245,20 +1289,26 @@
           <div id="inv-list"></div>
         </section>
 
-        <!-- TRANSACTIONS -->
-        <section class="screen" id="screen-transactions">
-          <div class="sgrid">
-            <div class="stat">
-              <div class="stat-label">Total received</div>
-              <div class="stat-val ct" id="tx-rcvd">₦0</div>
-            </div>
-            <div class="stat">
-              <div class="stat-label">Outstanding</div>
-              <div class="stat-val cr" id="tx-out">₦0</div>
-            </div>
+        <!-- SHOP -->
+        <section class="screen" id="screen-shop">
+          <div class="tabs" id="shop-tabs">
+            <button class="tab active" onclick="showShopTab('overview', this)">
+              Overview
+            </button>
+            <button class="tab" onclick="showShopTab('buy', this)">
+              Buy fish
+            </button>
+            <button class="tab" onclick="showShopTab('sell', this)">
+              Sell
+            </button>
+            <button class="tab" onclick="showShopTab('expenses', this)">
+              Expenses
+            </button>
+            <button class="tab" onclick="showShopTab('profit', this)">
+              Profit
+            </button>
           </div>
-          <div class="slabel">Transactions</div>
-          <div id="tx-list"></div>
+          <div id="shop-content"></div>
         </section>
 
         <!-- SUMMARY -->
@@ -1277,7 +1327,6 @@
           <div id="sum-content"></div>
         </section>
 
-        <!-- CUSTOMERS -->
         <section class="screen" id="screen-customers">
           <div class="search-wrap">
             <svg viewBox="0 0 24 24">
@@ -1295,19 +1344,88 @@
           <div id="cust-list"></div>
         </section>
 
-        <!-- DEBTS -->
         <section class="screen" id="screen-debts">
+          <div class="tabs">
+            <button class="tab active" onclick="filterDebts('all', this)">
+              All
+            </button>
+            <button class="tab" onclick="filterDebts('service', this)">
+              Service
+            </button>
+            <button class="tab" onclick="filterDebts('sales', this)">
+              Sales
+            </button>
+            <button class="tab" onclick="filterDebts('supplier', this)">
+              Suppliers
+            </button>
+          </div>
           <div id="debt-alert"></div>
           <div id="debt-list"></div>
         </section>
 
-        <!-- ANALYTICS -->
         <section class="screen" id="screen-analytics">
           <div id="analytics-content"></div>
         </section>
+
+        <section class="screen" id="screen-settings">
+          <div class="card">
+            <div class="card-title">App settings</div>
+            <div class="fg">
+              <label class="fl">Your name</label>
+              <div style="display: flex; gap: 8px">
+                <input
+                  class="fi"
+                  id="settings-name"
+                  type="text"
+                  style="flex: 1"
+                /><button class="btn sm primary" onclick="saveSettingsName()">
+                  Save
+                </button>
+              </div>
+            </div>
+            <div class="fg">
+              <label class="fl">Dry fish price per kg (₦)</label>
+              <div style="display: flex; gap: 8px">
+                <input
+                  class="fi"
+                  id="settings-price"
+                  type="number"
+                  inputmode="numeric"
+                  style="flex: 1"
+                /><button class="btn sm primary" onclick="saveSettingsPrice()">
+                  Save
+                </button>
+              </div>
+            </div>
+            <div class="fg" style="margin-top: 16px">
+              <button class="btn" onclick="toggleDark()">
+                Toggle dark mode
+              </button>
+            </div>
+            <div class="fg" style="margin-top: 8px">
+              <button
+                class="btn"
+                onclick="signOut()"
+                style="
+                  border-color: var(--red);
+                  color: var(--red);
+                  opacity: 0.6;
+                "
+              >
+                Sign out of Google
+              </button>
+            </div>
+            <div class="fg" style="margin-top: 16px">
+              <label class="fl" style="color: var(--red)">Danger zone</label>
+              <button class="btn danger" onclick="confirmClearAll()">
+                Clear all records
+              </button>
+            </div>
+          </div>
+        </section>
       </div>
 
-      <nav class="nav" style="min-height: 56px">
+      <nav class="nav">
         <button class="nb active" onclick="showScreen('home')">
           <svg viewBox="0 0 24 24">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -1328,13 +1446,12 @@
             ></path></svg
           >Stock
         </button>
-        <button class="nb" onclick="showScreen('summary')">
+        <button class="nb" onclick="showScreen('shop')">
           <svg viewBox="0 0 24 24">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line></svg
-          >Summary
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path></svg
+          >Shop
         </button>
         <button class="nb" onclick="showMoreMenu()">
           <svg viewBox="0 0 24 24">
@@ -1354,14 +1471,7 @@
     >
       <div class="modal">
         <div class="mhandle"></div>
-        <div
-          style="
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            padding-bottom: 4px;
-          "
-        >
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
           <button
             class="btn"
             onclick="
@@ -1393,15 +1503,15 @@
             class="btn"
             onclick="
               closeMore();
-              showScreen('transactions');
+              showScreen('summary');
             "
           >
             <svg viewBox="0 0 24 24">
-              <path
-                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-              ></path>
-              <polyline points="14 2 14 8 20 8"></polyline></svg
-            >Transactions
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line></svg
+            >Summary
           </button>
           <button
             class="btn"
@@ -1416,32 +1526,32 @@
               <line x1="6" y1="20" x2="6" y2="14"></line></svg
             >Analytics
           </button>
+          <button
+            class="btn"
+            onclick="
+              closeMore();
+              showScreen('settings');
+            "
+            style="grid-column: span 2"
+          >
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path
+                d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"
+              ></path></svg
+            >Settings
+          </button>
         </div>
-        <div class="dvdr"></div>
-        <button
-          class="btn"
-          onclick="
-            closeMore();
-            promptChangeName();
-          "
-        >
-          <svg viewBox="0 0 24 24">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle></svg
-          >Change your name (<span id="current-user-name"></span>)
-        </button>
       </div>
     </div>
 
-    <!-- ITEM MODAL -->
+    <!-- MODALS -->
     <div class="mbg" id="modal-bg" onclick="handleMBGClick(event)">
-      <div class="modal" id="modal-inner">
+      <div class="modal">
         <div class="mhandle"></div>
         <div id="modal-body"></div>
       </div>
     </div>
-
-    <!-- PAYMENT MODAL -->
     <div
       class="mbg"
       id="pay-mbg"
@@ -1452,8 +1562,6 @@
         <div id="pay-body"></div>
       </div>
     </div>
-
-    <!-- CUSTOMER MODAL -->
     <div
       class="mbg"
       id="cust-mbg"
@@ -1464,24 +1572,29 @@
         <div id="cust-body"></div>
       </div>
     </div>
-
-    <!-- CONFIRM -->
+    <div
+      class="mbg"
+      id="receipt-mbg"
+      onclick="if (event.target === this) closeReceipt();"
+    >
+      <div class="modal">
+        <div class="mhandle"></div>
+        <div id="receipt-body"></div>
+      </div>
+    </div>
     <div class="cfm" id="cfm">
       <div class="cfm-box">
         <div class="cfm-title" id="cfm-title">Are you sure?</div>
         <div class="cfm-msg" id="cfm-msg"></div>
         <div class="cfm-btns">
-          <button class="btn" onclick="closeCfm()">Cancel</button>
-          <button class="btn danger" id="cfm-ok">Confirm</button>
+          <button class="btn" onclick="closeCfm()">Cancel</button
+          ><button class="btn danger" id="cfm-ok">Confirm</button>
         </div>
       </div>
     </div>
-
     <div class="toast" id="toast"></div>
-
     <script src="https://accounts.google.com/gsi/client" async></script>
     <script>
-      // ─── GOOGLE DRIVE CONFIG ───────────────────────────────────────────────────
       const GOOGLE_CLIENT_ID =
         "544090940321-n25niaqnn9pobbv2a91j4tsha807pv22.apps.googleusercontent.com";
       const DRIVE_FILE_NAME = "fishdryer-data.json";
@@ -1489,13 +1602,28 @@
       let gToken = null,
         gFileId = null,
         syncTmr = null,
-        isSyncing = false;
+        isSyncing = false,
+        gTokenClient = null,
+        gTokenExpiry = 0,
+        silentSignInTimer = null;
 
-      // ─── STATE ─────────────────────────────────────────────────────────────────
-      let state = { items: [], nextId: 1 };
-      let userName = "";
-      let darkMode = false;
-      let fishRowCount = 0;
+      let state = {
+        items: [],
+        nextId: 1,
+        shop: {
+          purchases: [],
+          purNextId: 1,
+          expenses: [],
+          expNextId: 1,
+          sales: [],
+          saleNextId: 1,
+          dryStockKg: 0,
+          pricePerKg: 17000,
+        },
+      };
+      let userName = "",
+        darkMode = false,
+        fishRowCount = 0;
 
       function lsave() {
         try {
@@ -1506,23 +1634,89 @@
         try {
           const d = localStorage.getItem("fishdryer_v4");
           if (d) state = JSON.parse(d);
+          if (!state.shop)
+            state.shop = {
+              purchases: [],
+              purNextId: 1,
+              expenses: [],
+              expNextId: 1,
+              sales: [],
+              saleNextId: 1,
+              dryStockKg: 0,
+              pricePerKg: 17000,
+            };
+          ["purchases", "expenses", "sales"].forEach((k) => {
+            if (!state.shop[k]) state.shop[k] = [];
+          });
+          if (!state.shop.pricePerKg) state.shop.pricePerKg = 17000;
+          if (!state.shop.purNextId) state.shop.purNextId = 1;
+          if (!state.shop.expNextId) state.shop.expNextId = 1;
+          if (!state.shop.saleNextId) state.shop.saleNextId = 1;
         } catch (e) {}
       }
       lload();
 
-      // ─── SETUP ─────────────────────────────────────────────────────────────────
+      window.addEventListener("online", () => {
+        if (localStorage.getItem("fd_gsignin") === "1" && !isTokenValid()) {
+          setSyncStatus("syncing", "Signing in...");
+          signInGoogle(true);
+        }
+      });
+
+      window.addEventListener("offline", () => {
+        setSyncStatus("", "Offline");
+      });
+
+      // ─── BACK BUTTON HANDLER ───────────────────────────────────────────────────
+      window.addEventListener("popstate", handleBackButton);
+
+      function pushState() {
+        history.pushState({ page: true }, "");
+      }
+
+      function handleBackButton() {
+        // if any modal is open, close it and push state again
+        const modals = [
+          { id: "modal-bg", fn: closeModal },
+          { id: "pay-mbg", fn: closePayModal },
+          { id: "cust-mbg", fn: closeCustModal },
+          { id: "receipt-mbg", fn: closeReceipt },
+          { id: "more-bg", fn: closeMore },
+          { id: "cfm", fn: closeCfm },
+        ];
+
+        for (const m of modals) {
+          const el = document.getElementById(m.id);
+          if (el && el.classList.contains("open")) {
+            m.fn();
+            pushState(); // push again so next back still works
+            return;
+          }
+        }
+
+        // no modal open — go back to home if not already there
+        const activeScreen = document.querySelector(".screen.active");
+        if (activeScreen && activeScreen.id !== "screen-home") {
+          showScreen("home");
+          pushState();
+          return;
+        }
+
+        // already on home — let the app minimize naturally (don't exit)
+        history.back();
+      }
+
       function initApp() {
         userName = localStorage.getItem("fd_user") || "";
-        const savedDark = localStorage.getItem("fd_dark");
+        const sd = localStorage.getItem("fd_dark");
         darkMode =
-          savedDark !== null
-            ? savedDark === "1"
+          sd !== null
+            ? sd === "1"
             : window.matchMedia("(prefers-color-scheme: dark)").matches;
         if (darkMode) document.documentElement.classList.add("dark");
         updateDarkBtn();
-        if (!userName) {
+        if (!userName)
           document.getElementById("setup-overlay").classList.add("show");
-        }
         document.getElementById("current-user-name").textContent =
           userName || "?";
         document.getElementById("hdr-date").textContent =
@@ -1531,20 +1725,23 @@
             day: "numeric",
             month: "long",
           });
+        document.getElementById("settings-name").value = userName;
+        document.getElementById("settings-price").value = state.shop.pricePerKg;
         initFishRows();
         renderHome();
-
-        // ─── AUTO GOOGLE SIGN IN ─────────────────────
         if (GOOGLE_CLIENT_ID) {
           const tryAutoSignIn = () => {
+            if (!navigator.onLine) {
+              setSyncStatus("", "Offline");
+              return;
+            }
+
             if (window.google) {
               if (localStorage.getItem("fd_gsignin") === "1") {
                 setSyncStatus("syncing", "Signing in...");
                 signInGoogle(true);
               }
-            } else {
-              setTimeout(tryAutoSignIn, 500);
-            }
+            } else setTimeout(tryAutoSignIn, 500);
           };
           setTimeout(tryAutoSignIn, 1000);
         }
@@ -1557,6 +1754,7 @@
             pullLatestFromDrive();
           }
         }, 60000);
+        pushState();
       }
 
       function saveSetupName() {
@@ -1569,27 +1767,27 @@
         localStorage.setItem("fd_user", n);
         document.getElementById("setup-overlay").classList.remove("show");
         document.getElementById("current-user-name").textContent = n;
+        document.getElementById("settings-name").value = n;
         showToast("Welcome, " + n + "!");
       }
-
-      function promptChangeName() {
-        document.getElementById("cfm-title").textContent = "Change your name";
-        document.getElementById("cfm-msg").innerHTML =
-          `<input class="fi" id="new-name-input" type="text" placeholder="Your name" value="${userName}" style="margin-top:4px">`;
-        document.getElementById("cfm-ok").textContent = "Save";
-        document.getElementById("cfm-ok").onclick = () => {
-          const n = document.getElementById("new-name-input").value.trim();
-          if (!n) return;
-          userName = n;
-          localStorage.setItem("fd_user", n);
-          document.getElementById("current-user-name").textContent = n;
-          closeCfm();
-          showToast("Name updated to " + n);
-        };
-        document.getElementById("cfm").classList.add("open");
+      function saveSettingsName() {
+        const n = document.getElementById("settings-name").value.trim();
+        if (!n) return;
+        userName = n;
+        localStorage.setItem("fd_user", n);
+        document.getElementById("current-user-name").textContent = n;
+        showToast("Name updated");
+      }
+      function saveSettingsPrice() {
+        const p =
+          parseFloat(document.getElementById("settings-price").value) || 0;
+        if (!p) return;
+        state.shop.pricePerKg = p;
+        lsave();
+        scheduleSync();
+        showToast("Price updated to " + fmt(p) + "/kg");
       }
 
-      // ─── DARK MODE ─────────────────────────────────────────────────────────────
       function toggleDark() {
         darkMode = !darkMode;
         document.documentElement.classList.toggle("dark", darkMode);
@@ -1597,57 +1795,38 @@
         updateDarkBtn();
       }
       function updateDarkBtn() {
-        const btn = document.getElementById("dark-btn");
-        btn.innerHTML = darkMode
+        const b = document.getElementById("dark-btn");
+        b.innerHTML = darkMode
           ? `<svg viewBox="0 0 24 24" style="fill:var(--amber);stroke:var(--amber)"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`
           : `<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
       }
 
-      // ─── FISH ROWS ─────────────────────────────────────────────────────────────
       function initFishRows() {
         fishRowCount = 0;
         document.getElementById("fish-rows").innerHTML = "";
+        const dateEl = document.getElementById("in-date");
+        if (dateEl) dateEl.value = new Date().toISOString().split("T")[0];
         addFishRow();
       }
-
       function addFishRow() {
         fishRowCount++;
         const id = fishRowCount;
         const el = document.createElement("div");
         el.className = "fish-row";
         el.id = "fish-row-" + id;
-        el.innerHTML = `
-              <div class="fish-row-header">
-                <span class="fish-row-label">Fish #${id}</span>
-                ${id > 1 ? `<button class="fish-row-del" onclick="removeFishRow(${id})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4h6v2"></path></svg></button>` : ""}
-              </div>
-              <div class="fg">
-                <select class="fi fr-type" id="fr-type-${id}" onchange="calcVisitTotal()">
-                  <option value="">Select fish type...</option>
-                  <option>Catfish</option><option>Tilapia</option><option>Croaker</option>
-                  <option>Mackerel</option><option>Sardine</option><option>Carp</option>
-                  <option>Titus</option><option>Panla</option><option>Mixed fish</option><option>Other</option>
-                </select>
-              </div>
-              <div class="fg"><input class="fi" id="fr-custom-${id}" type="text" placeholder="Custom name (optional)"></div>
-              <div class="r2">
-                <div class="fg"><label class="fl">Weight (kg)</label><input class="fi" id="fr-weight-${id}" type="number" placeholder="0.0" step="0.1" min="0" inputmode="decimal" oninput="calcVisitTotal()"></div>
-                <div class="fg"><label class="fl">Count (pcs)</label><input class="fi" id="fr-count-${id}" type="number" placeholder="0" min="0" inputmode="numeric"></div>
-              </div>
-              <div class="r2">
-                <div class="fg"><label class="fl">Price/kg (₦)</label><input class="fi" id="fr-price-${id}" type="number" placeholder="0" min="0" inputmode="numeric" oninput="calcVisitTotal()"></div>
-                <div class="fg"><label class="fl">Discount (₦)</label><input class="fi" id="fr-disc-${id}" type="number" placeholder="0" min="0" inputmode="numeric" oninput="calcVisitTotal()"></div>
-              </div>
-              <div class="fish-row-total" id="fr-total-${id}"></div>`;
+        el.innerHTML = `<div class="fish-row-header"><span class="fish-row-label">Fish #${id}</span>${id > 1 ? `<button class="fish-row-del" onclick="removeFishRow(${id})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6M14 11v6M9 6V4h6v2"></path></svg></button>` : ""}</div>
+  <div class="fg"><select class="fi" id="fr-type-${id}" onchange="calcVisitTotal()"><option value="">Select fish type...</option><option>Catfish</option><option>Tilapia</option><option>Titus</option><option>Panla</option><option>Mixed fish</option><option>Goat Meat</option><option>Cow Meat</option><option>Other</option></select></div>
+  <div class="fg"><input class="fi" id="fr-custom-${id}" type="text" placeholder="Custom name (optional)"></div>
+  <div class="r2"><div class="fg"><label class="fl">Weight (kg)</label><input class="fi" id="fr-weight-${id}" type="number" placeholder="0.0" step="0.1" min="0" inputmode="decimal" oninput="calcVisitTotal()"></div><div class="fg"><label class="fl">Count (pcs)</label><input class="fi" id="fr-count-${id}" type="number" placeholder="0" min="0" inputmode="numeric"></div></div>
+  <div class="r2"><div class="fg"><label class="fl">Price/kg (₦)</label><input class="fi" id="fr-price-${id}" type="number" placeholder="0" min="0" inputmode="numeric" oninput="calcVisitTotal()"></div><div class="fg"><label class="fl">Discount (₦)</label><input class="fi" id="fr-disc-${id}" type="number" placeholder="0" min="0" inputmode="numeric" oninput="calcVisitTotal()"></div></div>
+  <div class="fish-row-total" id="fr-total-${id}"></div>`;
         document.getElementById("fish-rows").appendChild(el);
         calcVisitTotal();
       }
-
       function removeFishRow(id) {
         document.getElementById("fish-row-" + id)?.remove();
         calcVisitTotal();
       }
-
       function getFishRows() {
         const rows = [];
         document.querySelectorAll(".fish-row").forEach((el) => {
@@ -1663,15 +1842,20 @@
             parseFloat(document.getElementById("fr-price-" + id)?.value) || 0;
           const disc =
             parseFloat(document.getElementById("fr-disc-" + id)?.value) || 0;
-          const total = Math.max(0, weight * price - disc);
           if (type)
-            rows.push({ type, weight, count, price, discount: disc, total });
+            rows.push({
+              type,
+              weight,
+              count,
+              price,
+              discount: disc,
+              total: Math.max(0, weight * price - disc),
+            });
         });
         return rows;
       }
-
       function calcVisitTotal() {
-        let grand = 0;
+        let g = 0;
         document.querySelectorAll(".fish-row").forEach((el) => {
           const id = el.id.replace("fish-row-", "");
           const w =
@@ -1681,92 +1865,116 @@
           const d =
             parseFloat(document.getElementById("fr-disc-" + id)?.value) || 0;
           const t = Math.max(0, w * p - d);
-          grand += t;
+          g += t;
           const tel = document.getElementById("fr-total-" + id);
           if (tel) tel.textContent = t > 0 ? "Subtotal: " + fmt(t) : "";
         });
-        document.getElementById("in-total").textContent = fmt(grand);
+        document.getElementById("in-total").textContent = fmt(g);
       }
 
-      // ─── GOOGLE DRIVE ──────────────────────────────────────────────────────────
       function setSyncStatus(cls, lbl) {
-        const btn = document.getElementById("sync-btn");
-        btn.className = "sync-btn" + (cls ? " " + cls : "");
+        const b = document.getElementById("sync-btn");
+        b.className = "sync-btn" + (cls ? " " + cls : "");
         document.getElementById("sync-label").textContent = lbl;
       }
-      async function handleSyncClick() {
-        if (GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID_HERE") {
-          showToast("Add your Google Client ID to enable sync");
-          return;
-        }
-
-        if (isTokenValid()) {
-          setSyncStatus("syncing", "Fetching latest...");
-          // 1. Force fetch whatever is currently sitting on the cloud
-          await pullLatestFromDrive();
-          // 2. Resolve timestamps and upload any pending local states
-          await syncNow();
-          showToast("✓ App data updated");
-        } else {
-          signInGoogle(false);
-        }
+      function handleSyncClick() {
+        if (isTokenValid()) syncNow();
+        else signInGoogle(false);
       }
-
       async function pullLatestFromDrive() {
         if (!gToken) return;
-
         try {
-          // get file id if missing
           if (!gFileId) {
-            const list = await gFetch(
+            const l = await gFetch(
               `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id)`,
             );
-
-            if (list.files?.length) {
-              gFileId = list.files[0].id;
-            }
+            if (l.files?.length) gFileId = l.files[0].id;
           }
-
-          // always fetch latest data
           if (gFileId) {
-            const remote = await gFetch(
+            const r = await gFetch(
               `https://www.googleapis.com/drive/v3/files/${gFileId}?alt=media`,
             );
-
-            mergeRemote(remote);
+            mergeRemote(r);
+            renderHome();
             lsave();
-
-            // Dynamically refresh the layout currently visible to the user
-            const activeScreen = document.querySelector(".screen.active")?.id;
-            if (activeScreen === "screen-home") {
-              renderHome();
-            } else if (activeScreen === "screen-inventory") {
-              renderInventory("all");
-            } else if (activeScreen === "screen-transactions") {
-              renderTransactions();
-            }
           }
         } catch (e) {
           console.log("Pull failed", e);
         }
       }
-
+      function signInGoogle(silent = false) {
+        if (!window.google) {
+          if (!silent) showToast("Loading Google... try again");
+          setTimeout(() => signInGoogle(silent), 1000);
+          return;
+        }
+        if (!gTokenClient) {
+          gTokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: GOOGLE_CLIENT_ID,
+            scope: SCOPES,
+            callback: async (r) => {
+              clearTimeout(silentSignInTimer);
+              if (r.error) {
+                if (!silent) showToast("Sign in failed");
+                setSyncStatus("", "Sign in");
+                return;
+              }
+              gToken = r.access_token;
+              gTokenExpiry = Date.now() + (r.expires_in - 60) * 1000;
+              localStorage.setItem("fd_gsignin", "1");
+              setSyncStatus("syncing", "Syncing...");
+              await pullLatestFromDrive();
+              await syncNow();
+              scheduleTokenRefresh(r.expires_in - 60);
+            },
+          });
+        }
+        if (silent)
+          silentSignInTimer = setTimeout(
+            () => setSyncStatus("", "Sign in"),
+            5000,
+          );
+        gTokenClient.requestAccessToken({
+          prompt: silent ? "" : "select_account",
+        });
+      }
+      function signOut() {
+        gToken = null;
+        gFileId = null;
+        gTokenExpiry = 0;
+        gTokenClient = null;
+        localStorage.removeItem("fd_gsignin");
+        setSyncStatus("", "Sign in");
+        showToast("Signed out");
+      }
+      function scheduleTokenRefresh(sec) {
+        setTimeout(
+          () => {
+            if (localStorage.getItem("fd_gsignin") === "1")
+              gTokenClient?.requestAccessToken({ prompt: "" });
+          },
+          Math.max(0, sec * 1000),
+        );
+      }
+      function isTokenValid() {
+        return gToken && Date.now() < gTokenExpiry;
+      }
       async function syncNow() {
         if (!gToken || isSyncing) return;
         isSyncing = true;
         setSyncStatus("syncing", "Syncing...");
         try {
           if (!gFileId) {
-            const list = await gFetch(
+            const l = await gFetch(
               `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id)`,
             );
-            if (list.files?.length) gFileId = list.files[0].id;
+            if (l.files?.length) gFileId = l.files[0].id;
           }
           if (gFileId) {
-            const remote = await gFetch(
+            const r = await gFetch(
               `https://www.googleapis.com/drive/v3/files/${gFileId}?alt=media`,
             );
-            mergeRemote(remote);
+            mergeRemote(r);
             renderHome();
           }
           const body = JSON.stringify(state);
@@ -1780,7 +1988,7 @@
               },
             );
           } else {
-            const meta = await gFetch(
+            const m = await gFetch(
               "https://www.googleapis.com/drive/v3/files",
               {
                 method: "POST",
@@ -1791,7 +1999,7 @@
                 }),
               },
             );
-            gFileId = meta.id;
+            gFileId = m.id;
             await gFetchRaw(
               `https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`,
               {
@@ -1811,65 +2019,6 @@
         }
         isSyncing = false;
       }
-
-      let gTokenClient = null;
-      let gTokenExpiry = 0;
-      let silentSignInTimer = null;
-
-      function signInGoogle(silent = false) {
-        if (!window.google) {
-          if (!silent) showToast("Loading Google... try again in a moment");
-          // retry once google loads
-          setTimeout(() => signInGoogle(silent), 1000);
-          return;
-        }
-        if (!gTokenClient) {
-          gTokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: GOOGLE_CLIENT_ID,
-            scope: SCOPES,
-            callback: async (r) => {
-              if (r.error) {
-                if (!silent) showToast("Sign in failed");
-                setSyncStatus("", "Sign in");
-                return;
-              }
-              gToken = r.access_token;
-              gTokenExpiry = Date.now() + (r.expires_in - 60) * 1000;
-              localStorage.setItem("fd_gsignin", "1");
-              setSyncStatus("syncing", "Syncing...");
-              await pullLatestFromDrive();
-              await syncNow();
-              // schedule token refresh before it expires
-              scheduleTokenRefresh(r.expires_in - 60);
-            },
-          });
-        }
-
-        if (silent) {
-          silentSignInTimer = setTimeout(() => {
-            setSyncStatus("", "sign in");
-          }, 5000);
-        }
-        // silent = skip account picker but user must still have active Google session
-        gTokenClient.requestAccessToken({
-          prompt: silent ? "" : "select_account",
-        });
-      }
-
-      function scheduleTokenRefresh(secondsUntilExpiry) {
-        const ms = Math.max(0, secondsUntilExpiry * 1000);
-        setTimeout(() => {
-          if (localStorage.getItem("fd_gsignin") === "1") {
-            // silently get a new token
-            gTokenClient?.requestAccessToken({ prompt: "" });
-          }
-        }, ms);
-      }
-
-      function isTokenValid() {
-        return gToken && Date.now() < gTokenExpiry;
-      }
-
       function mergeRemote(remote) {
         if (!remote?.items) return;
         const map = {};
@@ -1877,8 +2026,8 @@
         remote.items.forEach((ri) => {
           if (!map[ri.id]) state.items.push(ri);
           else {
-            const le = new Date(map[ri.id].editedAt || map[ri.id].createdAt);
-            const re = new Date(ri.editedAt || ri.createdAt);
+            const le = new Date(map[ri.id].editedAt || map[ri.id].createdAt),
+              re = new Date(ri.editedAt || ri.createdAt);
             if (re > le) Object.assign(map[ri.id], ri);
           }
         });
@@ -1886,6 +2035,26 @@
         state.items.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
         );
+        if (remote.shop) {
+          ["purchases", "expenses", "sales"].forEach((k) => {
+            if (remote.shop[k]) {
+              const lm = {};
+              (state.shop[k] || []).forEach((x) => (lm[x.id] = x));
+              remote.shop[k].forEach((x) => {
+                if (!lm[x.id]) state.shop[k].push(x);
+                else {
+                  const le = new Date(lm[x.id].editedAt || lm[x.id].date || 0),
+                    re = new Date(x.editedAt || x.date || 0);
+                  if (re > le) Object.assign(lm[x.id], x);
+                }
+              });
+              state.shop[k].sort((a, b) => new Date(b.date) - new Date(a.date));
+            }
+          });
+          if (remote.shop.pricePerKg)
+            state.shop.pricePerKg = remote.shop.pricePerKg;
+          recalcDryStock();
+        }
       }
       function gFetch(url, opts = {}) {
         opts.headers = Object.assign(
@@ -1908,17 +2077,16 @@
         if (!localStorage.getItem("fd_gsignin")) return;
         clearTimeout(syncTmr);
         syncTmr = setTimeout(async () => {
-          // refresh token if expired before syncing
           if (!isTokenValid()) {
             gTokenClient?.requestAccessToken({ prompt: "" });
-            return; // syncNow will be called from the token callback
+            return;
           }
           syncNow();
         }, 3000);
       }
 
-      // ─── HELPERS ───────────────────────────────────────────────────────────────
       const fmt = (n) => "₦" + Math.round(n).toLocaleString("en-NG");
+      const fmtKg = (n) => (n % 1 === 0 ? n + "kg" : +n.toFixed(2) + "kg");
       const statusLabel = (s) =>
         ({
           fresh: "In stock",
@@ -1960,11 +2128,18 @@
           ] || ""
         );
       }
+      function recalcDryStock() {
+        const bought = state.shop.purchases.reduce(
+          (a, p) => a + (p.actualDryKg || p.estimatedDryKg || 0),
+          0,
+        );
+        const sold = state.shop.sales.reduce((a, s) => a + s.weightKg, 0);
+        state.shop.dryStockKg = Math.max(0, +(bought - sold).toFixed(2));
+      }
 
-      // ─── CONTACT PICKER ────────────────────────────────────────────────────────
       async function pickContact() {
         if (!("contacts" in navigator && "ContactsManager" in window)) {
-          showToast("Contact picker not available on this browser");
+          showToast("Contact picker not available");
           return;
         }
         try {
@@ -1982,8 +2157,167 @@
         }
       }
 
-      // ─── NAV ───────────────────────────────────────────────────────────────────
-      const NAV_SCREENS = ["home", "intake", "inventory", "summary", "more"];
+      async function pickSellContact() {
+        if (!("contacts" in navigator && "ContactsManager" in window)) {
+          showToast("Contact picker not available");
+          return;
+        }
+        try {
+          const c = await navigator.contacts.select(["name", "tel"], {
+            multiple: false,
+          });
+          if (c.length > 0) {
+            if (c[0].name?.[0])
+              document.getElementById("sell-buyer").value =
+                c[0].name[0].replace(/\b\w/g, (x) => x.toUpperCase());
+            if (c[0].tel?.[0])
+              document.getElementById("sell-phone").value = c[0].tel[0];
+          }
+        } catch (e) {
+          showToast("Could not open contacts");
+        }
+      }
+
+      async function pickBuyContact() {
+        if (!("contacts" in navigator && "ContactsManager" in window)) {
+          showToast("Contact picker not available");
+          return;
+        }
+        try {
+          const c = await navigator.contacts.select(["name", "tel"], {
+            multiple: false,
+          });
+          if (c.length > 0) {
+            if (c[0].name?.[0])
+              document.getElementById("buy-supplier").value =
+                c[0].name[0].replace(/\b\w/g, (x) => x.toUpperCase());
+            if (c[0].tel?.[0])
+              document.getElementById("buy-phone").value = c[0].tel[0];
+          }
+        } catch (e) {
+          showToast("Could not open contacts");
+        }
+      }
+
+      function showNameSuggestions() {
+        const q = document.getElementById("in-name").value.trim().toLowerCase();
+        const box = document.getElementById("name-suggestions");
+        if (!q || q.length < 2) {
+          box.style.display = "none";
+          return;
+        }
+        const seen = {};
+        state.items.forEach((i) => {
+          const k = i.name.toLowerCase();
+          if (!seen[k]) seen[k] = { name: i.name, phone: i.phone || "" };
+        });
+        state.shop.sales.forEach((s) => {
+          if (s.buyerName) {
+            const k = s.buyerName.toLowerCase();
+            if (!seen[k]) seen[k] = { name: s.buyerName, phone: s.phone || "" };
+          }
+        });
+        const m = Object.values(seen)
+          .filter((c) => c.name.toLowerCase().includes(q))
+          .slice(0, 5);
+        if (!m.length) {
+          box.style.display = "none";
+          return;
+        }
+        box.innerHTML = m
+          .map(
+            (c) =>
+              `<div class="suggestion-item" onmousedown="selectCustomer('${c.name.replace(/'/g, "\\'")}','${c.phone}')"><span class="suggestion-name">${c.name}</span><span class="suggestion-phone">${c.phone || "No phone"}</span></div>`,
+          )
+          .join("");
+        box.style.display = "block";
+      }
+      function showSupplierSuggestions() {
+        const q = document
+          .getElementById("buy-supplier")
+          ?.value.trim()
+          .toLowerCase();
+        const box = document.getElementById("supplier-suggestions");
+        if (!box || !q || q.length < 2) {
+          box && (box.style.display = "none");
+          return;
+        }
+        const seen = {};
+        state.shop.purchases.forEach((p) => {
+          const k = p.supplierName.toLowerCase();
+          if (!seen[k])
+            seen[k] = { name: p.supplierName, phone: p.phone || "" };
+        });
+        const m = Object.values(seen)
+          .filter((c) => c.name.toLowerCase().includes(q))
+          .slice(0, 5);
+        if (!m.length) {
+          box.style.display = "none";
+          return;
+        }
+        box.innerHTML = m
+          .map(
+            (c) =>
+              `<div class="suggestion-item" onmousedown="document.getElementById('buy-supplier').value='${c.name.replace(/'/g, "\\'")}';${c.phone ? `document.getElementById('buy-phone').value='${c.phone}';` : ""}hideSupplierSuggestions()"><span class="suggestion-name">${c.name}</span><span class="suggestion-phone">${c.phone || "No phone"}</span></div>`,
+          )
+          .join("");
+        box.style.display = "block";
+      }
+      function hideSupplierSuggestions() {
+        const b = document.getElementById("supplier-suggestions");
+        if (b) b.style.display = "none";
+      }
+
+      function showBuyerSuggestions() {
+        const q = document
+          .getElementById("sell-buyer")
+          ?.value.trim()
+          .toLowerCase();
+        const box = document.getElementById("buyer-suggestions");
+        if (!box || !q || q.length < 2) {
+          box && (box.style.display = "none");
+          return;
+        }
+        const seen = {};
+        state.items.forEach((i) => {
+          const k = i.name.toLowerCase();
+          if (!seen[k]) seen[k] = { name: i.name, phone: i.phone || "" };
+        });
+        state.shop.sales.forEach((s) => {
+          if (s.buyerName) {
+            const k = s.buyerName.toLowerCase();
+            if (!seen[k]) seen[k] = { name: s.buyerName, phone: s.phone || "" };
+          }
+        });
+        const m = Object.values(seen)
+          .filter((c) => c.name.toLowerCase().includes(q))
+          .slice(0, 5);
+        if (!m.length) {
+          box.style.display = "none";
+          return;
+        }
+        box.innerHTML = m
+          .map(
+            (c) =>
+              `<div class="suggestion-item" onmousedown="document.getElementById('sell-buyer').value='${c.name.replace(/'/g, "\\'")}';${c.phone ? `document.getElementById('sell-phone').value='${c.phone}';` : ""}hideBuyerSuggestions()"><span class="suggestion-name">${c.name}</span><span class="suggestion-phone">${c.phone || "No phone"}</span></div>`,
+          )
+          .join("");
+        box.style.display = "block";
+      }
+      function hideBuyerSuggestions() {
+        const b = document.getElementById("buyer-suggestions");
+        if (b) b.style.display = "none";
+      }
+      function selectCustomer(name, phone) {
+        document.getElementById("in-name").value = name;
+        if (phone) document.getElementById("in-phone").value = phone;
+        hideNameSuggestions();
+      }
+      function hideNameSuggestions() {
+        document.getElementById("name-suggestions").style.display = "none";
+      }
+
+      const NAV_SCREENS = ["home", "intake", "inventory", "shop", "more"];
       function showScreen(name) {
         document
           .querySelectorAll(".screen")
@@ -1998,12 +2332,14 @@
         ({
           home: renderHome,
           inventory: () => renderInventory("all"),
-          transactions: renderTransactions,
           customers: renderCustomers,
-          debts: renderDebts,
+          debts: () => renderDebts("all"),
           summary: () => renderSummary("week"),
           analytics: renderAnalytics,
+          shop: () => renderShopTab("overview"),
+          settings: renderSettings,
         })[name]?.();
+        pushState();
       }
       function showMoreMenu() {
         document.getElementById("more-bg").classList.add("open");
@@ -2012,10 +2348,12 @@
         document.getElementById("more-bg").classList.remove("open");
       }
 
-      // ─── SAVE ITEM ─────────────────────────────────────────────────────────────
       function saveItem() {
         const editId = document.getElementById("edit-id").value;
-        const name = document.getElementById("in-name").value.trim();
+        const name = document
+          .getElementById("in-name")
+          .value.trim()
+          .replace(/\b\w/g, (c) => c.toUpperCase());
         const phone = document.getElementById("in-phone").value.trim();
         const status = document.getElementById("in-status").value;
         const notes = document.getElementById("in-notes").value.trim();
@@ -2029,7 +2367,6 @@
           return;
         }
         const total = fishRows.reduce((a, r) => a + r.total, 0);
-
         if (editId) {
           const item = state.items.find((x) => x.id == editId);
           if (item)
@@ -2057,7 +2394,9 @@
             addedBy: userName,
             payments: [],
             settledShort: false,
-            createdAt: new Date().toISOString(),
+            createdAt: new Date(
+              document.getElementById("in-date").value || Date.now(),
+            ).toISOString(),
             collectedAt: null,
             editedAt: null,
           });
@@ -2068,16 +2407,17 @@
         lsave();
         scheduleSync();
       }
-
       function clearForm() {
         ["in-name", "in-phone", "in-notes"].forEach(
           (id) => (document.getElementById(id).value = ""),
         );
         document.getElementById("in-status").value = "drying";
         document.getElementById("edit-id").value = "";
+        document.getElementById("in-date").value = new Date()
+          .toISOString()
+          .split("T")[0];
         initFishRows();
       }
-
       function startEdit(id) {
         const i = state.items.find((x) => x.id === id);
         if (!i) return;
@@ -2086,8 +2426,10 @@
         document.getElementById("in-name").value = i.name;
         document.getElementById("in-phone").value = i.phone || "";
         document.getElementById("in-status").value = i.status || "drying";
+        document.getElementById("in-date").value = i.createdAt
+          ? i.createdAt.split("T")[0]
+          : new Date().toISOString().split("T")[0];
         document.getElementById("in-notes").value = i.notes || "";
-        // Rebuild fish rows
         fishRowCount = 0;
         document.getElementById("fish-rows").innerHTML = "";
         (
@@ -2116,7 +2458,6 @@
         document.getElementById("cancel-btn").style.display = "";
         showScreen("intake");
       }
-
       function cancelEdit() {
         clearForm();
         document.getElementById("form-title").textContent = "New intake";
@@ -2124,14 +2465,26 @@
         document.getElementById("cancel-btn").style.display = "none";
       }
 
-      // ─── DELETE ────────────────────────────────────────────────────────────────
-      function confirmDelete(id) {
+      function confirmDelete(id, type = "service") {
         document.getElementById("cfm-title").textContent = "Delete record?";
         document.getElementById("cfm-msg").textContent =
-          "This will permanently remove this record. Cannot be undone.";
+          "This will permanently remove this record.";
         document.getElementById("cfm-ok").textContent = "Delete";
         document.getElementById("cfm-ok").onclick = () => {
-          state.items = state.items.filter((x) => x.id !== id);
+          if (type === "service")
+            state.items = state.items.filter((x) => x.id !== id);
+          else if (type === "purchase")
+            state.shop.purchases = state.shop.purchases.filter(
+              (x) => x.id !== id,
+            );
+          else if (type === "expense")
+            state.shop.expenses = state.shop.expenses.filter(
+              (x) => x.id !== id,
+            );
+          else if (type === "sale") {
+            state.shop.sales = state.shop.sales.filter((x) => x.id !== id);
+            recalcDryStock();
+          }
           lsave();
           scheduleSync();
           closeModal();
@@ -2144,63 +2497,83 @@
       function closeCfm() {
         document.getElementById("cfm").classList.remove("open");
       }
-
-      // ─── HOME ──────────────────────────────────────────────────────────────────
       function renderHome() {
+        recalcDryStock();
         const drying = state.items.filter((i) => i.status === "drying").length;
         const ready = state.items.filter((i) => i.status === "ready").length;
-        const debtAmt = state.items
+        const serviceDebt = state.items
           .filter((i) => i.status === "collected" && !i.settledShort)
           .reduce((a, i) => a + balance(i), 0);
-        const weekStart = new Date();
-        weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-        const weekTotal = state.items
-          .filter((i) => new Date(i.createdAt) >= weekStart)
-          .reduce((a, i) => a + i.total, 0);
+        const salesDebt = state.shop.sales
+          .filter((s) => s.type === "credit" && !s.paid)
+          .reduce((a, s) => a + (s.amount - s.amtPaid), 0);
+        const youOwe = state.shop.purchases
+          .filter((p) => p.paymentType === "credit" && !p.paid)
+          .reduce((a, p) => a + (p.totalCost - p.amtPaid), 0);
         document.getElementById("s-dry").textContent = drying;
-        document.getElementById("s-ready").textContent = ready;
-        document.getElementById("s-debt").textContent = fmt(debtAmt);
-        document.getElementById("s-week").textContent = fmt(weekTotal);
-        const debtCount = state.items.filter(
-          (i) => i.status === "collected" && !i.settledShort && balance(i) > 0,
-        ).length;
-        const nbDebts = document.querySelector(".nb:last-child");
-        let badge = document.getElementById("debt-nav-badge");
-        if (debtCount > 0) {
-          if (!badge) {
-            badge = document.createElement("span");
-            badge.className = "nb-badge";
-            badge.id = "debt-nav-badge";
-            nbDebts?.prepend(badge);
-          }
-          badge.textContent = debtCount;
-        } else badge?.remove();
+        document.getElementById("s-stock").textContent = fmtKg(
+          state.shop.dryStockKg,
+        );
+        document.getElementById("s-owedto").textContent = fmt(
+          serviceDebt + salesDebt,
+        );
+        document.getElementById("s-youowe").textContent = fmt(youOwe);
+        const debtCount =
+          state.items.filter(
+            (i) =>
+              i.status === "collected" && !i.settledShort && balance(i) > 0,
+          ).length +
+          state.shop.sales.filter((s) => s.type === "credit" && !s.paid).length;
         let ah = "";
         if (debtCount > 0)
-          ah += `<div class="abar"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="abar-text">${debtCount} customer${debtCount > 1 ? "s" : ""} owe payment — check Debts (More menu)</div></div>`;
+          ah += `<div class="abar"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="abar-text">${debtCount} outstanding debt${debtCount > 1 ? "s" : ""} — check Debts</div></div>`;
         if (ready > 0)
-          ah += `<div class="abar" style="background:var(--teal-l);border-color:rgba(29,158,117,.25)"><svg viewBox="0 0 24 24" style="stroke:var(--teal)"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg><div class="abar-text" style="color:var(--teal-d)">${ready} item${ready > 1 ? "s" : ""} ready — call customers to collect</div></div>`;
+          ah += `<div class="abar" style="background:var(--teal-l);border-color:rgba(29,158,117,.25)"><svg viewBox="0 0 24 24" style="stroke:var(--teal)"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg><div class="abar-text" style="color:var(--teal-d)">${ready} item${ready > 1 ? "s" : ""} ready — notify customers</div></div>`;
+        if (state.shop.dryStockKg > 0 && state.shop.dryStockKg <= 2)
+          ah += `<div class="abar" style="background:var(--red-l);border-color:rgba(226,75,74,.3)"><svg viewBox="0 0 24 24" style="stroke:var(--red)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg><div class="abar-text" style="color:var(--red)">Low stock — only ${fmtKg(state.shop.dryStockKg)} dry fish left</div></div>`;
         document.getElementById("home-alerts").innerHTML = ah;
+        const all = [
+          ...state.items.map((i) => ({
+            ...i,
+            _type: "service",
+            _date: i.createdAt,
+          })),
+          ...state.shop.purchases.map((p) => ({
+            ...p,
+            _type: "purchase",
+            _date: p.date,
+          })),
+          ...state.shop.sales.map((s) => ({
+            ...s,
+            _type: "sale",
+            _date: s.date,
+          })),
+        ]
+          .sort((a, b) => new Date(b._date) - new Date(a._date))
+          .slice(0, 6);
         const recent = document.getElementById("home-recent");
-        if (!state.items.length) {
+        if (!all.length) {
           recent.innerHTML =
-            '<div class="empty"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><p>No activity yet.<br>Tap Add to record your first intake!</p></div>';
+            '<div class="empty"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><p>No activity yet</p></div>';
           return;
         }
-        recent.innerHTML = state.items
-          .slice(0, 6)
-          .map((i) => {
-            const ps = payStatus(i);
-            const fish =
-              (i.fishRows || []).map((r) => r.type).join(", ") ||
-              i.type ||
-              "Fish";
-            return `<div class="itr" onclick="openItem(${i.id})"><div><div class="itr-name">${i.name}</div><div class="itr-meta">${fish} · ${timeAgo(i.createdAt)}</div><div class="itr-meta"><span class="pill ${i.status}">${statusLabel(i.status)}</span>${ps ? ' <span class="pill ' + ps + '">' + payLabel(i) + "</span>" : ""}</div>${i.addedBy ? `<div class="added-by">Added by ${i.addedBy}</div>` : ""}</div><div class="itr-right"><div class="itr-amt">${fmt(i.total)}</div></div></div>`;
+        recent.innerHTML = all
+          .map((r) => {
+            if (r._type === "service") {
+              const ps = payStatus(r);
+              const fish =
+                (r.fishRows || []).map((x) => x.type).join(", ") ||
+                r.type ||
+                "Fish";
+              return `<div class="itr" onclick="openItem(${r.id})"><div><div class="itr-name">${r.name}</div><div class="itr-meta">${fish} · ${timeAgo(r._date)}</div><div class="itr-meta"><span class="pill ${r.status}">${statusLabel(r.status)}</span>${ps ? ' <span class="pill ' + ps + '">' + payLabel(r) + "</span>" : ""}</div></div><div class="itr-right"><div class="itr-amt">${fmt(r.total)}</div></div></div>`;
+            }
+            if (r._type === "purchase")
+              return `<div class="itr" onclick="openPurchase(${r.id})"><div><div class="itr-name">Bought: ${r.supplierName}</div><div class="itr-meta">${fmtKg(r.freshKg)} fresh · ${timeAgo(r._date)}</div><div class="itr-meta"><span class="pill ${r.paymentType === "credit" ? "credit" : "cash"}">${r.paymentType === "credit" ? "Credit buy" : "Cash buy"}</span></div></div><div class="itr-right"><div class="itr-amt">${fmt(r.totalCost)}</div></div></div>`;
+            return `<div class="itr" onclick="openSale(${r.id})"><div><div class="itr-name">Sold: ${r.buyerName || "Walk-in"}</div><div class="itr-meta">${fmtKg(r.weightKg)} dry fish · ${timeAgo(r._date)}</div><div class="itr-meta"><span class="pill ${r.type}">${r.type === "credit" ? "Credit sale" : "Cash sale"}</span></div></div><div class="itr-right"><div class="itr-amt">${fmt(r.amount)}</div></div></div>`;
           })
           .join("");
       }
 
-      // ─── INVENTORY ─────────────────────────────────────────────────────────────
       function renderInventory(filter) {
         let items = state.items.filter((i) => i.status !== "collected");
         if (filter !== "all") items = items.filter((i) => i.status === filter);
@@ -2216,44 +2589,656 @@
               (i.fishRows || []).map((r) => r.type).join(", ") ||
               i.type ||
               "Fish";
-            return `<div class="card" style="cursor:pointer" onclick="openItem(${i.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1;min-width:0"><div class="itr-name">${i.name}</div><div class="itr-meta">${fish}</div><div class="itr-meta">${i.phone || ""}</div><div style="margin-top:5px;display:flex;gap:5px;flex-wrap:wrap"><span class="pill ${i.status}">${statusLabel(i.status)}</span></div>${i.addedBy ? `<div class="added-by">Added by ${i.addedBy}</div>` : ""}</div><div style="text-align:right;margin-left:10px;flex-shrink:0"><div class="itr-amt">${fmt(i.total)}</div><div class="itr-meta">${timeAgo(i.createdAt)}</div></div></div></div>`;
+            return `<div class="card" style="cursor:pointer" onclick="openItem(${i.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1;min-width:0"><div class="itr-name">${i.name}</div><div class="itr-meta">${fish}</div><div class="itr-meta">${i.phone || ""}</div><div style="margin-top:5px"><span class="pill ${i.status}">${statusLabel(i.status)}</span></div>${i.addedBy ? `<div class="added-by">Added by ${i.addedBy}</div>` : ""}</div><div style="text-align:right;margin-left:10px;flex-shrink:0"><div class="itr-amt">${fmt(i.total)}</div><div class="itr-meta">${timeAgo(i.createdAt)}</div></div></div></div>`;
           })
           .join("");
       }
       function filterInv(f, btn) {
         document
-          .querySelectorAll(".tab")
+          .querySelectorAll("#screen-inventory .tab")
           .forEach((t) => t.classList.remove("active"));
         btn.classList.add("active");
         renderInventory(f);
       }
 
-      // ─── TRANSACTIONS ───────────────────────────────────────────────────────────
-      function renderTransactions() {
-        const coll = state.items.filter((i) => i.status === "collected");
-        document.getElementById("tx-rcvd").textContent = fmt(
-          coll.reduce((a, i) => a + totalPaid(i), 0),
+      let currentShopTab = "overview";
+      function showShopTab(tab, btn) {
+        document
+          .querySelectorAll("#shop-tabs .tab")
+          .forEach((t) => t.classList.remove("active"));
+        btn.classList.add("active");
+        renderShopTab(tab);
+      }
+      function renderShopTab(tab) {
+        currentShopTab = tab;
+        const el = document.getElementById("shop-content");
+        if (tab === "overview") renderShopOverview(el);
+        else if (tab === "buy") renderBuyForm(el);
+        else if (tab === "sell") renderSellForm(el);
+        else if (tab === "expenses") renderExpenses(el);
+        else if (tab === "profit") renderProfit(el);
+      }
+
+      function renderShopOverview(el) {
+        recalcDryStock();
+        const totalBought = state.shop.purchases.reduce(
+          (a, p) => a + (p.actualDryKg || p.estimatedDryKg || 0),
+          0,
         );
-        document.getElementById("tx-out").textContent = fmt(
-          coll
-            .filter((i) => !i.settledShort)
-            .reduce((a, i) => a + balance(i), 0),
-        );
-        const el = document.getElementById("tx-list");
-        if (!coll.length) {
-          el.innerHTML =
-            '<div class="empty"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg><p>No transactions yet</p></div>';
+        const totalSold = state.shop.sales.reduce((a, s) => a + s.weightKg, 0);
+        const salesRev = state.shop.sales.reduce((a, s) => a + s.amount, 0);
+        el.innerHTML = `<div class="stock-hero"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="stock-hero-val">${fmtKg(state.shop.dryStockKg)}</div><div class="stock-hero-label">Dry fish in stock</div></div><div style="text-align:right;font-size:12px;opacity:.8"><div>Bought: ${fmtKg(totalBought)}</div><div>Sold: ${fmtKg(totalSold)}</div></div></div><div class="stock-hero-sub">Est. value: ${fmt(state.shop.dryStockKg * state.shop.pricePerKg)} at ${fmt(state.shop.pricePerKg)}/kg</div></div>
+  <div class="sgrid"><div class="stat"><div class="stat-label">Total sales</div><div class="stat-val ct">${fmt(salesRev)}</div></div><div class="stat"><div class="stat-label">Price/kg</div><div class="stat-val ct">${fmt(state.shop.pricePerKg)}</div></div><div class="stat"><div class="stat-label">Purchases</div><div class="stat-val ca">${state.shop.purchases.length}</div></div><div class="stat"><div class="stat-label">Sales</div><div class="stat-val ct">${state.shop.sales.length}</div></div></div>
+  ${
+    state.shop.purchases.length
+      ? `<div class="slabel">Recent purchases</div>${state.shop.purchases
+          .slice(0, 3)
+          .map(
+            (p) =>
+              `<div class="card" style="cursor:pointer;margin-bottom:8px" onclick="openPurchase(${p.id})"><div style="display:flex;justify-content:space-between"><div><div class="itr-name">${p.supplierName}</div><div class="itr-meta">${fmtKg(p.freshKg)} fresh → est. ${fmtKg(p.estimatedDryKg)} dry · ${shortDate(p.date)}</div><div class="itr-meta"><span class="pill ${p.paymentType === "credit" ? "credit" : "cash"}">${p.paymentType === "credit" ? "Credit" : "Cash"}</span>${!p.paid && p.paymentType === "credit" ? ` <span class="pill debt">Owes: ${fmt(p.totalCost - p.amtPaid)}</span>` : ""}</div></div><div style="text-align:right"><div class="itr-amt">${fmt(p.totalCost)}</div></div></div></div>`,
+          )
+          .join("")}`
+      : ""
+  }
+  ${
+    state.shop.sales.length
+      ? `<div class="slabel">Recent sales</div>${state.shop.sales
+          .slice(0, 3)
+          .map(
+            (s) =>
+              `<div class="card" style="cursor:pointer;margin-bottom:8px" onclick="openSale(${s.id})"><div style="display:flex;justify-content:space-between"><div><div class="itr-name">${s.buyerName || "Walk-in customer"}</div><div class="itr-meta">${fmtKg(s.weightKg)} · ${shortDate(s.date)}</div><div class="itr-meta"><span class="pill ${s.type}">${s.type === "credit" ? "Credit" : "Cash"}</span>${s.type === "credit" && !s.paid ? ` <span class="pill debt">Owes: ${fmt(s.amount - s.amtPaid)}</span>` : ""}</div></div><div style="text-align:right"><div class="itr-amt">${fmt(s.amount)}</div></div></div></div>`,
+          )
+          .join("")}`
+      : ""
+  }`;
+      }
+
+      function renderBuyForm(el) {
+        el.innerHTML = `<div class="card"><div class="card-title">Record fish purchase</div>
+  <div class="fg"><label class="fl">Supplier name *</label><div style="position:relative">
+  <input class="fi" id="buy-supplier" type="text" placeholder="e.g. Joy" autocomplete="off" oninput="showSupplierSuggestions()" onblur="setTimeout(hideSupplierSuggestions,200)">
+  <div id="supplier-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rsm);z-index:30;box-shadow:0 4px 12px rgba(0,0,0,0.1);max-height:160px;overflow-y:auto"></div>
+</div></div>
+  <div class="fg"><label class="fl">Supplier phone</label>
+  <div class="irow">
+    <input class="fi" id="buy-phone" type="tel" placeholder="e.g. 08012345678">
+    <button class="cb" onclick="pickBuyContact()" title="Pick from contacts"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></button>
+  </div>
+</div>
+  <div class="r2"><div class="fg"><label class="fl">Fresh weight (kg) *</label><input class="fi" id="buy-freshkg" type="number" placeholder="0.0" step="0.1" min="0" inputmode="decimal" oninput="calcBuyEst()"></div><div class="fg"><label class="fl">Price per kg (₦) *</label><input class="fi" id="buy-pricepkg" type="number" placeholder="0" min="0" inputmode="numeric" oninput="calcBuyEst()"></div></div>
+  <div class="total-box"><span class="total-label">Total cost</span><span class="total-amt" id="buy-total">₦0</span></div>
+  <div class="fg"><label class="fl">Est. dry weight (kg — auto ~35%)</label><input class="fi" id="buy-dryest" type="number" placeholder="0.0" step="0.1" min="0" inputmode="decimal"></div>
+  <div class="fg"><label class="fl">Actual dry weight (fill after drying)</label><input class="fi" id="buy-dryact" type="number" placeholder="Leave empty until dried" step="0.1" min="0" inputmode="decimal"></div>
+  <div class="fg"><label class="fl">Payment type</label><select class="fi" id="buy-paytype" onchange="toggleBuyCredit()"><option value="cash">Cash — paid fully</option><option value="credit">Credit — pay later</option></select></div>
+  <div id="buy-credit-section" style="display:none"><div class="fg"><label class="fl">Amount paid now (₦)</label><input class="fi" id="buy-amtpaid" type="number" placeholder="0" min="0" inputmode="numeric"></div></div>
+  <div class="fg"><label class="fl">Date</label><input class="fi" id="buy-date" type="date"></div>
+  <div class="fg"><label class="fl">Notes</label><input class="fi" id="buy-notes" type="text" placeholder="Optional..."></div>
+  <button class="btn primary" onclick="savePurchase()"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>Save purchase</button></div>
+  <div class="slabel">All purchases</div><div id="purchases-list"></div>`;
+        document.getElementById("buy-date").value = new Date()
+          .toISOString()
+          .split("T")[0];
+        renderPurchasesList();
+      }
+      function calcBuyEst() {
+        const kg =
+          parseFloat(document.getElementById("buy-freshkg")?.value) || 0;
+        const p =
+          parseFloat(document.getElementById("buy-pricepkg")?.value) || 0;
+        if (document.getElementById("buy-total")) {
+          document.getElementById("buy-total").textContent = fmt(kg * p);
+        }
+        const estEl = document.getElementById("buy-dryest");
+        if (estEl) {
+          estEl.value = kg ? +(kg * 0.35).toFixed(2) : "";
+        }
+      }
+      function toggleBuyCredit() {
+        const t = document.getElementById("buy-paytype")?.value;
+        const s = document.getElementById("buy-credit-section");
+        if (s) s.style.display = t === "credit" ? "block" : "none";
+      }
+      function savePurchase() {
+        const supplier = document
+          .getElementById("buy-supplier")
+          .value.trim()
+          .replace(/\b\w/g, (c) => c.toUpperCase());
+        const phone = document.getElementById("buy-phone").value.trim();
+        const freshKg =
+          parseFloat(document.getElementById("buy-freshkg").value) || 0;
+        const pricePerKg =
+          parseFloat(document.getElementById("buy-pricepkg").value) || 0;
+        const dryEst =
+          parseFloat(document.getElementById("buy-dryest").value) ||
+          +(freshKg * 0.35).toFixed(2);
+        const dryAct =
+          parseFloat(document.getElementById("buy-dryact").value) || 0;
+        const payType = document.getElementById("buy-paytype").value;
+        const amtPaid =
+          payType === "credit"
+            ? parseFloat(document.getElementById("buy-amtpaid")?.value) || 0
+            : freshKg * pricePerKg;
+        const date =
+          document.getElementById("buy-date").value ||
+          new Date().toISOString().split("T")[0];
+        const notes = document.getElementById("buy-notes").value.trim();
+        if (!supplier) {
+          showToast("Enter supplier name");
           return;
         }
-        el.innerHTML = coll
-          .map((i) => {
-            const ps = payStatus(i);
-            return `<div class="card" style="cursor:pointer" onclick="openItem(${i.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="itr-name">${i.name}</div><div class="itr-meta">${(i.fishRows || []).map((r) => r.type).join(", ") || i.type || ""}</div><div class="itr-meta">Collected: ${i.collectedAt ? shortDate(i.collectedAt) : "—"}</div>${balance(i) > 0 && !i.settledShort ? `<div class="itr-meta" style="color:var(--red)">Balance: ${fmt(balance(i))}</div>` : ""}</div><div style="text-align:right"><span class="pill ${ps}">${payLabel(i)}</span><div class="itr-amt" style="margin-top:5px">${fmt(i.total)}</div></div></div></div>`;
-          })
+        if (!freshKg || !pricePerKg) {
+          showToast("Enter weight and price");
+          return;
+        }
+        const totalCost = freshKg * pricePerKg;
+        state.shop.purchases.unshift({
+          id: state.shop.purNextId++,
+          supplierName: supplier,
+          phone,
+          freshKg,
+          pricePerKg,
+          totalCost,
+          estimatedDryKg: dryEst,
+          actualDryKg: dryAct || null,
+          paymentType: payType,
+          amtPaid,
+          paid: payType === "cash" || amtPaid >= totalCost,
+          date: new Date(date).toISOString(),
+          notes,
+          addedBy: userName,
+          payments:
+            payType === "credit" && amtPaid > 0
+              ? [{ amount: amtPaid, date: new Date().toISOString() }]
+              : [],
+        });
+        recalcDryStock();
+        lsave();
+        scheduleSync();
+        showToast("✓ Purchase saved");
+        [
+          "buy-supplier",
+          "buy-phone",
+          "buy-freshkg",
+          "buy-pricepkg",
+          "buy-dryest",
+          "buy-dryact",
+          "buy-amtpaid",
+          "buy-notes",
+        ].forEach((id) => {
+          const e = document.getElementById(id);
+          if (e) e.value = "";
+        });
+        document.getElementById("buy-paytype").value = "cash";
+        document.getElementById("buy-credit-section").style.display = "none";
+        document.getElementById("buy-total").textContent = "₦0";
+        document.getElementById("buy-date").value = new Date()
+          .toISOString()
+          .split("T")[0];
+        renderPurchasesList();
+      }
+      function renderPurchasesList() {
+        const el = document.getElementById("purchases-list");
+        if (!el) return;
+        if (!state.shop.purchases.length) {
+          el.innerHTML =
+            '<div class="empty"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line></svg><p>No purchases yet</p></div>';
+          return;
+        }
+        el.innerHTML = state.shop.purchases
+          .map(
+            (p) =>
+              `<div class="card" style="cursor:pointer;margin-bottom:8px" onclick="openPurchase(${p.id})"><div style="display:flex;justify-content:space-between"><div><div class="itr-name">${p.supplierName}</div><div class="itr-meta">${fmtKg(p.freshKg)} fresh → ${p.actualDryKg ? fmtKg(p.actualDryKg) : "est. " + fmtKg(p.estimatedDryKg)} dry</div><div class="itr-meta">${shortDate(p.date)} · <span class="pill ${p.paymentType === "credit" ? "credit" : "cash"}">${p.paymentType === "credit" ? "Credit" : "Cash"}</span>${p.paymentType === "credit" && !p.paid ? ` <span class="pill debt">Owes: ${fmt(p.totalCost - p.amtPaid)}</span>` : ""}</div></div><div style="text-align:right"><div class="itr-amt">${fmt(p.totalCost)}</div></div></div></div>`,
+          )
           .join("");
       }
 
-      // ─── SUMMARY ───────────────────────────────────────────────────────────────
+      function renderSellForm(el) {
+        el.innerHTML = `<div class="card"><div class="card-title">Record sale</div>
+  <div style="background:var(--teal-l);border-radius:var(--rsm);padding:10px 13px;margin-bottom:12px;display:flex;justify-content:space-between"><span style="font-size:13px;color:var(--teal-d);font-weight:500">Stock available</span><span style="font-size:16px;font-weight:700;color:var(--teal)">${fmtKg(state.shop.dryStockKg)}</span></div>
+  <div class="fg"><label class="fl">Buyer name</label><div style="position:relative">
+  <input class="fi" id="sell-buyer" type="text" placeholder="Leave empty for walk-in" autocomplete="off" oninput="showBuyerSuggestions()" onblur="setTimeout(hideBuyerSuggestions,200)">
+  <div id="buyer-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rsm);z-index:30;box-shadow:0 4px 12px rgba(0,0,0,0.1);max-height:160px;overflow-y:auto"></div></div>
+  <div class="fg"><label class="fl">Buyer phone</label>
+  <div class="irow">
+    <input class="fi" id="sell-phone" type="tel" placeholder="Optional">
+    <button class="cb" onclick="pickSellContact()" title="Pick from contacts"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></button>
+  </div>
+</div>
+  <div class="r2"><div class="fg"><label class="fl">Weight sold (kg) *</label><input class="fi" id="sell-kg" type="number" placeholder="0.0" step="0.1" min="0" inputmode="decimal" oninput="calcSaleTotal()"></div><div class="fg"><label class="fl">Price/kg (₦)</label><input class="fi" id="sell-price" type="number" value="${state.shop.pricePerKg}" inputmode="numeric" oninput="calcSaleTotal()"></div></div>
+  <div class="total-box"><span class="total-label">Sale total</span><span class="total-amt" id="sell-total">₦0</span></div>
+  <div class="fg"><label class="fl">Payment type</label><select class="fi" id="sell-paytype" onchange="toggleSellCredit()"><option value="cash">Cash — paid now</option><option value="credit">Credit — pay later</option></select></div>
+  <div id="sell-credit-section" style="display:none"><div class="fg"><label class="fl">Amount paid now (₦)</label><input class="fi" id="sell-amtpaid" type="number" placeholder="0" min="0" inputmode="numeric"></div></div>
+  <div class="fg"><label class="fl">Date</label><input class="fi" id="sell-date" type="date"></div>
+  <div class="fg"><label class="fl">Notes</label><input class="fi" id="sell-notes" type="text" placeholder="Optional..."></div>
+  <button class="btn primary" onclick="saveSale()"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>Save sale</button></div>
+  <div class="slabel">Recent sales</div><div id="sales-list"></div>`;
+        document.getElementById("sell-date").value = new Date()
+          .toISOString()
+          .split("T")[0];
+        calcSaleTotal();
+        renderSalesList();
+      }
+      function calcSaleTotal() {
+        const k = parseFloat(document.getElementById("sell-kg")?.value) || 0;
+        const p =
+          parseFloat(document.getElementById("sell-price")?.value) ||
+          state.shop.pricePerKg;
+        if (document.getElementById("sell-total"))
+          document.getElementById("sell-total").textContent = fmt(k * p);
+      }
+      function toggleSellCredit() {
+        const t = document.getElementById("sell-paytype")?.value;
+        const s = document.getElementById("sell-credit-section");
+        if (s) s.style.display = t === "credit" ? "block" : "none";
+      }
+      function saveSale() {
+        const buyer = document
+          .getElementById("sell-buyer")
+          .value.trim()
+          .replace(/\b\w/g, (c) => c.toUpperCase());
+        const phone = document.getElementById("sell-phone").value.trim();
+        const kg = parseFloat(document.getElementById("sell-kg").value) || 0;
+        const price =
+          parseFloat(document.getElementById("sell-price").value) ||
+          state.shop.pricePerKg;
+        const payType = document.getElementById("sell-paytype").value;
+        const amtPaid =
+          payType === "credit"
+            ? parseFloat(document.getElementById("sell-amtpaid")?.value) || 0
+            : kg * price;
+        const date =
+          document.getElementById("sell-date").value ||
+          new Date().toISOString().split("T")[0];
+        const notes = document.getElementById("sell-notes").value.trim();
+        if (!kg) {
+          showToast("Enter weight sold");
+          return;
+        }
+        if (kg > state.shop.dryStockKg + 0.01) {
+          showToast(
+            "Not enough stock! Only " +
+              fmtKg(state.shop.dryStockKg) +
+              " available",
+          );
+          return;
+        }
+        const amount = kg * price;
+        state.shop.sales.unshift({
+          id: state.shop.saleNextId++,
+          buyerName: buyer || "",
+          phone,
+          weightKg: kg,
+          pricePerKg: price,
+          amount,
+          type: payType,
+          amtPaid,
+          paid: payType === "cash" || amtPaid >= amount,
+          date: new Date(date).toISOString(),
+          notes,
+          addedBy: userName,
+          payments:
+            payType === "credit" && amtPaid > 0
+              ? [{ amount: amtPaid, date: new Date().toISOString() }]
+              : [],
+        });
+        recalcDryStock();
+        lsave();
+        scheduleSync();
+        showToast("✓ Sale saved — stock now " + fmtKg(state.shop.dryStockKg));
+        [
+          "sell-buyer",
+          "sell-phone",
+          "sell-kg",
+          "sell-amtpaid",
+          "sell-notes",
+        ].forEach((id) => {
+          const e = document.getElementById(id);
+          if (e) e.value = "";
+        });
+        document.getElementById("sell-paytype").value = "cash";
+        document.getElementById("sell-credit-section").style.display = "none";
+        document.getElementById("sell-date").value = new Date()
+          .toISOString()
+          .split("T")[0];
+        renderSellForm(el);
+      }
+      function renderSalesList() {
+        const el = document.getElementById("sales-list");
+        if (!el) return;
+        if (!state.shop.sales.length) {
+          el.innerHTML =
+            '<div class="empty"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg><p>No sales yet</p></div>';
+          return;
+        }
+        el.innerHTML = state.shop.sales
+          .map(
+            (s) =>
+              `<div class="card" style="cursor:pointer;margin-bottom:8px" onclick="openSale(${s.id})"><div style="display:flex;justify-content:space-between"><div><div class="itr-name">${s.buyerName || "Walk-in customer"}</div><div class="itr-meta">${fmtKg(s.weightKg)} at ${fmt(s.pricePerKg)}/kg · ${shortDate(s.date)}</div><div class="itr-meta"><span class="pill ${s.type}">${s.type === "credit" ? "Credit" : "Cash"}</span>${s.type === "credit" && !s.paid ? ` <span class="pill debt">Owes: ${fmt(s.amount - s.amtPaid)}</span>` : ""}</div></div><div style="text-align:right"><div class="itr-amt">${fmt(s.amount)}</div></div></div></div>`,
+          )
+          .join("");
+      }
+
+      function renderExpenses(el) {
+        el.innerHTML = `<div class="card"><div class="card-title">Record expense</div>
+  <div class="r2"><div class="fg"><label class="fl">Type</label><select class="fi" id="exp-type"><option>Salt</option><option>Charcoal</option><option>Labour</option><option>Transport</option><option>Other</option></select></div><div class="fg"><label class="fl">Amount (₦) *</label><input class="fi" id="exp-amount" type="number" placeholder="0" min="0" inputmode="numeric"></div></div>
+  <div class="fg"><label class="fl">Description</label><input class="fi" id="exp-desc" type="text" placeholder="e.g. 2 bags of salt"></div>
+  <div class="fg"><label class="fl">Date</label><input class="fi" id="exp-date" type="date"></div>
+  <button class="btn primary" onclick="saveExpense()"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>Save expense</button></div>
+  <div class="slabel">All expenses</div><div id="exp-list"></div>`;
+        document.getElementById("exp-date").value = new Date()
+          .toISOString()
+          .split("T")[0];
+        renderExpenseList();
+      }
+      function saveExpense() {
+        const type = document.getElementById("exp-type").value;
+        const amount =
+          parseFloat(document.getElementById("exp-amount").value) || 0;
+        const desc = document.getElementById("exp-desc").value.trim();
+        const date =
+          document.getElementById("exp-date").value ||
+          new Date().toISOString().split("T")[0];
+        if (!amount) {
+          showToast("Enter expense amount");
+          return;
+        }
+        state.shop.expenses.unshift({
+          id: state.shop.expNextId++,
+          type,
+          amount,
+          desc,
+          date: new Date(date).toISOString(),
+          addedBy: userName,
+        });
+        lsave();
+        scheduleSync();
+        showToast("✓ Expense saved");
+        document.getElementById("exp-amount").value = "";
+        document.getElementById("exp-desc").value = "";
+        renderExpenseList();
+      }
+      function renderExpenseList() {
+        const el = document.getElementById("exp-list");
+        if (!el) return;
+        if (!state.shop.expenses.length) {
+          el.innerHTML =
+            '<div class="empty"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg><p>No expenses yet</p></div>';
+          return;
+        }
+        const total = state.shop.expenses.reduce((a, e) => a + e.amount, 0);
+        el.innerHTML =
+          `<div style="background:var(--purple-l,#F0EAF9);border-radius:var(--r);padding:10px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:var(--purple,#6B3FA0);font-weight:600">Total expenses</span><span style="font-size:18px;font-weight:700;color:var(--purple,#6B3FA0)">${fmt(total)}</span></div>` +
+          state.shop.expenses
+            .map(
+              (e) =>
+                `<div class="card" style="margin-bottom:7px;display:flex;justify-content:space-between;align-items:center"><div><div class="itr-name">${e.type}</div><div class="itr-meta">${e.desc || ""} · ${shortDate(e.date)}</div></div><div style="display:flex;align-items:center;gap:8px"><div class="itr-amt" style="color:var(--purple,#6B3FA0)">${fmt(e.amount)}</div><button class="btn sm danger" onclick="confirmDelete(${e.id},'expense')">Del</button></div></div>`,
+            )
+            .join("");
+      }
+
+      function renderProfit(el) {
+        const now = new Date();
+        const ms = new Date(now.getFullYear(), now.getMonth(), 1);
+        const lms = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const lme = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+        function calc(s, e) {
+          const sales = state.shop.sales.filter(
+            (x) => new Date(x.date) >= s && new Date(x.date) <= e,
+          );
+          const purch = state.shop.purchases.filter(
+            (x) => new Date(x.date) >= s && new Date(x.date) <= e,
+          );
+          const exp = state.shop.expenses.filter(
+            (x) => new Date(x.date) >= s && new Date(x.date) <= e,
+          );
+          const rev = sales.reduce((a, x) => a + x.amount, 0);
+          const cost = purch.reduce((a, x) => a + x.totalCost, 0);
+          const expCost = exp.reduce((a, x) => a + x.amount, 0);
+          return { rev, cost, expCost, profit: rev - cost - expCost };
+        }
+        const tm = calc(ms, now);
+        const lm = calc(lms, lme);
+        const at = calc(new Date(0), now);
+        function pCard(label, d) {
+          const pos = d.profit >= 0;
+          return `<div class="profit-box ${pos ? "positive" : "negative"}"><div class="profit-label" style="color:${pos ? "var(--green)" : "var(--red)"}">${label}</div><div class="profit-val" style="color:${pos ? "var(--green)" : "var(--red)"}">${d.profit < 0 ? "-" : ""}${fmt(Math.abs(d.profit))}</div><div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap"><div style="font-size:12px"><span style="color:var(--t3)">Sales</span><br><strong style="color:var(--green)">${fmt(d.rev)}</strong></div><div style="font-size:12px"><span style="color:var(--t3)">Fish cost</span><br><strong style="color:var(--red)">-${fmt(d.cost)}</strong></div><div style="font-size:12px"><span style="color:var(--t3)">Expenses</span><br><strong style="color:var(--purple,#6B3FA0)">-${fmt(d.expCost)}</strong></div></div></div>`;
+        }
+        el.innerHTML =
+          pCard(
+            "This month — " +
+              now.toLocaleDateString("en-NG", {
+                month: "long",
+                year: "numeric",
+              }),
+            tm,
+          ) +
+          pCard(
+            "Last month — " +
+              lms.toLocaleDateString("en-NG", {
+                month: "long",
+                year: "numeric",
+              }),
+            lm,
+          ) +
+          pCard("All time", at) +
+          `<div class="card"><div class="card-title">Expense breakdown</div>${
+            ["Salt", "Charcoal", "Labour", "Transport", "Other"]
+              .map((t) => {
+                const tot = state.shop.expenses
+                  .filter((e) => e.type === t)
+                  .reduce((a, e) => a + e.amount, 0);
+                return tot > 0
+                  ? `<div class="sum-row"><span class="sl">${t}</span><span class="sv" style="color:var(--purple,#6B3FA0)">${fmt(tot)}</span></div>`
+                  : "";
+              })
+              .join("") ||
+            "<div class='itr-meta' style='padding:8px 0'>No expenses yet</div>"
+          }</div>`;
+      }
+      function openPurchase(id) {
+        const p = state.shop.purchases.find((x) => x.id === id);
+        if (!p) return;
+        const owes =
+          p.paymentType === "credit" && !p.paid ? p.totalCost - p.amtPaid : 0;
+        document.getElementById("modal-body").innerHTML = `
+    <button class="mclose" onclick="closeModal()">Close</button>
+    <div class="mtitle">${p.supplierName}</div><div class="msub">Fish purchase · ${shortDate(p.date)}</div>
+    <table class="dtbl">
+      <tr><td class="dl">Fresh weight</td><td class="dv">${fmtKg(p.freshKg)}</td></tr>
+      <tr><td class="dl">Price/kg</td><td class="dv">${fmt(p.pricePerKg)}</td></tr>
+      <tr><td class="dl">Total cost</td><td class="dv" style="color:var(--teal);font-weight:700">${fmt(p.totalCost)}</td></tr>
+      <tr><td class="dl">Est. dry weight</td><td class="dv">${fmtKg(p.estimatedDryKg)}</td></tr>
+      <tr><td class="dl">Actual dry weight</td><td class="dv">${p.actualDryKg ? fmtKg(p.actualDryKg) : "Not entered yet"}</td></tr>
+      <tr><td class="dl">Payment</td><td class="dv"><span class="pill ${p.paymentType === "credit" ? "credit" : "cash"}">${p.paymentType === "credit" ? "Credit" : "Cash"}</span></td></tr>
+      ${p.paymentType === "credit" ? `<tr><td class="dl">Paid so far</td><td class="dv" style="color:var(--green)">${fmt(p.amtPaid)}</td></tr>` : ""}
+      ${owes > 0 ? `<tr><td class="dl">You owe</td><td class="dv" style="color:var(--red);font-weight:700">${fmt(owes)}</td></tr>` : ""}
+      ${p.phone ? `<tr><td class="dl">Phone</td><td class="dv">${p.phone}</td></tr>` : ""}
+      ${p.notes ? `<tr><td class="dl">Notes</td><td class="dv">${p.notes}</td></tr>` : ""}
+    </table>
+    <div class="dvdr"></div>
+    ${!p.actualDryKg ? `<div class="fg"><label class="fl">Enter actual dry weight (kg)</label><div style="display:flex;gap:8px"><input class="fi" id="actual-dry-input" type="number" placeholder="0.0" step="0.1" min="0" inputmode="decimal" style="flex:1"><button class="btn sm primary" onclick="saveActualDry(${p.id})">Save</button></div></div>` : ""}
+    ${owes > 0 ? `<button class="btn primary" style="margin-bottom:8px" onclick="paySupplier(${p.id})"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>Record payment to supplier</button>` : ""}
+    ${p.phone ? `<button class="btn" style="margin-bottom:8px" onclick="callCustomer('${p.phone}','${p.supplierName}')"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.36 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>Call supplier</button>` : ""}
+    <button class="btn danger" onclick="confirmDelete(${p.id},'purchase')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path></svg>Delete</button>`;
+        document.getElementById("modal-bg").classList.add("open");
+      }
+
+      function saveActualDry(id) {
+        const p = state.shop.purchases.find((x) => x.id === id);
+        if (!p) return;
+        const val =
+          parseFloat(document.getElementById("actual-dry-input")?.value) || 0;
+        if (!val) {
+          showToast("Enter the actual dry weight");
+          return;
+        }
+        p.actualDryKg = val;
+        p.editedAt = new Date().toISOString();
+        recalcDryStock();
+        lsave();
+        scheduleSync();
+        showToast("✓ Dry weight updated");
+        closeModal();
+        renderHome();
+      }
+
+      function paySupplier(id) {
+        const p = state.shop.purchases.find((x) => x.id === id);
+        if (!p) return;
+        const owes = p.totalCost - p.amtPaid;
+        document.getElementById("pay-body").innerHTML = `
+    <button class="mclose" onclick="closePayModal()">Close</button>
+    <div class="mtitle">Pay supplier</div><div class="msub">${p.supplierName} — you owe ${fmt(owes)}</div>
+    <div class="fg"><label class="fl">Amount paying (₦)</label><input class="fi" id="sup-pay-amt" type="number" value="${owes}" min="0" inputmode="numeric"></div>
+    <div class="fg"><label class="fl">Note</label><input class="fi" id="sup-pay-note" type="text" placeholder="Optional..."></div>
+    <button class="btn primary" onclick="recordSupplierPayment(${id})"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>Record payment</button>`;
+        document.getElementById("pay-mbg").classList.add("open");
+      }
+      function recordSupplierPayment(id) {
+        const p = state.shop.purchases.find((x) => x.id === id);
+        if (!p) return;
+        const amt =
+          parseFloat(document.getElementById("sup-pay-amt")?.value) || 0;
+        if (!amt) {
+          showToast("Enter amount");
+          return;
+        }
+        p.amtPaid += amt;
+        if (!p.payments) p.payments = [];
+        p.payments.push({ amount: amt, date: new Date().toISOString() });
+        if (p.amtPaid >= p.totalCost) p.paid = true;
+        p.editedAt = new Date().toISOString();
+        lsave();
+        scheduleSync();
+        closePayModal();
+        closeModal();
+        showToast("✓ Payment to supplier recorded");
+        renderHome();
+      }
+
+      function openSale(id) {
+        const s = state.shop.sales.find((x) => x.id === id);
+        if (!s) return;
+        const owes = s.type === "credit" && !s.paid ? s.amount - s.amtPaid : 0;
+        document.getElementById("modal-body").innerHTML = `
+    <button class="mclose" onclick="closeModal()">Close</button>
+    <div class="mtitle">${s.buyerName || "Walk-in customer"}</div><div class="msub">Dry fish sale · ${shortDate(s.date)}</div>
+    <table class="dtbl">
+      <tr><td class="dl">Weight sold</td><td class="dv">${fmtKg(s.weightKg)}</td></tr>
+      <tr><td class="dl">Price/kg</td><td class="dv">${fmt(s.pricePerKg)}</td></tr>
+      <tr><td class="dl">Total amount</td><td class="dv" style="color:var(--teal);font-weight:700">${fmt(s.amount)}</td></tr>
+      <tr><td class="dl">Payment type</td><td class="dv"><span class="pill ${s.type}">${s.type === "credit" ? "Credit" : "Cash"}</span></td></tr>
+      ${s.type === "credit" ? `<tr><td class="dl">Paid so far</td><td class="dv" style="color:var(--green)">${fmt(s.amtPaid)}</td></tr>` : ""}
+      ${owes > 0 ? `<tr><td class="dl">Owes you</td><td class="dv" style="color:var(--red);font-weight:700">${fmt(owes)}</td></tr>` : ""}
+      ${s.phone ? `<tr><td class="dl">Phone</td><td class="dv">${s.phone}</td></tr>` : ""}
+      ${s.notes ? `<tr><td class="dl">Notes</td><td class="dv">${s.notes}</td></tr>` : ""}
+    </table>
+    <div class="dvdr"></div>
+    ${owes > 0 ? `<button class="btn primary" style="margin-bottom:8px" onclick="paySale(${s.id})"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>Record payment received</button>` : ""}
+    ${s.phone ? `<button class="btn whatsapp" style="margin-bottom:8px" onclick="sendWhatsApp('${s.phone}','${s.buyerName || ""}','saledebt',${s.id})"><svg viewBox="0 0 24 24" style="fill:none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>WhatsApp reminder</button>` : ""}
+    <button class="btn danger" onclick="confirmDelete(${s.id},'sale')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path></svg>Delete</button>`;
+        document.getElementById("modal-bg").classList.add("open");
+      }
+      function paySale(id) {
+        const s = state.shop.sales.find((x) => x.id === id);
+        if (!s) return;
+        const owes = s.amount - s.amtPaid;
+        document.getElementById("pay-body").innerHTML =
+          `<button class="mclose" onclick="closePayModal()">Close</button><div class="mtitle">Record payment</div><div class="msub">${s.buyerName || "Customer"} — owes ${fmt(owes)}</div><div class="fg"><label class="fl">Amount received (₦)</label><input class="fi" id="sale-pay-amt" type="number" value="${owes}" min="0" inputmode="numeric"></div><div class="fg"><label class="fl">Note</label><input class="fi" id="sale-pay-note" type="text" placeholder="Optional..."></div><button class="btn primary" onclick="recordSalePayment(${id},false)" style="margin-bottom:8px">Save payment</button><button class="btn" onclick="recordSalePayment(${id},true)" style="border-color:var(--green);color:var(--green)">Save &amp; mark fully settled</button>`;
+        document.getElementById("pay-mbg").classList.add("open");
+      }
+      function recordSalePayment(id, settle) {
+        const s = state.shop.sales.find((x) => x.id === id);
+        if (!s) return;
+        const amt =
+          parseFloat(document.getElementById("sale-pay-amt")?.value) || 0;
+        if (!amt) {
+          showToast("Enter amount");
+          return;
+        }
+        s.amtPaid += amt;
+        if (!s.payments) s.payments = [];
+        s.payments.push({ amount: amt, date: new Date().toISOString() });
+        if (settle || s.amtPaid >= s.amount) s.paid = true;
+        s.editedAt = new Date().toISOString();
+        lsave();
+        scheduleSync();
+        closePayModal();
+        closeModal();
+        showToast("✓ Payment recorded");
+        renderHome();
+      }
+
+      function filterDebts(filter, btn) {
+        document
+          .querySelectorAll("#screen-debts .tab")
+          .forEach((t) => t.classList.remove("active"));
+        btn.classList.add("active");
+        renderDebts(filter);
+      }
+      function renderDebts(filter = "all") {
+        const svcDebts = state.items.filter(
+          (i) => i.status === "collected" && !i.settledShort && balance(i) > 0,
+        );
+        const salesDebts = state.shop.sales.filter(
+          (s) => s.type === "credit" && !s.paid,
+        );
+        const supDebts = state.shop.purchases.filter(
+          (p) => p.paymentType === "credit" && !p.paid,
+        );
+        const owedToMe =
+          svcDebts.reduce((a, i) => a + balance(i), 0) +
+          salesDebts.reduce((a, s) => a + (s.amount - s.amtPaid), 0);
+        const youOwe = supDebts.reduce(
+          (a, p) => a + (p.totalCost - p.amtPaid),
+          0,
+        );
+        let ah = "";
+        if (svcDebts.length + salesDebts.length > 0)
+          ah += `<div class="abar"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="abar-text">${svcDebts.length + salesDebts.length} customer${svcDebts.length + salesDebts.length > 1 ? "s" : ""} owe you ${fmt(owedToMe)}</div></div>`;
+        if (supDebts.length > 0)
+          ah += `<div class="abar" style="background:var(--amber-l)"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="abar-text">You owe ${supDebts.length} supplier${supDebts.length > 1 ? "s" : ""} ${fmt(youOwe)}</div></div>`;
+        document.getElementById("debt-alert").innerHTML = ah;
+        let html = "";
+        if (filter === "all" || filter === "service") {
+          if (svcDebts.length) {
+            html += `<div class="slabel">Drying service debts</div>`;
+            html += svcDebts
+              .map(
+                (i) =>
+                  `<div class="card" style="margin-bottom:9px;cursor:pointer" onclick="openItem(${i.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:14px;font-weight:700">${i.name}</div><div class="itr-meta">Service · ${shortDate(i.createdAt)}</div>${i.phone ? `<div class="itr-meta">${i.phone}</div>` : ""}</div><div style="text-align:right"><div style="font-size:11px;color:var(--t3)">Owes</div><div style="font-size:16px;font-weight:700;color:var(--red)">${fmt(balance(i))}</div></div></div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">${i.phone ? `<button class="btn sm whatsapp" onclick="event.stopPropagation();sendWhatsApp('${i.phone}','${i.name}','debt',${i.id})">WhatsApp</button><button class="btn sm" onclick="event.stopPropagation();callCustomer('${i.phone}','${i.name}')">Call</button>` : ""}<button class="btn sm primary" onclick="event.stopPropagation();openItem(${i.id})">Pay</button></div></div>`,
+              )
+              .join("");
+          }
+        }
+        if (filter === "all" || filter === "sales") {
+          if (salesDebts.length) {
+            html += `<div class="slabel">Sales credit debts</div>`;
+            html += salesDebts
+              .map(
+                (s) =>
+                  `<div class="card" style="margin-bottom:9px;cursor:pointer" onclick="openSale(${s.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:14px;font-weight:700">${s.buyerName || "Walk-in"}</div><div class="itr-meta">Dry fish sale · ${shortDate(s.date)}</div>${s.phone ? `<div class="itr-meta">${s.phone}</div>` : ""}</div><div style="text-align:right"><div style="font-size:11px;color:var(--t3)">Owes</div><div style="font-size:16px;font-weight:700;color:var(--red)">${fmt(s.amount - s.amtPaid)}</div></div></div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">${s.phone ? `<button class="btn sm whatsapp" onclick="event.stopPropagation();sendWhatsApp('${s.phone}','${s.buyerName || ""}','saledebt',${s.id})">WhatsApp</button><button class="btn sm" onclick="event.stopPropagation();callCustomer('${s.phone}','${s.buyerName || ""}')">Call</button>` : ""}<button class="btn sm primary" onclick="event.stopPropagation();paySale(${s.id})">Pay</button></div></div>`,
+              )
+              .join("");
+          }
+        }
+        if (filter === "all" || filter === "supplier") {
+          if (supDebts.length) {
+            html += `<div class="slabel">What you owe suppliers</div>`;
+            html += supDebts
+              .map(
+                (p) =>
+                  `<div class="card" style="margin-bottom:9px;cursor:pointer" onclick="openPurchase(${p.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:14px;font-weight:700">${p.supplierName}</div><div class="itr-meta">Fish purchase · ${shortDate(p.date)}</div>${p.phone ? `<div class="itr-meta">${p.phone}</div>` : ""}</div><div style="text-align:right"><div style="font-size:11px;color:var(--t3)">You owe</div><div style="font-size:16px;font-weight:700;color:var(--amber)">${fmt(p.totalCost - p.amtPaid)}</div></div></div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">${p.phone ? `<button class="btn sm" onclick="event.stopPropagation();callCustomer('${p.phone}','${p.supplierName}')">Call</button>` : ""}<button class="btn sm primary" onclick="event.stopPropagation();paySupplier(${p.id})">Pay supplier</button></div></div>`,
+              )
+              .join("");
+          }
+        }
+        if (!html)
+          html =
+            '<div class="empty"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg><p>No debts here!<br>All clear 🎉</p></div>';
+        document.getElementById("debt-list").innerHTML = html;
+      }
+
       let currentSumPeriod = "week";
       function filterSum(period, btn) {
         document
@@ -2291,47 +3276,48 @@
           const d = new Date(i.createdAt);
           return d >= start && d <= end;
         });
+        const sales = state.shop.sales.filter((s) => {
+          const d = new Date(s.date);
+          return d >= start && d <= end;
+        });
+        const purchases = state.shop.purchases.filter((p) => {
+          const d = new Date(p.date);
+          return d >= start && d <= end;
+        });
+        const expenses = state.shop.expenses.filter((e) => {
+          const d = new Date(e.date);
+          return d >= start && d <= end;
+        });
         const collected = items.filter((i) => i.status === "collected");
-        const totalIn = items.reduce((a, i) => a + i.total, 0);
-        const totalColl = collected.reduce((a, i) => a + totalPaid(i), 0);
-        const totalOut = collected
-          .filter((i) => !i.settledShort)
-          .reduce((a, i) => a + balance(i), 0);
+        const serviceRev = collected.reduce((a, i) => a + totalPaid(i), 0);
+        const salesRev = sales.reduce((a, s) => a + s.amount, 0);
+        const buyingCost = purchases.reduce((a, p) => a + p.totalCost, 0);
+        const expCost = expenses.reduce((a, e) => a + e.amount, 0);
         const el = document.getElementById("sum-content");
-        if (!items.length) {
-          el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg><p>No records for ${label}</p></div>`;
-          return;
-        }
-        el.innerHTML = `
-              <div class="sum-card">
-                <div style="font-size:13px;font-weight:600;color:var(--t3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">${label}</div>
-                <div class="sum-row"><span class="sl">Total intakes</span><span class="sv">${items.length}</span></div>
-                <div class="sum-row"><span class="sl">Total charged</span><span class="sv ct">${fmt(totalIn)}</span></div>
-                <div class="sum-row"><span class="sl">Total collected</span><span class="sv" style="color:var(--green)">${fmt(totalColl)}</span></div>
-                <div class="sum-row"><span class="sl">Still drying</span><span class="sv ca">${items.filter((i) => i.status === "drying").length}</span></div>
-                <div class="sum-row"><span class="sl">Ready to collect</span><span class="sv ct">${items.filter((i) => i.status === "ready").length}</span></div>
-                <div class="sum-row"><span class="sl">Outstanding balance</span><span class="sv cr">${fmt(totalOut)}</span></div>
-              </div>
-              <div class="slabel">Customers this period</div>
-              ${[...new Set(items.map((i) => i.name))]
-                .map((name) => {
-                  const ci = items.filter((i) => i.name === name);
-                  const ct = ci.reduce((a, i) => a + i.total, 0);
-                  return `<div class="sum-card" style="cursor:pointer" onclick="openCustomer('${name.replace(/'/g, "\\'")}')"><div style="display:flex;justify-content:space-between"><div><div style="font-size:13px;font-weight:600">${name}</div><div class="itr-meta">${ci.length} visit${ci.length !== 1 ? "s" : ""}</div></div><div style="font-size:14px;font-weight:700;color:var(--teal)">${fmt(ct)}</div></div></div>`;
-                })
-                .join("")}`;
+        el.innerHTML = `<div class="sum-card">
+    <div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">${label}</div>
+    <div class="slabel">Drying service</div>
+    <div class="sum-row"><span class="sl">Intakes</span><span class="sv">${items.length}</span></div>
+    <div class="sum-row"><span class="sl">Revenue collected</span><span class="sv ct">${fmt(serviceRev)}</span></div>
+    <div class="sum-row"><span class="sl">Still drying</span><span class="sv ca">${items.filter((i) => i.status === "drying").length}</span></div>
+    <div class="sum-row"><span class="sl">Ready to collect</span><span class="sv ct">${items.filter((i) => i.status === "ready").length}</span></div>
+    <div class="slabel" style="margin-top:12px">Shop (buy & sell)</div>
+    <div class="sum-row"><span class="sl">Fish sales</span><span class="sv ct">${fmt(salesRev)}</span></div>
+    <div class="sum-row"><span class="sl">Fish bought (cost)</span><span class="sv cr">-${fmt(buyingCost)}</span></div>
+    <div class="sum-row"><span class="sl">Expenses</span><span class="sv" style="color:var(--purple,#6B3FA0)">-${fmt(expCost)}</span></div>
+    <div class="sum-row" style="border-top:1px solid var(--bdr2);margin-top:4px;padding-top:10px"><span class="sl" style="font-weight:600">Shop profit</span><span class="sv" style="color:${salesRev - buyingCost - expCost >= 0 ? "var(--green)" : "var(--red)"};font-size:16px">${fmt(salesRev - buyingCost - expCost)}</span></div>
+  </div>`;
       }
 
-      // ─── CUSTOMERS ─────────────────────────────────────────────────────────────
       function renderCustomers() {
         const q = (
           document.getElementById("cust-search").value || ""
         ).toLowerCase();
         const map = {};
         state.items.forEach((i) => {
-          const key = i.name.toLowerCase();
-          if (!map[key])
-            map[key] = {
+          const k = i.name.toLowerCase();
+          if (!map[k])
+            map[k] = {
               name: i.name,
               phone: i.phone || "",
               items: [],
@@ -2339,11 +3325,29 @@
               totalPaidAmt: 0,
               totalBal: 0,
             };
-          map[key].items.push(i);
-          map[key].totalBiz += i.total;
-          map[key].totalPaidAmt += totalPaid(i);
+          map[k].items.push(i);
+          map[k].totalBiz += i.total;
+          map[k].totalPaidAmt += totalPaid(i);
           if (i.status === "collected" && !i.settledShort)
-            map[key].totalBal += balance(i);
+            map[k].totalBal += balance(i);
+        });
+        state.shop.sales.forEach((s) => {
+          if (!s.buyerName) return;
+          const key = s.buyerName.toLowerCase();
+          if (!map[key])
+            map[key] = {
+              name: s.buyerName,
+              phone: s.phone || "",
+              items: [],
+              totalBiz: 0,
+              totalPaidAmt: 0,
+              totalBal: 0,
+              salesAmt: 0,
+            };
+          map[key].salesAmt = (map[key].salesAmt || 0) + s.amount;
+          map[key].totalBiz += s.amount;
+          map[key].totalPaidAmt += s.amtPaid;
+          if (!s.paid) map[key].totalBal += s.amount - s.amtPaid;
         });
         let custs = Object.values(map).sort((a, b) => b.totalBiz - a.totalBiz);
         if (q)
@@ -2358,20 +3362,11 @@
         }
         el.innerHTML = custs
           .map(
-            (c) => `
-              <div class="cust-card" onclick="openCustomer('${c.name.replace(/'/g, "\\'")}')">
-                <div class="cust-name">${c.name}</div>
-                <div class="cust-meta">${c.phone || "No phone"} · ${c.items.length} visit${c.items.length !== 1 ? "s" : ""}</div>
-                <div class="cust-stats">
-                  <div class="cst">Biz: <strong>${fmt(c.totalBiz)}</strong></div>
-                  <div class="cst">Paid: <strong style="color:var(--green)">${fmt(c.totalPaidAmt)}</strong></div>
-                  ${c.totalBal > 0 ? `<div class="cst">Owes: <strong style="color:var(--red)">${fmt(c.totalBal)}</strong></div>` : ""}
-                </div>
-              </div>`,
+            (c) =>
+              `<div class="cust-card" onclick="openCustomer('${c.name.replace(/'/g, "\\'")}')"><div class="cust-name">${c.name}</div><div class="cust-meta">${c.phone || "No phone"} · ${c.items.length} visit${c.items.length !== 1 ? "s" : ""}</div><div class="cust-stats"><div class="cst">Biz: <strong>${fmt(c.totalBiz)}</strong></div><div class="cst">Paid: <strong style="color:var(--green)">${fmt(c.totalPaidAmt)}</strong></div>${c.totalBal > 0 ? `<div class="cst">Owes: <strong style="color:var(--red)">${fmt(c.totalBal)}</strong></div>` : ""}</div></div>`,
           )
           .join("");
       }
-
       function openCustomer(name) {
         const items = state.items.filter(
           (i) => i.name.toLowerCase() === name.toLowerCase(),
@@ -2383,74 +3378,30 @@
         const tBal = items
           .filter((i) => i.status === "collected" && !i.settledShort)
           .reduce((a, i) => a + balance(i), 0);
-        document.getElementById("cust-body").innerHTML = `
-              <button class="mclose" onclick="closeCustModal()">Close</button>
-              <div class="mtitle">${c.name}</div>
-              <div class="msub">${c.phone || "No phone saved"}</div>
-              <div class="sgrid" style="margin-bottom:11px">
-                <div class="stat"><div class="stat-label">Total business</div><div class="stat-val ct" style="font-size:15px">${fmt(totalBiz)}</div></div>
-                <div class="stat"><div class="stat-label">Total paid</div><div class="stat-val" style="font-size:15px;color:var(--green)">${fmt(tPaid)}</div></div>
-                <div class="stat"><div class="stat-label">Visits</div><div class="stat-val ct" style="font-size:15px">${items.length}</div></div>
-                <div class="stat"><div class="stat-label">Outstanding</div><div class="stat-val cr" style="font-size:15px">${fmt(tBal)}</div></div>
-              </div>
-              ${
-                c.phone
-                  ? `<div style="display:flex;gap:8px;margin-bottom:12px">
-                <button class="btn" style="flex:1" onclick="callCustomer('${c.phone}','${c.name}')"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.36 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>Call</button>
-                <button class="btn whatsapp" style="flex:1" onclick="sendWhatsApp('${c.phone}','${c.name}','reminder')"><svg viewBox="0 0 24 24" style="fill:none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>WhatsApp</button>
-              </div>`
-                  : ""
-              }
-              <div class="slabel">All visits</div>
-              ${items
-                .map((i) => {
-                  const fish =
-                    (i.fishRows || []).map((r) => r.type).join(", ") ||
-                    i.type ||
-                    "Fish";
-                  return `<div class="card" style="cursor:pointer;margin-bottom:7px" onclick="closeCustModal();openItem(${i.id})"><div style="display:flex;justify-content:space-between"><div><div style="font-size:13px;font-weight:600">${fish}</div><div class="itr-meta">${shortDate(i.createdAt)} · <span class="pill ${i.status}">${statusLabel(i.status)}</span>${payStatus(i) ? ' <span class="pill ' + payStatus(i) + '">' + payLabel(i) + "</span>" : ""}</div>${i.notes ? `<div class="itr-meta">📝 ${i.notes}</div>` : ""}</div><div style="text-align:right"><div style="font-size:13px;font-weight:600">${fmt(i.total)}</div>${balance(i) > 0 && !i.settledShort ? `<div class="itr-meta" style="color:var(--red)">Bal: ${fmt(balance(i))}</div>` : ""}</div></div></div>`;
-                })
-                .join("")}`;
+        document.getElementById("cust-body").innerHTML =
+          `<button class="mclose" onclick="closeCustModal()">Close</button><div class="mtitle">${c.name}</div><div class="msub">${c.phone || "No phone saved"}</div>
+  <div class="sgrid" style="margin-bottom:11px"><div class="stat"><div class="stat-label">Total business</div><div class="stat-val ct" style="font-size:15px">${fmt(totalBiz)}</div></div><div class="stat"><div class="stat-label">Total paid</div><div class="stat-val" style="font-size:15px;color:var(--green)">${fmt(tPaid)}</div></div><div class="stat"><div class="stat-label">Visits</div><div class="stat-val ct" style="font-size:15px">${items.length}</div></div><div class="stat"><div class="stat-label">Outstanding</div><div class="stat-val cr" style="font-size:15px">${fmt(tBal)}</div></div></div>
+  ${c.phone ? `<div style="display:flex;gap:8px;margin-bottom:12px"><button class="btn" style="flex:1" onclick="callCustomer('${c.phone}','${c.name}')"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.36 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>Call</button><button class="btn whatsapp" style="flex:1" onclick="sendWhatsApp('${c.phone}','${c.name}','reminder')"><svg viewBox="0 0 24 24" style="fill:none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>WhatsApp</button></div>` : ""}
+  <div class="slabel">All visits</div>${items
+    .map((i) => {
+      const fish =
+        (i.fishRows || []).map((r) => r.type).join(", ") || i.type || "Fish";
+      return `<div class="card" style="cursor:pointer;margin-bottom:7px" onclick="closeCustModal();openItem(${i.id})"><div style="display:flex;justify-content:space-between"><div><div style="font-size:13px;font-weight:600">${fish}</div><div class="itr-meta">${shortDate(i.createdAt)} · <span class="pill ${i.status}">${statusLabel(i.status)}</span>${payStatus(i) ? ' <span class="pill ' + payStatus(i) + '">' + payLabel(i) + "</span>" : ""}</div>${i.notes ? `<div class="itr-meta">📝 ${i.notes}</div>` : ""}</div><div style="text-align:right"><div style="font-size:13px;font-weight:600">${fmt(i.total)}</div>${balance(i) > 0 && !i.settledShort ? `<div class="itr-meta" style="color:var(--red)">Bal: ${fmt(balance(i))}</div>` : ""}</div></div></div>`;
+    })
+    .join("")}`;
         document.getElementById("cust-mbg").classList.add("open");
       }
       function closeCustModal() {
         document.getElementById("cust-mbg").classList.remove("open");
       }
 
-      // ─── DEBTS ─────────────────────────────────────────────────────────────────
-      function renderDebts() {
-        const debts = state.items.filter(
-          (i) => i.status === "collected" && !i.settledShort && balance(i) > 0,
-        );
-        document.getElementById("debt-alert").innerHTML = debts.length
-          ? `<div class="abar"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="abar-text">${debts.length} customer${debts.length > 1 ? "s" : ""} owe you — remind them!</div></div>`
-          : "";
-        const el = document.getElementById("debt-list");
-        if (!debts.length) {
-          el.innerHTML =
-            '<div class="empty"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg><p>No outstanding debts!<br>All clear 🎉</p></div>';
-          return;
-        }
-        const total = debts.reduce((a, i) => a + balance(i), 0);
-        el.innerHTML =
-          `<div style="background:var(--red-l);border-radius:var(--r);padding:10px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:var(--red);font-weight:600">Total owed to you</span><span style="font-size:18px;font-weight:700;color:var(--red)">${fmt(total)}</span></div>` +
-          debts
-            .map(
-              (i) =>
-                `<div class="card" style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px"><div><div style="font-size:14px;font-weight:700">${i.name}</div><div class="itr-meta">${(i.fishRows || []).map((r) => r.type).join(", ") || i.type || ""}</div><div class="itr-meta">Collected: ${i.collectedAt ? shortDate(i.collectedAt) : shortDate(i.createdAt)}</div>${totalPaid(i) > 0 ? `<div class="itr-meta" style="color:var(--green)">Paid so far: ${fmt(totalPaid(i))}</div>` : ""}</div><div style="text-align:right"><div style="font-size:11px;color:var(--t3);margin-bottom:1px">Balance</div><div style="font-size:17px;font-weight:700;color:var(--red)">${fmt(balance(i))}</div></div></div><div style="display:flex;gap:7px;flex-wrap:wrap">${i.phone ? `<button class="btn sm whatsapp" onclick="sendWhatsApp('${i.phone}','${i.name}','debt',${i.id})">WhatsApp</button><button class="btn sm" onclick="callCustomer('${i.phone}','${i.name}')"><svg viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.36 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>` : ""}<button class="btn sm primary" onclick="openPayModal(${i.id})">+ Payment</button><button class="btn sm" onclick="openItem(${i.id})">Details</button></div></div>`,
-            )
-            .join("");
-      }
-
-      // ─── ANALYTICS ─────────────────────────────────────────────────────────────
       function renderAnalytics() {
         const el = document.getElementById("analytics-content");
-        if (!state.items.length) {
+        if (!state.items.length && !state.shop.sales.length) {
           el.innerHTML =
             '<div class="empty"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><p>No data yet</p></div>';
           return;
         }
-        // Best customers by total business
         const map = {};
         state.items.forEach((i) => {
           if (!map[i.name])
@@ -2462,62 +3413,20 @@
         const custs = Object.values(map)
           .sort((a, b) => b.total - a.total)
           .slice(0, 10);
-        const maxTotal = custs[0]?.total || 1;
-        el.innerHTML = `
-              <div class="card">
-                <div class="card-title"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>Best customers</div>
-                ${custs
-                  .map(
-                    (c, idx) => `
-                  <div class="bar-wrap">
-                    <div class="bar-label"><span>${idx + 1}. ${c.name}</span><span>${fmt(c.total)} · ${c.visits} visit${c.visits !== 1 ? "s" : ""}</span></div>
-                    <div class="bar-track"><div class="bar-fill" style="width:${Math.round((c.total / maxTotal) * 100)}%"></div></div>
-                  </div>`,
-                  )
-                  .join("")}
-              </div>
-              <div class="card">
-                <div class="card-title"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>Payment performance</div>
-                ${custs
-                  .map((c) => {
-                    const pct =
-                      c.total > 0 ? Math.round((c.paid / c.total) * 100) : 0;
-                    return `<div class="bar-wrap"><div class="bar-label"><span>${c.name}</span><span>${pct}% paid</span></div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${pct >= 100 ? "var(--green)" : pct >= 50 ? "var(--amber)" : "var(--red)"}"></div></div></div>`;
-                  })
-                  .join("")}
-              </div>
-              <div class="card">
-                <div class="card-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Overview</div>
-                <div class="sum-row"><span class="sl">Total customers</span><span class="sv">${Object.keys(map).length}</span></div>
-                <div class="sum-row"><span class="sl">Total intakes</span><span class="sv">${state.items.length}</span></div>
-                <div class="sum-row"><span class="sl">Total charged</span><span class="sv ct">${fmt(state.items.reduce((a, i) => a + i.total, 0))}</span></div>
-                <div class="sum-row"><span class="sl">Total collected</span><span class="sv" style="color:var(--green)">${fmt(state.items.reduce((a, i) => a + totalPaid(i), 0))}</span></div>
-              </div>`;
+        const maxT = custs[0]?.total || 1;
+        el.innerHTML = `<div class="card"><div class="card-title">Best customers (drying service)</div>${custs.map((c, idx) => `<div class="bar-wrap"><div class="bar-label"><span>${idx + 1}. ${c.name}</span><span>${fmt(c.total)} · ${c.visits} visit${c.visits !== 1 ? "s" : ""}</span></div><div class="bar-track"><div class="bar-fill" style="width:${Math.round((c.total / maxT) * 100)}%"></div></div></div>`).join("")}</div>
+  <div class="card"><div class="card-title">Payment performance</div>${custs
+    .map((c) => {
+      const pct = c.total > 0 ? Math.round((c.paid / c.total) * 100) : 0;
+      return `<div class="bar-wrap"><div class="bar-label"><span>${c.name}</span><span>${pct}% paid</span></div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${pct >= 100 ? "var(--green)" : pct >= 50 ? "var(--amber)" : "var(--red)"}"></div></div></div>`;
+    })
+    .join("")}</div>
+  <div class="card"><div class="card-title">Overview</div><div class="sum-row"><span class="sl">Service customers</span><span class="sv">${Object.keys(map).length}</span></div><div class="sum-row"><span class="sl">Total intakes</span><span class="sv">${state.items.length}</span></div><div class="sum-row"><span class="sl">Total charged</span><span class="sv ct">${fmt(state.items.reduce((a, i) => a + i.total, 0))}</span></div><div class="sum-row"><span class="sl">Total collected</span><span class="sv" style="color:var(--green)">${fmt(state.items.reduce((a, i) => a + totalPaid(i), 0))}</span></div><div class="sum-row"><span class="sl">Fish sales (all time)</span><span class="sv ct">${fmt(state.shop.sales.reduce((a, s) => a + s.amount, 0))}</span></div></div>`;
       }
-
-      // ─── WHATSAPP ──────────────────────────────────────────────────────────────
-      function sendWhatsApp(phone, name, type, itemId) {
-        let msg = "";
-        const cleanPhone = phone.replace(/\D/g, "").replace(/^0/, "234");
-        if (type === "debt" && itemId) {
-          const item = state.items.find((x) => x.id === itemId);
-          const bal = item ? balance(item) : 0;
-          msg = `Hello ${name}, this is a reminder that you have an outstanding balance of ${fmt(bal)} for your fish drying service at Mama J's Fish Store. Kindly settle at your earliest convenience. Thank you!`;
-        } else if (type === "ready" && itemId) {
-          const item = state.items.find((x) => x.id === itemId);
-          const fish =
-            (item?.fishRows || []).map((r) => r.type).join(", ") || "your fish";
-          msg = `Hello ${name}, good news! ${fish} is ready for collection at Mama J's Fish Store. Please come to collect. Thank you!`;
-        } else {
-          msg = `Hello ${name}, please note you have an outstanding balance at Mama J's Fish Store. Kindly come and settle. Thank you!`;
-        }
-        window.open(
-          `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`,
-          "_blank",
-        );
+      function renderSettings() {
+        document.getElementById("settings-name").value = userName;
+        document.getElementById("settings-price").value = state.shop.pricePerKg;
       }
-
-      // ─── ITEM MODAL ─────────────────────────────────────────────────────────────
       function openItem(id) {
         const i = state.items.find((x) => x.id === id);
         if (!i) return;
@@ -2535,27 +3444,38 @@
           },
         ];
         document.getElementById("modal-body").innerHTML = `
-              <button class="mclose" onclick="closeModal()">Close</button>
-              <div class="mtitle">${i.name}</div>
-              <div class="msub"><span class="pill ${i.status}">${statusLabel(i.status)}</span>${ps ? ' <span class="pill ' + ps + '">' + payLabel(i) + "</span>" : ""}</div>
-              ${fishRows.length > 1 ? `<div class="slabel">Fish items</div>${fishRows.map((r) => `<div style="background:var(--surf2);border-radius:var(--rsm);padding:8px 11px;margin-bottom:6px;font-size:13px"><div style="font-weight:600">${r.type}</div><div class="itr-meta">${r.weight ? r.weight + "kg " : ""}${r.count ? r.count + " pcs " : ""} ${r.price ? fmt(r.price) + "/kg " : ""} ${r.discount ? "Disc: " + fmt(r.discount) : ""}${r.total ? " = " + fmt(r.total) : ""}</div></div>`).join("")}` : ""}
-              <table class="dtbl">
-                ${fishRows.length === 1 ? `<tr><td class="dl">Fish type</td><td class="dv">${fishRows[0].type || "—"}</td></tr><tr><td class="dl">Weight</td><td class="dv">${fishRows[0].weight ? fishRows[0].weight + " kg" : "—"}</td></tr><tr><td class="dl">Count</td><td class="dv">${fishRows[0].count ? fishRows[0].count + " pcs" : "—"}</td></tr><tr><td class="dl">Price/kg</td><td class="dv">${fmt(fishRows[0].price || 0)}</td></tr>${fishRows[0].discount ? `<tr><td class="dl">Discount</td><td class="dv" style="color:var(--red)">- ${fmt(fishRows[0].discount)}</td></tr>` : "`"}` : ""}
-                <tr><td class="dl" style="font-weight:600">Total charged</td><td class="dv" style="font-size:15px;font-weight:700;color:var(--teal)">${fmt(i.total)}</td></tr>
-                ${i.phone ? `<tr><td class="dl">Phone</td><td class="dv" style="color:var(--teal)">${i.phone}</td></tr>` : ""}
-                <tr><td class="dl">Date in</td><td class="dv">${shortDate(i.createdAt)}</td></tr>
-                ${i.collectedAt ? `<tr><td class="dl">Collected</td><td class="dv">${shortDate(i.collectedAt)}</td></tr>` : ""}
-                ${i.addedBy ? `<tr><td class="dl">Added by</td><td class="dv">${i.addedBy}</td></tr>` : ""}
-                ${i.notes ? `<tr><td class="dl">Notes</td><td class="dv">${i.notes}</td></tr>` : ""}
-              </table>
-              ${i.payments?.length ? `<div class="slabel">Payments</div>${i.payments.map((p) => `<div class="pay-row"><div><div class="pay-amt">${fmt(p.amount)}</div><div class="pay-meta">${shortDate(p.date)}${p.note ? " · " + p.note : ""}</div></div></div>`).join("")}<div class="bal-box ${bal <= 0 || i.settledShort ? "clear" : ""}"><span style="font-size:12px;font-weight:600;color:${bal <= 0 || i.settledShort ? "var(--green)" : "var(--red)"}">${bal <= 0 || i.settledShort ? "Fully settled ✓" : "Remaining balance"}</span><span style="font-size:16px;font-weight:700;color:${bal <= 0 || i.settledShort ? "var(--green)" : "var(--red)"}">${i.settledShort ? "Settled" : fmt(bal)}</span></div>` : ""}
-              <div class="dvdr"></div>
-              ${getActions(i)}
-              <div class="dvdr"></div>
-              <div style="display:flex;gap:8px">
-                <button class="btn" style="flex:1" onclick="startEdit(${i.id})"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Edit</button>
-                <button class="btn danger" style="flex:1" onclick="confirmDelete(${i.id})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4h6v2"></path></svg> Delete</button>
-              </div>`;
+    <button class="mclose" onclick="closeModal()">Close</button>
+    <div class="mtitle">${i.name}</div>
+    <div class="msub"><span class="pill ${i.status}">${statusLabel(i.status)}</span>${ps ? ' <span class="pill ' + ps + '">' + payLabel(i) + "</span>" : ""}</div>
+    ${fishRows.length > 1 ? `<div class="slabel">Fish items</div>${fishRows.map((r) => `<div style="background:var(--surf2);border-radius:var(--rsm);padding:8px 11px;margin-bottom:6px;font-size:13px"><div style="font-weight:600">${r.type}</div><div class="itr-meta">${r.weight ? r.weight + "kg " : ""}${r.count ? r.count + " pcs " : ""}${r.price ? fmt(r.price) + "/kg " : ""}${r.discount ? "Disc: " + fmt(r.discount) : ""}${r.total ? " = " + fmt(r.total) : ""}</div></div>`).join("")}` : ""}
+    <table class="dtbl">
+      ${fishRows.length === 1 ? `<tr><td class="dl">Fish type</td><td class="dv">${fishRows[0].type || "—"}</td></tr><tr><td class="dl">Weight</td><td class="dv">${fishRows[0].weight ? fishRows[0].weight + " kg" : "—"}</td></tr><tr><td class="dl">Count</td><td class="dv">${fishRows[0].count ? fishRows[0].count + " pcs" : "—"}</td></tr><tr><td class="dl">Price/kg</td><td class="dv">${fmt(fishRows[0].price || 0)}</td></tr>${fishRows[0].discount ? `<tr><td class="dl">Discount</td><td class="dv" style="color:var(--red)">- ${fmt(fishRows[0].discount)}</td></tr>` : ""}` : ""} 
+      <tr><td class="dl" style="font-weight:600">Total charged</td><td class="dv" style="font-size:15px;font-weight:700;color:var(--teal)">${fmt(i.total)}</td></tr>
+      ${i.phone ? `<tr><td class="dl">Phone</td><td class="dv" style="color:var(--teal)">${i.phone}</td></tr>` : ""}
+      <tr><td class="dl">Date in</td><td class="dv">${shortDate(i.createdAt)}</td></tr>
+      ${i.collectedAt ? `<tr><td class="dl">Collected</td><td class="dv">${shortDate(i.collectedAt)}</td></tr>` : ""}
+      ${i.addedBy ? `<tr><td class="dl">Added by</td><td class="dv">${i.addedBy}</td></tr>` : ""}
+      ${i.notes ? `<tr><td class="dl">Notes</td><td class="dv">${i.notes}</td></tr>` : ""}
+    </table>
+    ${i.payments?.length ? `<div class="slabel">Payments</div>${i.payments.map((p) => `<div class="pay-row"><div><div class="pay-amt">${fmt(p.amount)}</div><div class="pay-meta">${shortDate(p.date)}${p.note ? " · " + p.note : ""}</div></div></div>`).join("")}<div class="bal-box ${bal <= 0 || i.settledShort ? "clear" : ""}"><span style="font-size:12px;font-weight:600;color:${bal <= 0 || i.settledShort ? "var(--green)" : "var(--red)"}">${bal <= 0 || i.settledShort ? "Fully settled ✓" : "Remaining balance"}</span><span style="font-size:16px;font-weight:700;color:${bal <= 0 || i.settledShort ? "var(--green)" : "var(--red)"}">${i.settledShort ? "Settled" : fmt(bal)}</span></div>` : ""}
+    <div class="dvdr"></div>
+    ${getActions(i)}
+    <div class="dvdr"></div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      ${
+        i.status === "fresh" || i.status === "drying" || i.status === "ready"
+          ? `<button class="btn" style="flex:1" onclick="closeModal();showAcknowledgement(${i.id})">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line></svg>
+        Acknowledgement
+      </button>`
+          : `<button class="btn" style="flex:1" onclick="closeModal();showReceipt(${i.id})">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        Receipt
+      </button>`
+      }
+      <button class="btn" style="flex:1" onclick="startEdit(${i.id})"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>Edit</button>
+    </div>
+    <button class="btn danger" onclick="confirmDelete(${i.id},'service')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path></svg>Delete</button>`;
         document.getElementById("modal-bg").classList.add("open");
       }
 
@@ -2564,17 +3484,16 @@
         if (i.status === "fresh")
           h += `<button class="btn" style="margin-bottom:8px" onclick="changeStatus(${i.id},'drying')">🔥 Start drying</button>`;
         if (i.status === "drying")
-          h += `<button class="btn primary" style="margin-bottom:8px" onclick="changeStatus(${i.id},'ready')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Mark as ready to collect</button>`;
+          h += `<button class="btn primary" style="margin-bottom:8px" onclick="changeStatus(${i.id},'ready')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>Mark as ready to collect</button>`;
         if (i.status === "ready") {
-          h += `<button class="btn primary" style="margin-bottom:8px" onclick="changeStatus(${i.id},'collected')"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg> Mark as collected</button>`;
-          if (i.phone) {
-            h += `<button class="btn whatsapp" style="margin-bottom:8px" onclick="sendWhatsApp('${i.phone}','${i.name}','ready',${i.id})"><svg viewBox="0 0 24 24" style="fill:none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg> WhatsApp — fish is ready</button>`;
-          }
+          h += `<button class="btn primary" style="margin-bottom:8px" onclick="changeStatus(${i.id},'collected')"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>Mark as collected</button>`;
+          if (i.phone)
+            h += `<button class="btn whatsapp" style="margin-bottom:8px" onclick="sendWhatsApp('${i.phone}','${i.name}','ready',${i.id})"><svg viewBox="0 0 24 24" style="fill:none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>WhatsApp — fish ready</button>`;
         }
         if (i.status === "collected" && !i.settledShort && balance(i) > 0) {
-          h += `<button class="btn primary" style="margin-bottom:8px" onclick="openPayModal(${i.id})"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> Record payment</button>`;
+          h += `<button class="btn primary" style="margin-bottom:8px" onclick="openPayModal(${i.id})"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>Record payment</button>`;
           if (i.phone)
-            h += `<button class="btn whatsapp" style="margin-bottom:8px" onclick="sendWhatsApp('${i.phone}','${i.name}','debt',${i.id})"><svg viewBox="0 0 24 24" style="fill:none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg> WhatsApp — remind payment</button>`;
+            h += `<button class="btn whatsapp" style="margin-bottom:8px" onclick="sendWhatsApp('${i.phone}','${i.name}','debt',${i.id})"><svg viewBox="0 0 24 24" style="fill:none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>WhatsApp — remind payment</button>`;
         }
         return h;
       }
@@ -2592,35 +3511,32 @@
         renderHome();
       }
 
-      // ─── PAYMENT MODAL ──────────────────────────────────────────────────────────
       function openPayModal(id) {
         const i = state.items.find((x) => x.id === id);
         if (!i) return;
         const bal = balance(i);
         const paid = totalPaid(i);
         document.getElementById("pay-body").innerHTML = `
-              <button class="mclose" onclick="closePayModal()">Close</button>
-              <div class="mtitle">Record payment</div>
-              <div class="msub">${i.name} — ${fmt(i.total)} total</div>
-              <table class="dtbl" style="margin-bottom:11px">
-                ${paid > 0 ? `<tr><td class="dl">Already paid</td><td class="dv" style="color:var(--green)">${fmt(paid)}</td></tr>` : ""}
-                <tr><td class="dl" style="font-weight:600">Balance owed</td><td class="dv" style="font-weight:700;color:var(--red)">${fmt(bal)}</td></tr>
-              </table>
-              <div class="fg"><label class="fl">Amount received (₦) *</label><input class="fi" id="pay-amt" type="number" placeholder="0" min="0" inputmode="numeric" value="${bal}" oninput="updatePayPreview(${i.id})"></div>
-              <div class="fg"><label class="fl">Note (optional)</label><input class="fi" id="pay-note" type="text" placeholder="e.g. half payment, will pay rest Friday..."></div>
-              <div id="pay-preview" style="margin-bottom:11px"></div>
-              <button class="btn primary" onclick="recordPayment(${i.id},false)" style="margin-bottom:8px"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Save payment</button>
-              <button class="btn" id="settle-btn" onclick="recordPayment(${i.id},true)" style="display:none;margin-bottom:8px;border-color:var(--green);color:var(--green)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Save &amp; mark fully settled</button>`;
+    <button class="mclose" onclick="closePayModal()">Close</button>
+    <div class="mtitle">Record payment</div><div class="msub">${i.name} — ${fmt(i.total)} total</div>
+    <table class="dtbl" style="margin-bottom:11px">
+      ${paid > 0 ? `<tr><td class="dl">Already paid</td><td class="dv" style="color:var(--green)">${fmt(paid)}</td></tr>` : ""}
+      <tr><td class="dl" style="font-weight:600">Balance owed</td><td class="dv" style="font-weight:700;color:var(--red)">${fmt(bal)}</td></tr>
+    </table>
+    <div class="fg"><label class="fl">Amount received (₦) *</label><input class="fi" id="pay-amt" type="number" placeholder="0" min="0" inputmode="numeric" value="${bal}" oninput="updatePayPreview(${i.id})"></div>
+    <div class="fg"><label class="fl">Note (optional)</label><input class="fi" id="pay-note" type="text" placeholder="e.g. half payment, balance Friday..."></div>
+    <div id="pay-preview" style="margin-bottom:11px"></div>
+    <button class="btn primary" onclick="recordPayment(${i.id},false)" style="margin-bottom:8px">Save payment</button>
+    <button class="btn" id="settle-btn" onclick="recordPayment(${i.id},true)" style="display:none;margin-bottom:8px;border-color:var(--green);color:var(--green)">Save &amp; mark fully settled</button>`;
         document.getElementById("pay-mbg").classList.add("open");
         updatePayPreview(id);
       }
-
       function updatePayPreview(id) {
         const i = state.items.find((x) => x.id === id);
         if (!i) return;
         const amt = parseFloat(document.getElementById("pay-amt")?.value) || 0;
         const bal = balance(i);
-        const newBal = Math.max(0, bal - amt);
+        const nb = Math.max(0, bal - amt);
         const sb = document.getElementById("settle-btn");
         let html = "";
         if (amt > 0) {
@@ -2628,13 +3544,12 @@
             html = `<div class="bal-box clear"><span style="font-size:12px;font-weight:600;color:var(--green)">Fully paid ✓</span><span style="font-size:14px;font-weight:700;color:var(--green)">No balance</span></div>`;
             if (sb) sb.style.display = "none";
           } else {
-            html = `<div class="bal-box"><span style="font-size:12px;font-weight:600;color:var(--red)">Remaining balance</span><span style="font-size:14px;font-weight:700;color:var(--red)">${fmt(newBal)}</span></div>`;
+            html = `<div class="bal-box"><span style="font-size:12px;font-weight:600;color:var(--red)">Remaining balance</span><span style="font-size:14px;font-weight:700;color:var(--red)">${fmt(nb)}</span></div>`;
             if (sb) sb.style.display = "";
           }
         }
         document.getElementById("pay-preview").innerHTML = html;
       }
-
       function recordPayment(id, settle) {
         const i = state.items.find((x) => x.id === id);
         if (!i) return;
@@ -2658,13 +3573,666 @@
             : "✓ Payment of " + fmt(amt) + " recorded",
         );
         renderHome();
-        renderDebts();
       }
       function closePayModal() {
         document.getElementById("pay-mbg").classList.remove("open");
       }
 
-      // ─── MISC ──────────────────────────────────────────────────────────────────
+      function sendWhatsApp(phone, name, type, itemId) {
+        let msg = "";
+        const cp = phone.replace(/\D/g, "").replace(/^0/, "234");
+        if (type === "debt" && itemId) {
+          const item = state.items.find((x) => x.id === itemId);
+          const bal = item ? balance(item) : 0;
+          msg = `Hello ${name}, this is a reminder that you have an outstanding balance of ${fmt(bal)} for your fish drying service at Mummy J's Fish Store. Kindly settle at your earliest convenience. Thank you!`;
+        } else if (type === "ready" && itemId) {
+          const item = state.items.find((x) => x.id === itemId);
+          const fish =
+            (item?.fishRows || []).map((r) => r.type).join(", ") || "your fish";
+          msg = `Hello ${name}, good news! ${fish} is ready for collection at Mummy J's Fish Store. Please come to collect. Thank you!`;
+        } else if (type === "saledebt" && itemId) {
+          const sale = state.shop.sales.find((x) => x.id === itemId);
+          const owes = sale ? sale.amount - sale.amtPaid : 0;
+          msg = `Hello ${name}, this is a reminder that you have an outstanding balance of ${fmt(owes)} for dry fish purchased from Mummy J's Fish Store. Kindly settle at your earliest convenience. Thank you!`;
+        } else {
+          msg = `Hello ${name}, please note you have an outstanding balance at Mummy J's Fish Store. Kindly come and settle. Thank you!`;
+        }
+        window.open(
+          `https://wa.me/${cp}?text=${encodeURIComponent(msg)}`,
+          "_blank",
+        );
+      }
+
+      function showReceipt(id) {
+        const item = state.items.find((x) => x.id === id);
+        if (!item) return;
+        const fishRows = item.fishRows || [
+          {
+            type: item.type,
+            weight: item.weight,
+            count: item.count,
+            price: item.price,
+            discount: item.discount,
+            total: item.total,
+          },
+        ];
+        const paid = totalPaid(item);
+        const bal = balance(item);
+        document.getElementById("receipt-body").innerHTML = `
+    <button class="mclose" onclick="closeReceipt()">Close</button>
+    <div class="mtitle">Receipt</div>
+    <div id="receipt-card" style="background:var(--surf);border-radius:var(--r);border:1px solid var(--bdr2);padding:20px;margin:12px 0">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:22px;margin-bottom:4px">🐟</div>
+        <div style="font-size:17px;font-weight:700;color:var(--t1)">Mummy J's Fish Store</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px">Fish Drying Service Receipt</div>
+        <div style="height:1px;background:var(--bdr2);margin:12px 0"></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:12px;color:var(--t3);margin-bottom:2px">Customer</div>
+        <div style="font-size:16px;font-weight:700;color:var(--t1)">${item.name}</div>
+        ${item.phone ? `<div style="font-size:12px;color:var(--t3)">${item.phone}</div>` : ""}
+      </div>
+      <div style="height:1px;background:var(--bdr);margin-bottom:12px"></div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:12px;color:var(--t3);margin-bottom:6px">Fish details</div>
+        ${fishRows.map((r) => `<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px"><div><span style="font-weight:600">${r.type}</span><span style="color:var(--t3)"> ${r.weight ? r.weight + "kg" : ""} ${r.count ? "· " + r.count + " pcs" : ""}</span></div><div style="font-weight:600">${fmt(r.total)}</div></div>${r.discount ? `<div style="font-size:11px;color:var(--red);text-align:right">Discount: -${fmt(r.discount)}</div>` : ""}`).join("")}
+      </div>
+      <div style="height:1px;background:var(--bdr2);margin-bottom:12px"></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px"><span style="color:var(--t2)">Total charged</span><span style="font-weight:700;color:var(--teal);font-size:16px">${fmt(item.total)}</span></div>
+      ${paid > 0 ? `<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px"><span style="color:var(--t2)">Amount paid</span><span style="font-weight:600;color:var(--green)">${fmt(paid)}</span></div>` : ""}
+      ${bal > 0 && !item.settledShort ? `<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px"><span style="color:var(--t2)">Balance owing</span><span style="font-weight:700;color:var(--red)">${fmt(bal)}</span></div>` : ""}
+      ${item.settledShort || bal <= 0 ? `<div style="text-align:center;background:var(--green-l);border-radius:var(--rsm);padding:6px;font-size:13px;font-weight:600;color:var(--green);margin-bottom:6px">✓ Fully paid</div>` : ""}
+      <div style="height:1px;background:var(--bdr);margin:10px 0"></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3)">
+        <span>Date in: ${shortDate(item.createdAt)}</span>
+        ${item.collectedAt ? `<span>Collected: ${shortDate(item.collectedAt)}</span>` : ""}
+      </div>
+      ${item.notes ? `<div style="margin-top:8px;font-size:11px;color:var(--t3)">Note: ${item.notes}</div>` : ""}
+      <div style="text-align:center;margin-top:14px;font-size:11px;color:var(--t3)">Thank you for your business! 🙏</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn primary" style="flex:1" onclick="shareReceipt(${id})"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>Share image</button>
+      <button class="btn whatsapp" style="flex:1" onclick="whatsappReceipt(${id})"><svg viewBox="0 0 24 24" style="fill:none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>WhatsApp</button>
+    </div>`;
+        document.getElementById("receipt-mbg").classList.add("open");
+      }
+      function closeReceipt() {
+        document.getElementById("receipt-mbg").classList.remove("open");
+      }
+
+      async function shareReceipt(id) {
+        const item = state.items.find((x) => x.id === id);
+        if (!item) return;
+        showToast("Generating image...");
+        try {
+          const canvas = await buildReceiptCanvas(item);
+          canvas.toBlob(async (blob) => {
+            const file = new File(
+              [blob],
+              `receipt-${item.name}-${Date.now()}.png`,
+              { type: "image/png" },
+            );
+            if (navigator.share && navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+                title: `Receipt — ${item.name}`,
+                text: "Fish drying receipt from Mummy J's Fish Store",
+              });
+            } else {
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `receipt-${item.name}.png`;
+              a.click();
+              URL.revokeObjectURL(url);
+              showToast("Receipt saved to downloads");
+            }
+          }, "image/png");
+        } catch (e) {
+          showToast("Could not share — try WhatsApp button");
+        }
+      }
+
+      function whatsappReceipt(id) {
+        const item = state.items.find((x) => x.id === id);
+        if (!item) return;
+        const fishRows = item.fishRows || [
+          { type: item.type, weight: item.weight, total: item.total },
+        ];
+        const paid = totalPaid(item);
+        const bal = balance(item);
+        const cp = (item.phone || "").replace(/\D/g, "").replace(/^0/, "234");
+        let msg = `🐟 *Mummy J's Fish Store*\n*Fish Drying Service Receipt*\n\n*Customer:* ${item.name}\n*Date in:* ${shortDate(item.createdAt)}\n`;
+        if (item.collectedAt)
+          msg += `*Collected:* ${shortDate(item.collectedAt)}\n`;
+        msg += `\n*Fish details:*\n`;
+        fishRows.forEach((r) => {
+          msg += `• ${r.type}${r.weight ? " — " + r.weight + "kg" : ""}${r.count ? " / " + r.count + " pcs" : ""}: ${fmt(r.total)}\n`;
+        });
+        msg += `\n*Total charged:* ${fmt(item.total)}\n`;
+        if (paid > 0) msg += `*Amount paid:* ${fmt(paid)}\n`;
+        if (bal > 0 && !item.settledShort)
+          msg += `*Balance owing:* ${fmt(bal)}\n`;
+        if (item.settledShort || bal <= 0) msg += `*Status:* ✅ Fully paid\n`;
+        msg += `\nThank you for your business! 🙏`;
+        window.open(
+          cp
+            ? `https://wa.me/${cp}?text=${encodeURIComponent(msg)}`
+            : `https://wa.me/?text=${encodeURIComponent(msg)}`,
+          "_blank",
+        );
+      }
+
+      async function buildReceiptCanvas(item) {
+        const fishRows = item.fishRows || [
+          {
+            type: item.type,
+            weight: item.weight,
+            count: item.count,
+            price: item.price,
+            discount: item.discount,
+            total: item.total,
+          },
+        ];
+        const paid = totalPaid(item);
+        const bal = balance(item);
+        const W = 640,
+          pad = 40;
+        const H =
+          480 +
+          fishRows.length * 50 +
+          (paid > 0 ? 30 : 0) +
+          (item.notes ? 30 : 0);
+        const canvas = document.createElement("canvas");
+        canvas.width = W;
+        canvas.height = H;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = "#1D9E75";
+        ctx.fillRect(0, 0, W, 8);
+        let y = 44;
+        ctx.fillStyle = "#1D9E75";
+        ctx.font = "bold 26px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("🐟 Mummy J's Fish Store", W / 2, y);
+        y += 28;
+        ctx.fillStyle = "#888";
+        ctx.font = "15px sans-serif";
+        ctx.fillText("Fish Drying Service Receipt", W / 2, y);
+        y += 34;
+        ctx.strokeStyle = "#e0e0e0";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(pad, y);
+        ctx.lineTo(W - pad, y);
+        ctx.stroke();
+        y += 20;
+        ctx.fillStyle = "#888";
+        ctx.font = "13px sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("CUSTOMER", pad, y);
+        y += 20;
+        ctx.fillStyle = "#1a1a1a";
+        ctx.font = "bold 19px sans-serif";
+        ctx.fillText(item.name, pad, y);
+        y += 22;
+        if (item.phone) {
+          ctx.fillStyle = "#888";
+          ctx.font = "13px sans-serif";
+          ctx.fillText(item.phone, pad, y);
+          y += 20;
+        }
+        y += 8;
+        ctx.strokeStyle = "#e0e0e0";
+        ctx.beginPath();
+        ctx.moveTo(pad, y);
+        ctx.lineTo(W - pad, y);
+        ctx.stroke();
+        y += 18;
+        ctx.fillStyle = "#888";
+        ctx.font = "13px sans-serif";
+        ctx.fillText("FISH DETAILS", pad, y);
+        y += 20;
+        fishRows.forEach((r) => {
+          ctx.fillStyle = "#1a1a1a";
+          ctx.font = "bold 14px sans-serif";
+          ctx.textAlign = "left";
+          ctx.fillText(r.type, pad, y);
+          ctx.textAlign = "right";
+          ctx.fillText(fmt(r.total), W - pad, y);
+          ctx.textAlign = "left";
+          y += 20;
+          if (r.weight || r.count) {
+            ctx.fillStyle = "#888";
+            ctx.font = "12px sans-serif";
+            ctx.fillText(
+              `${r.weight ? r.weight + "kg" : ""} ${r.count ? "· " + r.count + " pcs" : ""}`.trim(),
+              pad + 10,
+              y,
+            );
+            y += 18;
+          }
+          if (r.discount) {
+            ctx.fillStyle = "#E24B4A";
+            ctx.font = "12px sans-serif";
+            ctx.textAlign = "right";
+            ctx.fillText(`Discount: -${fmt(r.discount)}`, W - pad, y);
+            ctx.textAlign = "left";
+            y += 18;
+          }
+        });
+        y += 6;
+        ctx.strokeStyle = "#1D9E75";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(pad, y);
+        ctx.lineTo(W - pad, y);
+        ctx.stroke();
+        ctx.lineWidth = 1;
+        y += 18;
+        ctx.fillStyle = "#555";
+        ctx.font = "14px sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("Total charged", pad, y);
+        ctx.fillStyle = "#1D9E75";
+        ctx.font = "bold 19px sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(fmt(item.total), W - pad, y);
+        ctx.textAlign = "left";
+        y += 28;
+        if (paid > 0) {
+          ctx.fillStyle = "#555";
+          ctx.font = "14px sans-serif";
+          ctx.fillText("Amount paid", pad, y);
+          ctx.fillStyle = "#3B6D11";
+          ctx.font = "bold 15px sans-serif";
+          ctx.textAlign = "right";
+          ctx.fillText(fmt(paid), W - pad, y);
+          ctx.textAlign = "left";
+          y += 26;
+        }
+        if (bal > 0 && !item.settledShort) {
+          ctx.fillStyle = "#555";
+          ctx.font = "14px sans-serif";
+          ctx.fillText("Balance owing", pad, y);
+          ctx.fillStyle = "#E24B4A";
+          ctx.font = "bold 15px sans-serif";
+          ctx.textAlign = "right";
+          ctx.fillText(fmt(bal), W - pad, y);
+          ctx.textAlign = "left";
+          y += 26;
+        }
+        if (item.settledShort || bal <= 0) {
+          ctx.fillStyle = "#EAF3DE";
+          ctx.fillRect(pad, y - 18, W - pad * 2, 30);
+          ctx.fillStyle = "#3B6D11";
+          ctx.font = "bold 14px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText("✓ Fully paid", W / 2, y);
+          ctx.textAlign = "left";
+          y += 20;
+        }
+        y += 8;
+        ctx.strokeStyle = "#e0e0e0";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(pad, y);
+        ctx.lineTo(W - pad, y);
+        ctx.stroke();
+        y += 16;
+        ctx.fillStyle = "#888";
+        ctx.font = "12px sans-serif";
+        ctx.fillText(`Date in: ${shortDate(item.createdAt)}`, pad, y);
+        if (item.collectedAt) {
+          ctx.textAlign = "right";
+          ctx.fillText(`Collected: ${shortDate(item.collectedAt)}`, W - pad, y);
+          ctx.textAlign = "left";
+        }
+        y += 22;
+        if (item.notes) {
+          ctx.fillStyle = "#888";
+          ctx.font = "12px sans-serif";
+          ctx.fillText(`Note: ${item.notes}`, pad, y);
+          y += 20;
+        }
+        y += 8;
+        ctx.fillStyle = "#1D9E75";
+        ctx.font = "italic 13px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("Thank you for your business! 🙏", W / 2, y);
+        ctx.fillStyle = "#1D9E75";
+        ctx.fillRect(0, H - 8, W, 8);
+        return canvas;
+      }
+
+      function showAcknowledgement(id) {
+        const item = state.items.find((x) => x.id === id);
+        if (!item) return;
+        const fishRows = item.fishRows || [
+          {
+            type: item.type,
+            weight: item.weight,
+            count: item.count,
+            price: item.price,
+            discount: item.discount,
+            total: item.total,
+          },
+        ];
+        document.getElementById("receipt-body").innerHTML = `
+    <button class="mclose" onclick="closeReceipt()">Close</button>
+    <div class="mtitle">Acknowledgement</div>
+    <div id="ack-card" style="background:var(--surf);border-radius:var(--r);border:1px solid var(--bdr2);padding:20px;margin:12px 0">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:22px;margin-bottom:4px">🐟</div>
+        <div style="font-size:17px;font-weight:700;color:var(--t1)">Mummy J's Fish Store</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px">${getServiceType(item)} — Acknowledgement Slip</div>
+        <div style="height:1px;background:var(--bdr2);margin:12px 0"></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:12px;color:var(--t3);margin-bottom:2px">Customer</div>
+        <div style="font-size:16px;font-weight:700;color:var(--t1)">${item.name}</div>
+        ${item.phone ? `<div style="font-size:12px;color:var(--t3)">${item.phone}</div>` : ""}
+      </div>
+      <div style="height:1px;background:var(--bdr);margin-bottom:12px"></div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:12px;color:var(--t3);margin-bottom:6px">Product received</div>
+        ${fishRows
+          .map(
+            (r) => `
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px">
+            <div>
+              <span style="font-weight:600">${r.type}</span>
+              ${r.weight ? `<span style="background:var(--teal-l);color:var(--teal-d);font-size:11px;font-weight:600;padding:1px 6px;border-radius:10px;margin-left:4px">${r.weight}kg</span>` : ""}
+              ${r.count ? `<span style="background:var(--blue-l);color:var(--blue);font-size:11px;font-weight:600;padding:1px 6px;border-radius:10px;margin-left:4px">${r.count} pcs</span>` : ""}
+            </div>
+            <div style="font-weight:600">${fmt(r.total)}</div>
+          </div>
+          ${r.discount ? `<div style="font-size:11px;color:var(--red);text-align:right">Discount: -${fmt(r.discount)}</div>` : ""}`,
+          )
+          .join("")}
+      </div>
+      <div style="height:1px;background:var(--bdr2);margin-bottom:12px"></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px">
+        <span style="color:var(--t2)">Total</span>
+        <span style="font-weight:700;color:var(--teal);font-size:16px">${fmt(item.total)}</span>
+      </div>
+      <div style="height:1px;background:var(--bdr);margin:10px 0"></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-bottom:10px">
+        <span>Date received: ${shortDate(item.createdAt)}</span>
+        <span><span class="pill ${item.status}">${statusLabel(item.status)}</span></span>
+      </div>
+      ${item.notes ? `<div style="font-size:11px;color:var(--t3);margin-bottom:10px">Note: ${item.notes}</div>` : ""}
+      <div style="background:var(--teal-l);border-radius:var(--rsm);padding:10px 12px;font-size:12px;color:var(--teal-d);line-height:1.6;margin-bottom:10px">
+        Your fish has been received and is currently being processed. You will be notified when it is ready for collection. Payment is due upon collection.
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn primary" style="flex:1" onclick="shareAcknowledgement(${id})">
+        <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+        Share image
+      </button>
+      <button class="btn whatsapp" style="flex:1" onclick="whatsappAcknowledgement(${id})">
+        <svg viewBox="0 0 24 24" style="fill:none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+        WhatsApp
+      </button>
+    </div>`;
+        document.getElementById("receipt-mbg").classList.add("open");
+      }
+
+      function whatsappAcknowledgement(id) {
+        const item = state.items.find((x) => x.id === id);
+        if (!item) return;
+        const fishRows = item.fishRows || [
+          { type: item.type, weight: item.weight, total: item.total },
+        ];
+        const cp = (item.phone || "").replace(/\D/g, "").replace(/^0/, "234");
+        let msg = `🐟 *Mummy J's Fish Store*\n*Fish Drying — Acknowledgement*\n\n`;
+        msg += `*Customer:* ${item.name}\n`;
+        msg += `*Date received:* ${shortDate(item.createdAt)}\n\n`;
+        msg += `*Fish received:*\n`;
+        fishRows.forEach((r) => {
+          msg += `• ${r.type}${r.weight ? " — " + r.weight + "kg" : ""}${r.count ? " / " + r.count + " pcs" : ""}: ${fmt(r.total)}\n`;
+        });
+        msg += `\n*Total agreed:* ${fmt(item.total)}\n\n`;
+        msg += `Your fish has been received and is currently being processed. You will be notified when ready for collection. Payment is due upon collection.\n\n`;
+        msg += `_Received by: ${item.addedBy || "Mummy J's Fish Store"}_`;
+        window.open(
+          cp
+            ? `https://wa.me/${cp}?text=${encodeURIComponent(msg)}`
+            : `https://wa.me/?text=${encodeURIComponent(msg)}`,
+          "_blank",
+        );
+      }
+
+      async function shareAcknowledgement(id) {
+        const item = state.items.find((x) => x.id === id);
+        if (!item) return;
+        showToast("Generating image...");
+        try {
+          const canvas = await buildAcknowledgementCanvas(item);
+          canvas.toBlob(async (blob) => {
+            const file = new File(
+              [blob],
+              `ack-${item.name}-${Date.now()}.png`,
+              { type: "image/png" },
+            );
+            if (navigator.share && navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+                title: `Acknowledgement — ${item.name}`,
+                text: "Fish drying acknowledgement",
+              });
+            } else {
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `ack-${item.name}.png`;
+              a.click();
+              URL.revokeObjectURL(url);
+              showToast("Saved to downloads");
+            }
+          }, "image/png");
+        } catch (e) {
+          showToast("Could not share — try WhatsApp button");
+        }
+      }
+
+      async function buildAcknowledgementCanvas(item) {
+        const fishRows = item.fishRows || [
+          {
+            type: item.type,
+            weight: item.weight,
+            count: item.count,
+            price: item.price,
+            discount: item.discount,
+            total: item.total,
+          },
+        ];
+        const W = 640,
+          pad = 40;
+        const H = 520 + fishRows.length * 50 + (item.notes ? 30 : 0);
+        const canvas = document.createElement("canvas");
+        canvas.width = W;
+        canvas.height = H;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = "#1D9E75";
+        ctx.fillRect(0, 0, W, 8);
+        let y = 44;
+        ctx.fillStyle = "#1D9E75";
+        ctx.font = "bold 26px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("🐟 Mummy J's Fish Store", W / 2, y);
+        y += 28;
+        ctx.fillStyle = "#888";
+        ctx.font = "15px sans-serif";
+        ctx.fillText(
+          getServiceType(item) + " — Acknowledgement Slip",
+          W / 2,
+          y,
+        );
+        y += 34;
+        ctx.strokeStyle = "#e0e0e0";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(pad, y);
+        ctx.lineTo(W - pad, y);
+        ctx.stroke();
+        y += 20;
+        ctx.fillStyle = "#888";
+        ctx.font = "13px sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("CUSTOMER", pad, y);
+        y += 20;
+        ctx.fillStyle = "#1a1a1a";
+        ctx.font = "bold 19px sans-serif";
+        ctx.fillText(item.name, pad, y);
+        y += 22;
+        if (item.phone) {
+          ctx.fillStyle = "#888";
+          ctx.font = "13px sans-serif";
+          ctx.fillText(item.phone, pad, y);
+          y += 20;
+        }
+        y += 8;
+        ctx.strokeStyle = "#e0e0e0";
+        ctx.beginPath();
+        ctx.moveTo(pad, y);
+        ctx.lineTo(W - pad, y);
+        ctx.stroke();
+        y += 18;
+        ctx.fillStyle = "#888";
+        ctx.font = "13px sans-serif";
+        ctx.fillText("ITEMS RECEIVED", pad, y);
+        y += 20;
+        fishRows.forEach((r) => {
+          ctx.fillStyle = "#1a1a1a";
+          ctx.font = "bold 14px sans-serif";
+          ctx.textAlign = "left";
+          ctx.fillText(r.type, pad, y);
+          ctx.textAlign = "right";
+          ctx.fillText(fmt(r.total), W - pad, y);
+          ctx.textAlign = "left";
+          y += 20;
+          if (r.weight || r.count) {
+            ctx.fillStyle = "#1D9E75";
+            ctx.font = "bold 12px sans-serif";
+            ctx.fillText(
+              `${r.weight ? r.weight + "kg" : ""} ${r.count ? "· " + r.count + " pcs" : ""}`.trim(),
+              pad + 10,
+              y,
+            );
+            y += 18;
+          }
+          if (r.discount) {
+            ctx.fillStyle = "#E24B4A";
+            ctx.font = "12px sans-serif";
+            ctx.textAlign = "right";
+            ctx.fillText(`Discount: -${fmt(r.discount)}`, W - pad, y);
+            ctx.textAlign = "left";
+            y += 18;
+          }
+        });
+        y += 6;
+        ctx.strokeStyle = "#1D9E75";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(pad, y);
+        ctx.lineTo(W - pad, y);
+        ctx.stroke();
+        ctx.lineWidth = 1;
+        y += 18;
+        ctx.fillStyle = "#555";
+        ctx.font = "14px sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("Total agreed", pad, y);
+        ctx.fillStyle = "#1D9E75";
+        ctx.font = "bold 19px sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(fmt(item.total), W - pad, y);
+        ctx.textAlign = "left";
+        y += 28;
+        ctx.strokeStyle = "#e0e0e0";
+        ctx.beginPath();
+        ctx.moveTo(pad, y);
+        ctx.lineTo(W - pad, y);
+        ctx.stroke();
+        y += 16;
+        ctx.fillStyle = "#888";
+        ctx.font = "12px sans-serif";
+        ctx.fillText(`Date received: ${shortDate(item.createdAt)}`, pad, y);
+        ctx.textAlign = "right";
+        ctx.fillText(`Status: ${statusLabel(item.status)}`, W - pad, y);
+        ctx.textAlign = "left";
+        y += 22;
+        if (item.notes) {
+          ctx.fillStyle = "#888";
+          ctx.font = "12px sans-serif";
+          ctx.fillText(`Note: ${item.notes}`, pad, y);
+          y += 20;
+        }
+        // teal notice box
+        y += 6;
+        ctx.fillStyle = "#E1F5EE";
+        ctx.fillRect(pad, y, W - pad * 2, 56);
+        ctx.fillStyle = "#085041";
+        ctx.font = "12px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(
+          "Your fish has been received and is being processed.",
+          W / 2,
+          y + 18,
+        );
+        ctx.fillText(
+          "You will be notified when ready for collection.",
+          W / 2,
+          y + 34,
+        );
+        ctx.fillText("Payment is due upon collection.", W / 2, y + 50);
+        ctx.textAlign = "left";
+        y += 70;
+        ctx.fillStyle = "#888";
+        ctx.font = "12px sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(
+          `Received by: ${item.addedBy || "Mummy J's Fish Store"}`,
+          W - pad,
+          y,
+        );
+        ctx.fillStyle = "#1D9E75";
+        ctx.fillRect(0, H - 8, W, 8);
+        return canvas;
+      }
+
+      function getServiceType(item) {
+        const fishRows = item.fishRows || [{ type: item.type }];
+        const types = fishRows.map((r) => (r.type || "").toLowerCase());
+        const hasMeat = types.some(
+          (t) =>
+            t.includes("meat") ||
+            t.includes("beef") ||
+            t.includes("chicken") ||
+            t.includes("goat") ||
+            t.includes("turkey") ||
+            t.includes("pork"),
+        );
+        const hasFish = types.some(
+          (t) =>
+            !t.includes("meat") &&
+            !t.includes("beef") &&
+            !t.includes("chicken") &&
+            !t.includes("goat") &&
+            !t.includes("turkey") &&
+            !t.includes("pork"),
+        );
+        if (hasMeat && hasFish) return "Drying Service";
+        if (hasMeat) return "Meat Drying";
+        return "Fish Drying";
+      }
+
       function callCustomer(phone, name) {
         showToast("Calling " + name + "...");
         setTimeout(() => {
@@ -2677,7 +4245,6 @@
       function closeModal() {
         document.getElementById("modal-bg").classList.remove("open");
       }
-
       function showToast(msg) {
         const t = document.getElementById("toast");
         t.textContent = msg;
@@ -2686,7 +4253,6 @@
         t._t = setTimeout(() => t.classList.remove("show"), 2800);
       }
 
-      // ─── SERVICE WORKER + UPDATE ────────────────────────────────────────────────
       let newWorker;
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register("sw.js").then((reg) => {
@@ -2696,9 +4262,8 @@
               if (
                 newWorker.state === "installed" &&
                 navigator.serviceWorker.controller
-              ) {
+              )
                 document.getElementById("update-banner").classList.add("show");
-              }
             });
           });
         });
@@ -2710,7 +4275,30 @@
         if (newWorker) newWorker.postMessage("skipWaiting");
       }
 
-      const dvdr = `<div class="dvdr"></div>`;
+      function confirmClearAll() {
+        document.getElementById("cfm-title").textContent = "Clear all records?";
+        document.getElementById("cfm-msg").textContent =
+          "This will permanently delete ALL drying service records, purchases, sales and expenses. This cannot be undone. Are you absolutely sure?";
+        document.getElementById("cfm-ok").textContent = "Yes, clear everything";
+        document.getElementById("cfm-ok").onclick = () => {
+          state.items = [];
+          state.nextId = 1;
+          state.shop.purchases = [];
+          state.shop.sales = [];
+          state.shop.expenses = [];
+          state.shop.purNextId = 1;
+          state.shop.saleNextId = 1;
+          state.shop.expNextId = 1;
+          state.shop.dryStockKg = 0;
+          lsave();
+          scheduleSync();
+          closeCfm();
+          showScreen("home");
+          showToast("All records cleared");
+        };
+        document.getElementById("cfm").classList.add("open");
+      }
+
       initApp();
     </script>
   </body>
