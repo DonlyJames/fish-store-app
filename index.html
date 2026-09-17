@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <meta name="theme-color" content="#1D9E75" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -12,7 +12,9 @@
     <meta name="apple-mobile-web-app-title" content="Fish Dryer" />
     <link rel="manifest" href="manifest.json" />
     <link rel="icon" href="icons/icon-192.png" />
-    <title>Fish Dryer v3.0</title>
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <meta name="description" content="Fish business tracker - drying service, stock, sales and debts." />
+    <title>Fish Dryer v4.0</title>
     <style>
       @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap");
       *,
@@ -50,6 +52,7 @@
         --rsm: 8px;
         --rp: 20px;
         --f: "DM Sans", sans-serif;
+        --font-size: 14px;
       }
       .dark {
         --bg: #111;
@@ -76,9 +79,10 @@
         font-family: var(--f);
         background: var(--bg);
         color: var(--t1);
+        font-size: var(--font-size);
       }
       #app {
-        height: 100dvh;
+        height: var(--vh, 100dvh);
         display: flex;
         flex-direction: column;
         max-width: 430px;
@@ -652,6 +656,8 @@
         display: none;
         position: fixed;
         inset: 0;
+        height: var(--vh, 100%);
+        width: var(--vw, 100%);
         background: rgba(0, 0, 0, 0.5);
         z-index: 50;
         align-items: flex-end;
@@ -666,7 +672,7 @@
         padding: 16px 15px 28px;
         width: 100%;
         max-width: 430px;
-        max-height: 88dvh;
+        max-height: calc(var(--vh, 100dvh) * 0.88);
         overflow-y: auto;
       }
       .mhandle {
@@ -881,6 +887,8 @@
         display: none;
         position: fixed;
         inset: 0;
+        height: var(--vh, 100%);
+        width: var(--vw, 100%);
         background: rgba(0, 0, 0, 0.5);
         z-index: 100;
         align-items: center;
@@ -920,6 +928,8 @@
         display: none;
         position: fixed;
         inset: 0;
+        height: var(--vh, 100%);
+        width: var(--vw, 100%);
         background: var(--bg);
         z-index: 200;
         flex-direction: column;
@@ -1102,9 +1112,13 @@
         <div class="hdr-row">
           <div>
             <div class="app-name">
-              🐟 Mummy J's <span class="app-ver">v3.0</span>
+              🐟 Mummy J's <span class="app-ver">v4.0</span>
             </div>
-            <div class="app-date" id="hdr-date"></div>
+            <div class="app-date">
+              <span id="hdr-date"></span>
+              <span style="color: var(--t3)"> · </span>
+              <span id="current-user-name">?</span>
+            </div>
           </div>
           <div class="hdr-btns">
             <button class="icon-btn" onclick="toggleDark()" id="dark-btn">
@@ -1135,16 +1149,16 @@
               <div class="stat-val ca" id="s-dry">0</div>
             </div>
             <div class="stat">
-              <div class="stat-label">Dry stock (kg)</div>
-              <div class="stat-val ct" id="s-stock">0</div>
+              <div class="stat-label">Ready for pickup</div>
+              <div class="stat-val ct" id="s-ready">0</div>
             </div>
             <div class="stat">
               <div class="stat-label">Owed to you</div>
               <div class="stat-val cr" id="s-owedto">₦0</div>
             </div>
             <div class="stat">
-              <div class="stat-label">You owe</div>
-              <div class="stat-val ca" id="s-youowe">₦0</div>
+              <div class="stat-label">Expenses (mo)</div>
+              <div class="stat-val ca" id="s-expmo">₦0</div>
             </div>
           </div>
           <div class="card">
@@ -1241,6 +1255,40 @@
               <span class="total-label">Visit total</span
               ><span class="total-amt" id="in-total">₦0</span>
             </div>
+            <div
+              class="fg"
+              id="drying-expense-block"
+              style="
+                background: var(--purple-l, #f0eaf9);
+                border-radius: var(--rsm);
+                padding: 10px 12px;
+              "
+            >
+              <label
+                class="fl"
+                style="display: flex; align-items: center; gap: 8px; margin-bottom: 0"
+              >
+                <input
+                  type="checkbox"
+                  id="in-drying-pay"
+                  checked
+                  onchange="toggleDryingAmt()"
+                  style="width: 17px; height: 17px"
+                />
+                Pay for drying this visit?
+              </label>
+              <div id="drying-amt-row" style="margin-top: 8px">
+                <label class="fl">Amount you'll pay for drying (₦)</label>
+                <input
+                  class="fi"
+                  id="in-drying-amt"
+                  type="number"
+                  min="0"
+                  inputmode="numeric"
+                  oninput="this.dataset.touched='1'"
+                />
+              </div>
+            </div>
             <div class="fg">
               <label class="fl">Date received</label
               ><input class="fi" id="in-date" type="date" />
@@ -1291,23 +1339,6 @@
 
         <!-- SHOP -->
         <section class="screen" id="screen-shop">
-          <div class="tabs" id="shop-tabs">
-            <button class="tab active" onclick="showShopTab('overview', this)">
-              Overview
-            </button>
-            <button class="tab" onclick="showShopTab('buy', this)">
-              Buy fish
-            </button>
-            <button class="tab" onclick="showShopTab('sell', this)">
-              Sell
-            </button>
-            <button class="tab" onclick="showShopTab('expenses', this)">
-              Expenses
-            </button>
-            <button class="tab" onclick="showShopTab('profit', this)">
-              Profit
-            </button>
-          </div>
           <div id="shop-content"></div>
         </section>
 
@@ -1345,20 +1376,6 @@
         </section>
 
         <section class="screen" id="screen-debts">
-          <div class="tabs">
-            <button class="tab active" onclick="filterDebts('all', this)">
-              All
-            </button>
-            <button class="tab" onclick="filterDebts('service', this)">
-              Service
-            </button>
-            <button class="tab" onclick="filterDebts('sales', this)">
-              Sales
-            </button>
-            <button class="tab" onclick="filterDebts('supplier', this)">
-              Suppliers
-            </button>
-          </div>
           <div id="debt-alert"></div>
           <div id="debt-list"></div>
         </section>
@@ -1384,17 +1401,41 @@
               </div>
             </div>
             <div class="fg">
-              <label class="fl">Dry fish price per kg (₦)</label>
+              <label class="fl">Drying charge you pay (₦ per kg)</label>
               <div style="display: flex; gap: 8px">
                 <input
                   class="fi"
-                  id="settings-price"
+                  id="settings-dryrate"
                   type="number"
                   inputmode="numeric"
                   style="flex: 1"
-                /><button class="btn sm primary" onclick="saveSettingsPrice()">
+                /><button class="btn sm primary" onclick="saveDryingRate()">
                   Save
                 </button>
+              </div>
+              <div class="fl" style="margin-top: 6px; color: var(--t3)">
+                Used to pre-fill the drying expense when you save a new
+                intake.
+              </div>
+            </div>
+            <div class="fg">
+              <label class="fl">Display size (zoom)</label>
+              <div style="display: flex; align-items: center; gap: 10px">
+                <button class="btn sm" onclick="changeZoom(-1)">A-</button>
+                <span
+                  id="zoom-label"
+                  style="
+                    font-size: 13px;
+                    color: var(--t2);
+                    min-width: 46px;
+                    text-align: center;
+                  "
+                ></span>
+                <button class="btn sm" onclick="changeZoom(1)">A+</button>
+                <button class="btn sm" onclick="changeZoom(0)">Reset</button>
+              </div>
+              <div class="fl" style="margin-top: 6px; color: var(--t3)">
+                Makes everything bigger or smaller. You can also pinch to zoom.
               </div>
             </div>
             <div class="fg" style="margin-top: 16px">
@@ -1402,18 +1443,43 @@
                 Toggle dark mode
               </button>
             </div>
-            <div class="fg" style="margin-top: 8px">
+            <div class="fg" style="margin-top: 16px">
+              <label class="fl">Cloud sync (all your devices)</label>
+              <div id="sync-info" class="fl" style="color: var(--t3)"></div>
+              <button
+                class="btn primary"
+                style="margin-top: 8px"
+                onclick="forceSync()"
+              >
+                Sync now
+              </button>
               <button
                 class="btn"
+                style="margin-top: 8px"
                 onclick="signOut()"
-                style="
-                  border-color: var(--red);
-                  color: var(--red);
-                  opacity: 0.6;
-                "
               >
                 Sign out of Google
               </button>
+            </div>
+            <div class="fg" style="margin-top: 16px">
+              <label class="fl">Backup</label>
+              <button class="btn" onclick="exportBackup()">
+                Download backup file
+              </button>
+              <button
+                class="btn"
+                style="margin-top: 8px"
+                onclick="document.getElementById('restore-file').click()"
+              >
+                Restore from backup
+              </button>
+              <input
+                type="file"
+                id="restore-file"
+                accept="application/json,.json"
+                style="display: none"
+                onchange="restoreBackup(this)"
+              />
             </div>
             <div class="fg" style="margin-top: 16px">
               <label class="fl" style="color: var(--red)">Danger zone</label>
@@ -1448,10 +1514,9 @@
         </button>
         <button class="nb" onclick="showScreen('shop')">
           <svg viewBox="0 0 24 24">
-            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <path d="M16 10a4 4 0 0 1-8 0"></path></svg
-          >Shop
+            <rect x="2" y="7" width="20" height="14" rx="2"></rect>
+            <path d="M16 3H8a2 2 0 0 0-2 2v2h12V5a2 2 0 0 0-2-2z"></path></svg
+          >Expenses
         </button>
         <button class="nb" onclick="showMoreMenu()">
           <svg viewBox="0 0 24 24">
@@ -1605,71 +1670,192 @@
         isSyncing = false,
         gTokenClient = null,
         gTokenExpiry = 0,
-        silentSignInTimer = null;
+        silentSignInTimer = null,
+        tokenRefreshTimer = null;
 
       let state = {
         items: [],
         nextId: 1,
+        deleted: {},
+        updatedAt: null,
         shop: {
-          purchases: [],
-          purNextId: 1,
           expenses: [],
-          expNextId: 1,
-          sales: [],
-          saleNextId: 1,
-          dryStockKg: 0,
-          pricePerKg: 17000,
+          dryingRatePerKg: 50,
+          priceDefaults: { Catfish: 350 },
+          settingsAt: null,
         },
       };
       let userName = "",
         darkMode = false,
-        fishRowCount = 0;
+        fishRowCount = 0,
+        pendingChanges = false,
+        lastSyncAt = null;
+
+      // ─── SAFE TEXT HELPERS (names with quotes used to break the app) ───────
+      const esc = (v) =>
+        String(v === null || v === undefined ? "" : v)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      // safe to drop inside a single-quoted JS string in an inline handler
+      const jss = (v) =>
+        esc(
+          String(v === null || v === undefined ? "" : v)
+            .replace(/\\/g, "\\\\")
+            .replace(/'/g, "\\'")
+            .replace(/\r?\n/g, " "),
+        );
+
+      // ─── LOCAL-DATE HELPERS (toISOString was shifting dates by a day) ──────
+      function setText(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+        return !!el;
+      }
+      function setVal(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.value = value;
+        return !!el;
+      }
+
+      function clean(v) {
+        return String(v === null || v === undefined ? "" : v)
+          .replace(/[<>]/g, "")
+          .replace(/\\/g, "")
+          .replace(/'/g, "\u2019")
+          .replace(/"/g, "\u201d")
+          .replace(/\s+/g, " ")
+          .trim();
+      }
+      function cleanExisting() {
+        const f = (o, keys) =>
+          keys.forEach((k) => {
+            if (typeof o[k] === "string") o[k] = clean(o[k]);
+          });
+        state.items.forEach((i) => {
+          f(i, ["name", "phone", "notes", "addedBy", "type"]);
+          (i.fishRows || []).forEach((r) => f(r, ["type"]));
+        });
+        state.shop.expenses.forEach((e) => f(e, ["type", "desc", "addedBy"]));
+      }
+
+      function todayStr(d) {
+        const x = d ? new Date(d) : new Date();
+        return new Date(x.getTime() - x.getTimezoneOffset() * 60000)
+          .toISOString()
+          .split("T")[0];
+      }
+      function dateToISO(str) {
+        if (!str) return new Date().toISOString();
+        // anchor at local midday so the stored day never slips a timezone
+        const d = new Date(str + "T12:00:00");
+        return isNaN(d) ? new Date().toISOString() : d.toISOString();
+      }
+
+      // ─── GLOBALLY UNIQUE IDS ──────────────────────────────────────────────
+      // Old per-device counters (1, 2, 3...) meant two phones could create two
+      // different records with the same id, and sync would silently overwrite
+      // one with the other. These ids can never collide between devices.
+      let _lastId = 0;
+      function newId() {
+        let id = (Date.now() - 1600000000000) * 1000 + Math.floor(Math.random() * 1000);
+        if (id <= _lastId) id = _lastId + 1;
+        _lastId = id;
+        return id;
+      }
 
       function lsave() {
         try {
           localStorage.setItem("fishdryer_v4", JSON.stringify(state));
-        } catch (e) {}
+        } catch (e) {
+          showToast("Phone storage is full — could not save");
+        }
       }
       function lload() {
         try {
           const d = localStorage.getItem("fishdryer_v4");
-          if (d) state = JSON.parse(d);
-          if (!state.shop)
-            state.shop = {
-              purchases: [],
-              purNextId: 1,
-              expenses: [],
-              expNextId: 1,
-              sales: [],
-              saleNextId: 1,
-              dryStockKg: 0,
-              pricePerKg: 17000,
-            };
-          ["purchases", "expenses", "sales"].forEach((k) => {
-            if (!state.shop[k]) state.shop[k] = [];
-          });
-          if (!state.shop.pricePerKg) state.shop.pricePerKg = 17000;
-          if (!state.shop.purNextId) state.shop.purNextId = 1;
-          if (!state.shop.expNextId) state.shop.expNextId = 1;
-          if (!state.shop.saleNextId) state.shop.saleNextId = 1;
-        } catch (e) {}
+          if (d) {
+            const parsed = JSON.parse(d);
+            if (parsed && typeof parsed === "object") state = parsed;
+          }
+        } catch (e) {
+          console.error("Could not read saved data", e);
+        }
+        normaliseState();
+        cleanExisting();
+        pendingChanges = localStorage.getItem("fd_dirty") === "1";
+        lastSyncAt = localStorage.getItem("fd_lastsync") || null;
+      }
+      function normaliseState() {
+        if (!state || typeof state !== "object") state = {};
+        if (!Array.isArray(state.items)) state.items = [];
+        if (!state.deleted || typeof state.deleted !== "object")
+          state.deleted = {};
+        if (!state.shop || typeof state.shop !== "object") state.shop = {};
+        if (!Array.isArray(state.shop.expenses)) state.shop.expenses = [];
+        if (!state.shop.dryingRatePerKg) state.shop.dryingRatePerKg = 50;
+        if (
+          !state.shop.priceDefaults ||
+          typeof state.shop.priceDefaults !== "object"
+        )
+          state.shop.priceDefaults = { Catfish: 350 };
+        if (!state.nextId) state.nextId = 1;
+        // guard against records saved without payment arrays
+        state.items.forEach((i) => {
+          if (!Array.isArray(i.payments)) i.payments = [];
+        });
       }
       lload();
 
+      // ─── TOMBSTONES ───────────────────────────────────────────────────────
+      // Deleting used to only remove the record locally. The next sync pulled
+      // it back down from the other device and it reappeared. A tombstone
+      // records the deletion itself so it travels between devices too.
+      function tombstone(kind, id) {
+        state.deleted[kind + ":" + id] = new Date().toISOString();
+      }
+      function isDeleted(kind, id) {
+        return !!state.deleted[kind + ":" + id];
+      }
+      function purgeTombstones() {
+        const cutoff = Date.now() - 120 * 86400000;
+        Object.keys(state.deleted).forEach((k) => {
+          const t = new Date(state.deleted[k]).getTime();
+          if (!t || t < cutoff) delete state.deleted[k];
+        });
+      }
+
       window.addEventListener("online", () => {
-        if (localStorage.getItem("fd_gsignin") === "1" && !isTokenValid()) {
-          setSyncStatus("syncing", "Signing in...");
-          signInGoogle(true);
-        }
+        if (!isSignedIn()) return;
+        setSyncStatus("syncing", "Signing in...");
+        if (!isTokenValid()) signInGoogle(true);
+        else syncNow();
       });
 
       window.addEventListener("offline", () => {
         setSyncStatus("", "Offline");
       });
 
+      // Coming back to the app is the moment you most want fresh data from the
+      // other phone, so pull straight away instead of waiting for the poll.
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState !== "visible") return;
+        updateViewportVars();
+        if (!isSignedIn() || !navigator.onLine) return;
+        if (!isTokenValid()) signInGoogle(true);
+        else if (pendingChanges) syncNow();
+        else pullLatestFromDrive();
+      });
+      window.addEventListener("focus", () => {
+        if (isTokenValid() && navigator.onLine) pullLatestFromDrive();
+      });
+
       // ─── BACK BUTTON HANDLER ───────────────────────────────────────────────────
       window.addEventListener("popstate", handleBackButton);
 
+      let lastBackPress = 0;
       function pushState() {
         history.pushState({ page: true }, "");
       }
@@ -1702,11 +1888,86 @@
           return;
         }
 
-        // already on home — let the app minimize naturally (don't exit)
-        history.back();
+        // already on home — require a second press before leaving, so a
+        // stray back tap can't close the app mid-entry
+        if (Date.now() - lastBackPress < 2000) {
+          history.back();
+          return;
+        }
+        lastBackPress = Date.now();
+        showToast("Press back again to exit");
+        pushState();
       }
 
+      // ─── ZOOM ─────────────────────────────────────────────────────────────
+      // The old "font size" setting forced every element to the same size with
+      // `#app * { font-size: inherit !important }`, which flattened headings,
+      // labels and amounts into one size and broke the layout. This scales the
+      // whole interface instead, so proportions stay correct.
+      const ZOOM_STEPS = [0.8, 0.9, 1, 1.1, 1.25, 1.4, 1.6];
+      const zoomSupported = () =>
+        typeof CSS !== "undefined" && CSS.supports && CSS.supports("zoom", "1.5");
+
+      function getZoom() {
+        const v = parseFloat(localStorage.getItem("fd_zoom"));
+        return ZOOM_STEPS.indexOf(v) >= 0 ? v : 1;
+      }
+      function applyZoom(z) {
+        localStorage.setItem("fd_zoom", String(z));
+        if (zoomSupported()) document.documentElement.style.zoom = z;
+        updateViewportVars();
+        const label = document.getElementById("zoom-label");
+        if (label) label.textContent = Math.round(z * 100) + "%";
+      }
+      function updateViewportVars() {
+        const z = zoomSupported() ? getZoom() : 1;
+        const r = document.documentElement.style;
+        r.setProperty("--vh", window.innerHeight / z + "px");
+        r.setProperty("--vw", window.innerWidth / z + "px");
+      }
+      function changeZoom(dir) {
+        if (dir === 0) {
+          applyZoom(1);
+          showToast("Display size reset");
+          return;
+        }
+        let i = ZOOM_STEPS.indexOf(getZoom());
+        if (i < 0) i = ZOOM_STEPS.indexOf(1);
+        const next = Math.min(ZOOM_STEPS.length - 1, Math.max(0, i + dir));
+        if (next === i) {
+          showToast(dir > 0 ? "Already at the largest size" : "Already at the smallest size");
+          return;
+        }
+        applyZoom(ZOOM_STEPS[next]);
+      }
+      function initZoom() {
+        applyZoom(getZoom());
+        window.addEventListener("resize", updateViewportVars);
+        window.addEventListener("orientationchange", () =>
+          setTimeout(updateViewportVars, 200),
+        );
+      }
+      // kept so any older saved shortcut/handler still works
+      const initFontSize = initZoom;
+      const changeFontSize = changeZoom;
+
       function initApp() {
+        try {
+          bootApp();
+        } catch (e) {
+          console.error("Start-up problem", e);
+          // keep the app usable even if one piece failed
+          try {
+            renderHome();
+            pushState();
+          } catch (e2) {
+            console.error(e2);
+          }
+        }
+      }
+
+      function bootApp() {
+        initZoom();
         userName = localStorage.getItem("fd_user") || "";
         const sd = localStorage.getItem("fd_dark");
         darkMode =
@@ -1716,76 +1977,86 @@
         if (darkMode) document.documentElement.classList.add("dark");
         updateDarkBtn();
         if (!userName)
-          document.getElementById("setup-overlay").classList.add("show");
-        document.getElementById("current-user-name").textContent =
-          userName || "?";
-        document.getElementById("hdr-date").textContent =
+          document.getElementById("setup-overlay")?.classList.add("show");
+        setText("current-user-name", userName || "?");
+        setText(
+          "hdr-date",
           new Date().toLocaleDateString("en-NG", {
             weekday: "long",
             day: "numeric",
             month: "long",
-          });
-        document.getElementById("settings-name").value = userName;
-        document.getElementById("settings-price").value = state.shop.pricePerKg;
+          }),
+        );
+        if (!navigator.onLine) setSyncStatus("", "Offline");
+        else if (isSignedIn()) setSyncStatus("syncing", "Signing in...");
+        renderSyncInfo();
+        setVal("settings-name", userName);
+        setVal("settings-dryrate", state.shop.dryingRatePerKg);
         initFishRows();
         renderHome();
         if (GOOGLE_CLIENT_ID) {
+          let tries = 0;
           const tryAutoSignIn = () => {
             if (!navigator.onLine) {
               setSyncStatus("", "Offline");
               return;
             }
-
-            if (window.google) {
-              if (localStorage.getItem("fd_gsignin") === "1") {
-                setSyncStatus("syncing", "Signing in...");
-                signInGoogle(true);
-              }
-            } else setTimeout(tryAutoSignIn, 500);
+            if (window.google && google.accounts && google.accounts.oauth2) {
+              if (isSignedIn()) signInGoogle(true);
+              else setSyncStatus("", "Sign in");
+            } else if (tries++ < 20) setTimeout(tryAutoSignIn, 500);
+            else setSyncStatus("", "Sign in");
           };
-          setTimeout(tryAutoSignIn, 1000);
+          setTimeout(tryAutoSignIn, 600);
         }
 
-        // ─── BACKGROUND POLLING AUTO-REFRESH ──────────
-        // Periodically pulls changes down from the cloud every 60 seconds
+        // ─── BACKGROUND REFRESH ───────────────────────────────────────────
+        // Pull other devices' changes down every 30s while the app is open,
+        // and push anything that is still waiting to upload.
         setInterval(() => {
-          if (isTokenValid() && !isSyncing) {
-            console.log("Checking cloud for data changes...");
-            pullLatestFromDrive();
+          if (document.visibilityState !== "visible") return;
+          if (!navigator.onLine || isSyncing) return;
+          if (!isTokenValid()) {
+            if (isSignedIn()) signInGoogle(true);
+            return;
           }
-        }, 60000);
+          if (pendingChanges) syncNow();
+          else pullLatestFromDrive();
+        }, 30000);
+        setInterval(renderSyncInfo, 30000);
         pushState();
       }
 
       function saveSetupName() {
-        const n = document.getElementById("setup-name").value.trim();
+        const n = clean(document.getElementById("setup-name").value);
         if (!n) {
           showToast("Please enter your name");
           return;
         }
         userName = n;
         localStorage.setItem("fd_user", n);
-        document.getElementById("setup-overlay").classList.remove("show");
-        document.getElementById("current-user-name").textContent = n;
-        document.getElementById("settings-name").value = n;
+        document.getElementById("setup-overlay")?.classList.remove("show");
+        setText("current-user-name", n);
+        setVal("settings-name", n);
         showToast("Welcome, " + n + "!");
       }
       function saveSettingsName() {
-        const n = document.getElementById("settings-name").value.trim();
+        const n = clean(document.getElementById("settings-name").value);
         if (!n) return;
         userName = n;
         localStorage.setItem("fd_user", n);
-        document.getElementById("current-user-name").textContent = n;
+        setText("current-user-name", n);
         showToast("Name updated");
       }
-      function saveSettingsPrice() {
-        const p =
-          parseFloat(document.getElementById("settings-price").value) || 0;
-        if (!p) return;
-        state.shop.pricePerKg = p;
+      function saveDryingRate() {
+        const r =
+          parseFloat(document.getElementById("settings-dryrate").value) || 0;
+        if (!r) return;
+        state.shop.dryingRatePerKg = r;
+        state.shop.settingsAt = new Date().toISOString();
         lsave();
         scheduleSync();
-        showToast("Price updated to " + fmt(p) + "/kg");
+        showToast("Drying charge updated to " + fmt(r) + "/kg");
       }
 
       function toggleDark() {
@@ -1805,7 +2076,7 @@
         fishRowCount = 0;
         document.getElementById("fish-rows").innerHTML = "";
         const dateEl = document.getElementById("in-date");
-        if (dateEl) dateEl.value = new Date().toISOString().split("T")[0];
+        if (dateEl) dateEl.value = todayStr();
         addFishRow();
       }
       function addFishRow() {
@@ -1815,16 +2086,31 @@
         el.className = "fish-row";
         el.id = "fish-row-" + id;
         el.innerHTML = `<div class="fish-row-header"><span class="fish-row-label">Fish #${id}</span>${id > 1 ? `<button class="fish-row-del" onclick="removeFishRow(${id})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6M14 11v6M9 6V4h6v2"></path></svg></button>` : ""}</div>
-  <div class="fg"><select class="fi" id="fr-type-${id}" onchange="calcVisitTotal()"><option value="">Select fish type...</option><option>Catfish</option><option>Tilapia</option><option>Titus</option><option>Panla</option><option>Mixed fish</option><option>Goat Meat</option><option>Cow Meat</option><option>Other</option></select></div>
+  <div class="fg"><select class="fi" id="fr-type-${id}" onchange="onFishTypeChange(${id})"><option>Catfish</option><option>Tilapia</option><option>Titus</option><option>Panla</option><option>Mixed fish</option><option>Goat Meat</option><option>Cow Meat</option><option value="">Other / select...</option></select></div>
   <div class="fg"><input class="fi" id="fr-custom-${id}" type="text" placeholder="Custom name (optional)"></div>
   <div class="r2"><div class="fg"><label class="fl">Weight (kg)</label><input class="fi" id="fr-weight-${id}" type="number" placeholder="0.0" step="0.1" min="0" inputmode="decimal" oninput="calcVisitTotal()"></div><div class="fg"><label class="fl">Count (pcs)</label><input class="fi" id="fr-count-${id}" type="number" placeholder="0" min="0" inputmode="numeric"></div></div>
   <div class="r2"><div class="fg"><label class="fl">Price/kg (₦)</label><input class="fi" id="fr-price-${id}" type="number" placeholder="0" min="0" inputmode="numeric" oninput="calcVisitTotal()"></div><div class="fg"><label class="fl">Discount (₦)</label><input class="fi" id="fr-disc-${id}" type="number" placeholder="0" min="0" inputmode="numeric" oninput="calcVisitTotal()"></div></div>
   <div class="fish-row-total" id="fr-total-${id}"></div>`;
         document.getElementById("fish-rows").appendChild(el);
+        // 90% of intakes are catfish, so it's pre-selected — this fills in
+        // its usual price straight away while leaving it editable.
+        onFishTypeChange(id, true);
         calcVisitTotal();
       }
       function removeFishRow(id) {
         document.getElementById("fish-row-" + id)?.remove();
+        calcVisitTotal();
+        updateDryingPreview();
+      }
+      // Fills the price field with what was last charged for this fish type,
+      // without overwriting a price the user already typed in themselves.
+      function onFishTypeChange(id, force) {
+        const type = document.getElementById("fr-type-" + id)?.value;
+        const priceEl = document.getElementById("fr-price-" + id);
+        if (priceEl && type && (force || !priceEl.value)) {
+          const def = state.shop.priceDefaults[type];
+          if (def) priceEl.value = def;
+        }
         calcVisitTotal();
       }
       function getFishRows() {
@@ -1832,8 +2118,8 @@
         document.querySelectorAll(".fish-row").forEach((el) => {
           const id = el.id.replace("fish-row-", "");
           const type =
-            document.getElementById("fr-custom-" + id)?.value.trim() ||
-            document.getElementById("fr-type-" + id)?.value;
+            clean(document.getElementById("fr-custom-" + id)?.value) ||
+            clean(document.getElementById("fr-type-" + id)?.value);
           const weight =
             parseFloat(document.getElementById("fr-weight-" + id)?.value) || 0;
           const count =
@@ -1870,192 +2156,372 @@
           if (tel) tel.textContent = t > 0 ? "Subtotal: " + fmt(t) : "";
         });
         document.getElementById("in-total").textContent = fmt(g);
+        updateDryingPreview();
+      }
+
+      // Most visits (about 9 in 10) she pays for the drying itself, at a flat
+      // rate per kg — this keeps that expense one tap away instead of a trip
+      // to a separate screen, while staying editable for the times it's not
+      // exactly that rate, or not paid at all.
+      function totalIntakeWeight() {
+        let w = 0;
+        document.querySelectorAll(".fish-row").forEach((el) => {
+          const id = el.id.replace("fish-row-", "");
+          w += parseFloat(document.getElementById("fr-weight-" + id)?.value) || 0;
+        });
+        return w;
+      }
+      function updateDryingPreview() {
+        const amtEl = document.getElementById("in-drying-amt");
+        if (!amtEl) return;
+        // don't clobber a value the user already customised by hand
+        if (amtEl.dataset.touched === "1") return;
+        const w = totalIntakeWeight();
+        amtEl.value = w ? +(w * state.shop.dryingRatePerKg).toFixed(2) : "";
+      }
+      function toggleDryingAmt() {
+        const on = document.getElementById("in-drying-pay")?.checked;
+        const row = document.getElementById("drying-amt-row");
+        if (row) row.style.display = on ? "" : "none";
       }
 
       function setSyncStatus(cls, lbl) {
         const b = document.getElementById("sync-btn");
-        b.className = "sync-btn" + (cls ? " " + cls : "");
-        document.getElementById("sync-label").textContent = lbl;
+        if (b) b.className = "sync-btn" + (cls ? " " + cls : "");
+        setText("sync-label", lbl);
       }
-      function handleSyncClick() {
-        if (isTokenValid()) syncNow();
-        else signInGoogle(false);
+      function ensureFileId() {
+        if (gFileId) return Promise.resolve(gFileId);
+        return gFetch(
+          `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id)`,
+        ).then((l) => {
+          if (l && l.files && l.files.length) gFileId = l.files[0].id;
+          return gFileId;
+        });
       }
-      async function pullLatestFromDrive() {
-        if (!gToken) return;
+
+      async function downloadRemote() {
+        await ensureFileId();
+        if (!gFileId) return null;
+        const r = await gFetchRaw(
+          `https://www.googleapis.com/drive/v3/files/${gFileId}?alt=media`,
+        );
+        if (r.status === 404) {
+          gFileId = null;
+          return null;
+        }
+        if (!r.ok) throw new Error("Drive read failed: " + r.status);
+        const txt = await r.text();
+        if (!txt) return null;
         try {
-          if (!gFileId) {
-            const l = await gFetch(
-              `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id)`,
-            );
-            if (l.files?.length) gFileId = l.files[0].id;
-          }
-          if (gFileId) {
-            const r = await gFetch(
-              `https://www.googleapis.com/drive/v3/files/${gFileId}?alt=media`,
-            );
-            mergeRemote(r);
-            renderHome();
+          return JSON.parse(txt);
+        } catch (e) {
+          console.error("Cloud file was not readable", e);
+          return null;
+        }
+      }
+
+      async function uploadState() {
+        state.updatedAt = new Date().toISOString();
+        const body = JSON.stringify(state);
+        if (!gFileId) {
+          const m = await gFetch("https://www.googleapis.com/drive/v3/files", {
+            method: "POST",
+            body: JSON.stringify({
+              name: DRIVE_FILE_NAME,
+              parents: ["appDataFolder"],
+            }),
+          });
+          if (!m || !m.id) throw new Error("Could not create cloud file");
+          gFileId = m.id;
+        }
+        const r = await gFetchRaw(
+          `https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body,
+          },
+        );
+        if (!r.ok) throw new Error("Drive write failed: " + r.status);
+      }
+
+      // Pull only — used by the background poll and when the app regains focus,
+      // so a record typed on one phone shows up on the other without anyone
+      // pressing sync.
+      let lastPullAt = 0;
+      async function pullLatestFromDrive(force) {
+        if (!isTokenValid() || isSyncing) return;
+        if (!force && Date.now() - lastPullAt < 4000) return;
+        lastPullAt = Date.now();
+        isSyncing = true;
+        try {
+          const remote = await downloadRemote();
+          if (remote) {
+            const changed = mergeRemote(remote);
             lsave();
+            if (changed) {
+              refreshCurrentScreen();
+              setSyncStatus("synced", "Updated");
+            }
+          }
+          markSynced();
+          if (pendingChanges) {
+            isSyncing = false;
+            await syncNow();
+            return;
           }
         } catch (e) {
           console.log("Pull failed", e);
         }
+        isSyncing = false;
       }
+
       function signInGoogle(silent = false) {
-        if (!window.google) {
-          if (!silent) showToast("Loading Google... try again");
-          setTimeout(() => signInGoogle(silent), 1000);
+        if (!window.google || !google.accounts || !google.accounts.oauth2) {
+          if (!silent) showToast("Loading Google — try again in a moment");
+          if (navigator.onLine) setTimeout(() => signInGoogle(silent), 1200);
           return;
         }
-        if (!gTokenClient) {
-          gTokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: GOOGLE_CLIENT_ID,
-            scope: SCOPES,
-            callback: async (r) => {
-              clearTimeout(silentSignInTimer);
-              if (r.error) {
-                if (!silent) showToast("Sign in failed");
-                setSyncStatus("", "Sign in");
-                return;
-              }
-              gToken = r.access_token;
-              gTokenExpiry = Date.now() + (r.expires_in - 60) * 1000;
-              localStorage.setItem("fd_gsignin", "1");
-              setSyncStatus("syncing", "Syncing...");
-              await pullLatestFromDrive();
-              await syncNow();
-              scheduleTokenRefresh(r.expires_in - 60);
-            },
-          });
-        }
-        if (silent)
-          silentSignInTimer = setTimeout(
-            () => setSyncStatus("", "Sign in"),
-            5000,
-          );
-        gTokenClient.requestAccessToken({
-          prompt: silent ? "" : "select_account",
+        const client = google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_CLIENT_ID,
+          scope: SCOPES,
+          callback: async (r) => {
+            clearTimeout(silentSignInTimer);
+            if (r.error) {
+              // a silent refresh can fail simply because consent expired;
+              // that is not an error worth shouting about
+              if (!silent) showToast("Sign in failed — please try again");
+              setSyncStatus("", silent && isSignedIn() ? "Tap to sync" : "Sign in");
+              return;
+            }
+            gToken = r.access_token;
+            gTokenExpiry = Date.now() + (r.expires_in - 120) * 1000;
+            localStorage.setItem("fd_gsignin", "1");
+            setSyncStatus("syncing", "Syncing...");
+            await syncNow();
+            scheduleTokenRefresh(r.expires_in - 180);
+          },
         });
+        // The old code never stored the client, so every later token refresh
+        // called a null object and quietly did nothing — after about an hour
+        // the app stopped syncing without telling anyone.
+        gTokenClient = client;
+        if (silent) {
+          silentSignInTimer = setTimeout(
+            () => setSyncStatus("", "Tap to sync"),
+            8000,
+          );
+          client.requestAccessToken({ prompt: "none" });
+        } else {
+          client.requestAccessToken({ prompt: "select_account" });
+        }
       }
+
+      function isSignedIn() {
+        return localStorage.getItem("fd_gsignin") === "1";
+      }
+
       function signOut() {
+        try {
+          if (gToken && window.google && google.accounts && google.accounts.oauth2)
+            google.accounts.oauth2.revoke(gToken, () => {});
+        } catch (e) {}
         gToken = null;
         gFileId = null;
         gTokenExpiry = 0;
         gTokenClient = null;
+        clearTimeout(tokenRefreshTimer);
         localStorage.removeItem("fd_gsignin");
         setSyncStatus("", "Sign in");
-        showToast("Signed out");
+        showToast("Signed out — records stay on this phone");
+        renderSyncInfo();
       }
+
       function scheduleTokenRefresh(sec) {
-        setTimeout(
+        clearTimeout(tokenRefreshTimer);
+        tokenRefreshTimer = setTimeout(
           () => {
-            if (localStorage.getItem("fd_gsignin") === "1")
-              gTokenClient?.requestAccessToken({ prompt: "" });
+            if (isSignedIn() && navigator.onLine) signInGoogle(true);
           },
-          Math.max(0, sec * 1000),
+          Math.max(30, sec) * 1000,
         );
       }
+
       function isTokenValid() {
-        return gToken && Date.now() < gTokenExpiry;
+        return !!gToken && Date.now() < gTokenExpiry;
       }
-      async function syncNow() {
-        if (!gToken || isSyncing) return;
+
+      function markSynced() {
+        lastSyncAt = new Date().toISOString();
+        localStorage.setItem("fd_lastsync", lastSyncAt);
+        renderSyncInfo();
+      }
+
+      function markDirty() {
+        pendingChanges = true;
+        localStorage.setItem("fd_dirty", "1");
+      }
+
+      function clearDirty() {
+        pendingChanges = false;
+        localStorage.removeItem("fd_dirty");
+      }
+
+      // Full two-way sync: read what the other devices wrote, merge it into
+      // what is on this phone, then write the merged result back.
+      async function syncNow(manual) {
+        if (isSyncing) return;
+        if (!navigator.onLine) {
+          setSyncStatus("", "Offline");
+          if (manual) showToast("No internet — will sync when you're back online");
+          return;
+        }
+        if (!isTokenValid()) {
+          if (isSignedIn()) signInGoogle(true);
+          else if (manual) signInGoogle(false);
+          return;
+        }
         isSyncing = true;
         setSyncStatus("syncing", "Syncing...");
         try {
-          if (!gFileId) {
-            const l = await gFetch(
-              `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id)`,
-            );
-            if (l.files?.length) gFileId = l.files[0].id;
-          }
-          if (gFileId) {
-            const r = await gFetch(
-              `https://www.googleapis.com/drive/v3/files/${gFileId}?alt=media`,
-            );
-            mergeRemote(r);
-            renderHome();
-          }
-          const body = JSON.stringify(state);
-          if (gFileId) {
-            await gFetchRaw(
-              `https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`,
-              {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body,
-              },
-            );
-          } else {
-            const m = await gFetch(
-              "https://www.googleapis.com/drive/v3/files",
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  name: DRIVE_FILE_NAME,
-                  parents: ["appDataFolder"],
-                }),
-              },
-            );
-            gFileId = m.id;
-            await gFetchRaw(
-              `https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`,
-              {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body,
-              },
-            );
-          }
+          const remote = await downloadRemote();
+          if (remote) mergeRemote(remote);
+          await uploadState();
+          clearDirty();
           lsave();
-          setSyncStatus("synced", "Synced ✓");
-          renderHome();
+          markSynced();
+          setSyncStatus("synced", "Synced");
+          refreshCurrentScreen();
+          if (manual) showToast("✓ Synced with your other devices");
         } catch (e) {
           console.error(e);
           setSyncStatus("", "Retry sync");
-          showToast("Sync failed — check connection");
+          if (manual) showToast("Sync failed — check your connection");
         }
         isSyncing = false;
       }
-      function mergeRemote(remote) {
-        if (!remote?.items) return;
-        const map = {};
-        state.items.forEach((i) => (map[i.id] = i));
-        remote.items.forEach((ri) => {
-          if (!map[ri.id]) state.items.push(ri);
-          else {
-            const le = new Date(map[ri.id].editedAt || map[ri.id].createdAt),
-              re = new Date(ri.editedAt || ri.createdAt);
-            if (re > le) Object.assign(map[ri.id], ri);
+
+      function forceSync() {
+        syncNow(true);
+      }
+
+      function handleSyncClick() {
+        if (isTokenValid() || isSignedIn()) syncNow(true);
+        else signInGoogle(false);
+      }
+
+      // ─── MERGE ────────────────────────────────────────────────────────────
+      // Rules: a record that exists in only one place is kept; when both sides
+      // have it the most recently edited version wins; payments from both sides
+      // are combined; anything deleted anywhere stays deleted everywhere.
+      function recordTime(r, dateField) {
+        return new Date(r.editedAt || r[dateField] || 0).getTime() || 0;
+      }
+
+      function mergePayments(a, b) {
+        const out = [];
+        const seen = {};
+        (a || []).concat(b || []).forEach((p) => {
+          if (!p || typeof p.amount !== "number") return;
+          const k = (p.date || "") + "|" + p.amount + "|" + (p.note || "");
+          if (seen[k]) return;
+          seen[k] = 1;
+          out.push(p);
+        });
+        out.sort((x, y) => new Date(x.date) - new Date(y.date));
+        return out;
+      }
+
+      function mergeList(localArr, remoteArr, kind, dateField) {
+        let changed = false;
+        const byId = {};
+        localArr.forEach((r) => (byId[r.id] = r));
+        (remoteArr || []).forEach((rr) => {
+          if (!rr || rr.id === undefined || rr.id === null) return;
+          if (isDeleted(kind, rr.id)) return;
+          const mine = byId[rr.id];
+          if (!mine) {
+            localArr.push(rr);
+            byId[rr.id] = rr;
+            changed = true;
+            return;
+          }
+          const payments = mergePayments(mine.payments, rr.payments);
+          if (recordTime(rr, dateField) > recordTime(mine, dateField)) {
+            Object.assign(mine, rr);
+            changed = true;
+          }
+          if (
+            JSON.stringify(payments) !== JSON.stringify(mine.payments || [])
+          ) {
+            mine.payments = payments;
+            changed = true;
           }
         });
-        if (remote.nextId > state.nextId) state.nextId = remote.nextId;
-        state.items.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-        );
-        if (remote.shop) {
-          ["purchases", "expenses", "sales"].forEach((k) => {
-            if (remote.shop[k]) {
-              const lm = {};
-              (state.shop[k] || []).forEach((x) => (lm[x.id] = x));
-              remote.shop[k].forEach((x) => {
-                if (!lm[x.id]) state.shop[k].push(x);
-                else {
-                  const le = new Date(lm[x.id].editedAt || lm[x.id].date || 0),
-                    re = new Date(x.editedAt || x.date || 0);
-                  if (re > le) Object.assign(lm[x.id], x);
-                }
-              });
-              state.shop[k].sort((a, b) => new Date(b.date) - new Date(a.date));
-            }
-          });
-          if (remote.shop.pricePerKg)
-            state.shop.pricePerKg = remote.shop.pricePerKg;
-          recalcDryStock();
+        // apply deletions from any device
+        for (let i = localArr.length - 1; i >= 0; i--) {
+          if (isDeleted(kind, localArr[i].id)) {
+            localArr.splice(i, 1);
+            changed = true;
+          }
         }
+        localArr.sort(
+          (a, b) => new Date(b[dateField] || 0) - new Date(a[dateField] || 0),
+        );
+        return changed;
       }
+
+      function mergeRemote(remote) {
+        if (!remote || typeof remote !== "object") return false;
+        let changed = false;
+
+        const rd = remote.deleted || {};
+        Object.keys(rd).forEach((k) => {
+          if (!state.deleted[k]) {
+            state.deleted[k] = rd[k];
+            changed = true;
+          }
+        });
+
+        if (mergeList(state.items, remote.items, "service", "createdAt"))
+          changed = true;
+        if (remote.nextId > state.nextId) state.nextId = remote.nextId;
+
+        if (remote.shop && typeof remote.shop === "object") {
+          if (
+            mergeList(
+              state.shop.expenses,
+              remote.shop.expenses,
+              "expense",
+              "date",
+            )
+          )
+            changed = true;
+
+          // Drying rate + learned fish-price defaults: newest edit wins.
+          const rAt = new Date(remote.shop.settingsAt || 0).getTime() || 0;
+          const lAt = new Date(state.shop.settingsAt || 0).getTime() || 0;
+          if (rAt > lAt) {
+            if (remote.shop.dryingRatePerKg)
+              state.shop.dryingRatePerKg = remote.shop.dryingRatePerKg;
+            if (
+              remote.shop.priceDefaults &&
+              typeof remote.shop.priceDefaults === "object"
+            )
+              state.shop.priceDefaults = Object.assign(
+                {},
+                state.shop.priceDefaults,
+                remote.shop.priceDefaults,
+              );
+            state.shop.settingsAt = remote.shop.settingsAt;
+            changed = true;
+          }
+        }
+        purgeTombstones();
+        return changed;
+      }
+
       function gFetch(url, opts = {}) {
         opts.headers = Object.assign(
           {
@@ -2064,29 +2530,78 @@
           },
           opts.headers || {},
         );
-        return fetch(url, opts).then((r) => r.json());
+        opts.cache = "no-store";
+        return fetch(url, opts).then((r) => {
+          if (!r.ok) throw new Error("Drive request failed: " + r.status);
+          return r.json();
+        });
       }
+
       function gFetchRaw(url, opts = {}) {
         opts.headers = Object.assign(
           { Authorization: "Bearer " + gToken },
           opts.headers || {},
         );
+        opts.cache = "no-store";
         return fetch(url, opts);
       }
+
+      // Called after every change the user makes.
       function scheduleSync() {
-        if (!localStorage.getItem("fd_gsignin")) return;
+        markDirty();
+        renderSyncInfo();
+        if (!isSignedIn()) return;
         clearTimeout(syncTmr);
-        syncTmr = setTimeout(async () => {
-          if (!isTokenValid()) {
-            gTokenClient?.requestAccessToken({ prompt: "" });
-            return;
-          }
-          syncNow();
-        }, 3000);
+        syncTmr = setTimeout(() => {
+          if (!navigator.onLine) return;
+          if (!isTokenValid()) signInGoogle(true);
+          else syncNow();
+        }, 1500);
+      }
+
+      function renderSyncInfo() {
+        const el = document.getElementById("sync-info");
+        if (!el) return;
+        if (!isSignedIn()) {
+          el.textContent =
+            "Not signed in — records are only on this phone. Sign in with the same Google account on each device to share them.";
+          return;
+        }
+        let t = "Signed in. ";
+        t += lastSyncAt ? "Last synced " + timeAgo(lastSyncAt) + "." : "Not synced yet.";
+        if (pendingChanges) t += " Changes waiting to upload.";
+        el.textContent = t;
+      }
+
+      // Re-draw whichever screen is open, so data arriving from another device
+      // appears straight away instead of only on the home screen.
+      function refreshCurrentScreen() {
+        try {
+          renderHome();
+          const active = document.querySelector(".screen.active");
+          if (!active) return;
+          const id = active.id.replace("screen-", "");
+          if (id === "inventory") {
+            const t = document.querySelector("#screen-inventory .tab.active");
+            renderInventory(
+              t ? t.textContent.trim().toLowerCase() : "all",
+            );
+          } else if (id === "shop") renderShopScreen();
+          else if (id === "customers") renderCustomers();
+          else if (id === "debts") renderDebts("all");
+          else if (id === "summary") renderSummary(currentSumPeriod);
+          else if (id === "analytics") renderAnalytics();
+          else if (id === "settings") renderSettings();
+        } catch (e) {
+          console.error("refresh failed", e);
+        }
       }
 
       const fmt = (n) => "₦" + Math.round(n).toLocaleString("en-NG");
-      const fmtKg = (n) => (n % 1 === 0 ? n + "kg" : +n.toFixed(2) + "kg");
+      const fmtKg = (n) => {
+        const v = Number(n) || 0;
+        return (v % 1 === 0 ? v : +v.toFixed(2)) + "kg";
+      };
       const statusLabel = (s) =>
         ({
           fresh: "In stock",
@@ -2128,14 +2643,6 @@
           ] || ""
         );
       }
-      function recalcDryStock() {
-        const bought = state.shop.purchases.reduce(
-          (a, p) => a + (p.actualDryKg || p.estimatedDryKg || 0),
-          0,
-        );
-        const sold = state.shop.sales.reduce((a, s) => a + s.weightKg, 0);
-        state.shop.dryStockKg = Math.max(0, +(bought - sold).toFixed(2));
-      }
 
       async function pickContact() {
         if (!("contacts" in navigator && "ContactsManager" in window)) {
@@ -2148,51 +2655,9 @@
           });
           if (c.length > 0) {
             if (c[0].name?.[0])
-              document.getElementById("in-name").value = c[0].name[0];
+              document.getElementById("in-name").value = clean(c[0].name[0]);
             if (c[0].tel?.[0])
-              document.getElementById("in-phone").value = c[0].tel[0];
-          }
-        } catch (e) {
-          showToast("Could not open contacts");
-        }
-      }
-
-      async function pickSellContact() {
-        if (!("contacts" in navigator && "ContactsManager" in window)) {
-          showToast("Contact picker not available");
-          return;
-        }
-        try {
-          const c = await navigator.contacts.select(["name", "tel"], {
-            multiple: false,
-          });
-          if (c.length > 0) {
-            if (c[0].name?.[0])
-              document.getElementById("sell-buyer").value =
-                c[0].name[0].replace(/\b\w/g, (x) => x.toUpperCase());
-            if (c[0].tel?.[0])
-              document.getElementById("sell-phone").value = c[0].tel[0];
-          }
-        } catch (e) {
-          showToast("Could not open contacts");
-        }
-      }
-
-      async function pickBuyContact() {
-        if (!("contacts" in navigator && "ContactsManager" in window)) {
-          showToast("Contact picker not available");
-          return;
-        }
-        try {
-          const c = await navigator.contacts.select(["name", "tel"], {
-            multiple: false,
-          });
-          if (c.length > 0) {
-            if (c[0].name?.[0])
-              document.getElementById("buy-supplier").value =
-                c[0].name[0].replace(/\b\w/g, (x) => x.toUpperCase());
-            if (c[0].tel?.[0])
-              document.getElementById("buy-phone").value = c[0].tel[0];
+              document.getElementById("in-phone").value = clean(c[0].tel[0]);
           }
         } catch (e) {
           showToast("Could not open contacts");
@@ -2208,15 +2673,10 @@
         }
         const seen = {};
         state.items.forEach((i) => {
+          if (!i.name) return;
           const k = i.name.toLowerCase();
           if (!seen[k]) seen[k] = { name: i.name, phone: i.phone || "" };
         });
-        state.shop.sales.forEach((s) => {
-          if (s.buyerName) {
-            const k = s.buyerName.toLowerCase();
-            if (!seen[k]) seen[k] = { name: s.buyerName, phone: s.phone || "" };
-          }
-        });
         const m = Object.values(seen)
           .filter((c) => c.name.toLowerCase().includes(q))
           .slice(0, 5);
@@ -2227,86 +2687,10 @@
         box.innerHTML = m
           .map(
             (c) =>
-              `<div class="suggestion-item" onmousedown="selectCustomer('${c.name.replace(/'/g, "\\'")}','${c.phone}')"><span class="suggestion-name">${c.name}</span><span class="suggestion-phone">${c.phone || "No phone"}</span></div>`,
+              `<div class="suggestion-item" onmousedown="selectCustomer('${c.name}','${c.phone}')"><span class="suggestion-name">${c.name}</span><span class="suggestion-phone">${c.phone || "No phone"}</span></div>`,
           )
           .join("");
         box.style.display = "block";
-      }
-      function showSupplierSuggestions() {
-        const q = document
-          .getElementById("buy-supplier")
-          ?.value.trim()
-          .toLowerCase();
-        const box = document.getElementById("supplier-suggestions");
-        if (!box || !q || q.length < 2) {
-          box && (box.style.display = "none");
-          return;
-        }
-        const seen = {};
-        state.shop.purchases.forEach((p) => {
-          const k = p.supplierName.toLowerCase();
-          if (!seen[k])
-            seen[k] = { name: p.supplierName, phone: p.phone || "" };
-        });
-        const m = Object.values(seen)
-          .filter((c) => c.name.toLowerCase().includes(q))
-          .slice(0, 5);
-        if (!m.length) {
-          box.style.display = "none";
-          return;
-        }
-        box.innerHTML = m
-          .map(
-            (c) =>
-              `<div class="suggestion-item" onmousedown="document.getElementById('buy-supplier').value='${c.name.replace(/'/g, "\\'")}';${c.phone ? `document.getElementById('buy-phone').value='${c.phone}';` : ""}hideSupplierSuggestions()"><span class="suggestion-name">${c.name}</span><span class="suggestion-phone">${c.phone || "No phone"}</span></div>`,
-          )
-          .join("");
-        box.style.display = "block";
-      }
-      function hideSupplierSuggestions() {
-        const b = document.getElementById("supplier-suggestions");
-        if (b) b.style.display = "none";
-      }
-
-      function showBuyerSuggestions() {
-        const q = document
-          .getElementById("sell-buyer")
-          ?.value.trim()
-          .toLowerCase();
-        const box = document.getElementById("buyer-suggestions");
-        if (!box || !q || q.length < 2) {
-          box && (box.style.display = "none");
-          return;
-        }
-        const seen = {};
-        state.items.forEach((i) => {
-          const k = i.name.toLowerCase();
-          if (!seen[k]) seen[k] = { name: i.name, phone: i.phone || "" };
-        });
-        state.shop.sales.forEach((s) => {
-          if (s.buyerName) {
-            const k = s.buyerName.toLowerCase();
-            if (!seen[k]) seen[k] = { name: s.buyerName, phone: s.phone || "" };
-          }
-        });
-        const m = Object.values(seen)
-          .filter((c) => c.name.toLowerCase().includes(q))
-          .slice(0, 5);
-        if (!m.length) {
-          box.style.display = "none";
-          return;
-        }
-        box.innerHTML = m
-          .map(
-            (c) =>
-              `<div class="suggestion-item" onmousedown="document.getElementById('sell-buyer').value='${c.name.replace(/'/g, "\\'")}';${c.phone ? `document.getElementById('sell-phone').value='${c.phone}';` : ""}hideBuyerSuggestions()"><span class="suggestion-name">${c.name}</span><span class="suggestion-phone">${c.phone || "No phone"}</span></div>`,
-          )
-          .join("");
-        box.style.display = "block";
-      }
-      function hideBuyerSuggestions() {
-        const b = document.getElementById("buyer-suggestions");
-        if (b) b.style.display = "none";
       }
       function selectCustomer(name, phone) {
         document.getElementById("in-name").value = name;
@@ -2336,7 +2720,7 @@
           debts: () => renderDebts("all"),
           summary: () => renderSummary("week"),
           analytics: renderAnalytics,
-          shop: () => renderShopTab("overview"),
+          shop: renderShopScreen,
           settings: renderSettings,
         })[name]?.();
         pushState();
@@ -2350,13 +2734,12 @@
 
       function saveItem() {
         const editId = document.getElementById("edit-id").value;
-        const name = document
-          .getElementById("in-name")
-          .value.trim()
-          .replace(/\b\w/g, (c) => c.toUpperCase());
-        const phone = document.getElementById("in-phone").value.trim();
+        const name = clean(
+          document.getElementById("in-name").value,
+        ).replace(/\b\w/g, (c) => c.toUpperCase());
+        const phone = clean(document.getElementById("in-phone").value);
         const status = document.getElementById("in-status").value;
-        const notes = document.getElementById("in-notes").value.trim();
+        const notes = clean(document.getElementById("in-notes").value);
         if (!name) {
           showToast("Please enter the customer name");
           return;
@@ -2367,6 +2750,12 @@
           return;
         }
         const total = fishRows.reduce((a, r) => a + r.total, 0);
+        // learn each fish type's usual price as it's used, so next time it's
+        // picked the price shows up already — still editable, never fixed
+        fishRows.forEach((r) => {
+          if (r.type && r.price) state.shop.priceDefaults[r.type] = r.price;
+        });
+        state.shop.settingsAt = new Date().toISOString();
         if (editId) {
           const item = state.items.find((x) => x.id == editId);
           if (item)
@@ -2383,8 +2772,9 @@
           cancelEdit();
           showScreen("inventory");
         } else {
+          const dateVal = document.getElementById("in-date").value;
           state.items.unshift({
-            id: state.nextId++,
+            id: newId(),
             name,
             phone,
             fishRows,
@@ -2394,12 +2784,24 @@
             addedBy: userName,
             payments: [],
             settledShort: false,
-            createdAt: new Date(
-              document.getElementById("in-date").value || Date.now(),
-            ).toISOString(),
+            createdAt: dateToISO(dateVal),
             collectedAt: null,
             editedAt: null,
           });
+          // record what she pays for drying this visit, if she does
+          const payDrying = document.getElementById("in-drying-pay")?.checked;
+          const dryingAmt =
+            parseFloat(document.getElementById("in-drying-amt")?.value) || 0;
+          if (payDrying && dryingAmt > 0) {
+            state.shop.expenses.unshift({
+              id: newId(),
+              type: "Drying",
+              amount: dryingAmt,
+              desc: "Drying for " + name + " (" + fmtKg(totalIntakeWeight()) + ")",
+              date: dateToISO(dateVal),
+              addedBy: userName,
+            });
+          }
           showToast("✓ Intake saved for " + name);
           clearForm();
           showScreen("inventory");
@@ -2413,22 +2815,32 @@
         );
         document.getElementById("in-status").value = "drying";
         document.getElementById("edit-id").value = "";
-        document.getElementById("in-date").value = new Date()
-          .toISOString()
-          .split("T")[0];
+        document.getElementById("in-date").value = todayStr();
+        const dBlock = document.getElementById("drying-expense-block");
+        if (dBlock) dBlock.style.display = "";
+        const dCheck = document.getElementById("in-drying-pay");
+        if (dCheck) dCheck.checked = true;
+        const dAmt = document.getElementById("in-drying-amt");
+        if (dAmt) {
+          dAmt.value = "";
+          dAmt.dataset.touched = "";
+        }
+        toggleDryingAmt();
         initFishRows();
       }
       function startEdit(id) {
         const i = state.items.find((x) => x.id === id);
         if (!i) return;
         closeModal();
+        const dBlock = document.getElementById("drying-expense-block");
+        if (dBlock) dBlock.style.display = "none";
         document.getElementById("edit-id").value = id;
         document.getElementById("in-name").value = i.name;
         document.getElementById("in-phone").value = i.phone || "";
         document.getElementById("in-status").value = i.status || "drying";
         document.getElementById("in-date").value = i.createdAt
-          ? i.createdAt.split("T")[0]
-          : new Date().toISOString().split("T")[0];
+          ? todayStr(i.createdAt)
+          : todayStr();
         document.getElementById("in-notes").value = i.notes || "";
         fishRowCount = 0;
         document.getElementById("fish-rows").innerHTML = "";
@@ -2471,26 +2883,19 @@
           "This will permanently remove this record.";
         document.getElementById("cfm-ok").textContent = "Delete";
         document.getElementById("cfm-ok").onclick = () => {
+          tombstone(type, id);
           if (type === "service")
             state.items = state.items.filter((x) => x.id !== id);
-          else if (type === "purchase")
-            state.shop.purchases = state.shop.purchases.filter(
-              (x) => x.id !== id,
-            );
           else if (type === "expense")
             state.shop.expenses = state.shop.expenses.filter(
               (x) => x.id !== id,
             );
-          else if (type === "sale") {
-            state.shop.sales = state.shop.sales.filter((x) => x.id !== id);
-            recalcDryStock();
-          }
           lsave();
           scheduleSync();
           closeModal();
           closeCfm();
           showToast("Record deleted");
-          renderHome();
+          refreshCurrentScreen();
         };
         document.getElementById("cfm").classList.add("open");
       }
@@ -2498,57 +2903,31 @@
         document.getElementById("cfm").classList.remove("open");
       }
       function renderHome() {
-        recalcDryStock();
         const drying = state.items.filter((i) => i.status === "drying").length;
         const ready = state.items.filter((i) => i.status === "ready").length;
         const serviceDebt = state.items
           .filter((i) => i.status === "collected" && !i.settledShort)
           .reduce((a, i) => a + balance(i), 0);
-        const salesDebt = state.shop.sales
-          .filter((s) => s.type === "credit" && !s.paid)
-          .reduce((a, s) => a + (s.amount - s.amtPaid), 0);
-        const youOwe = state.shop.purchases
-          .filter((p) => p.paymentType === "credit" && !p.paid)
-          .reduce((a, p) => a + (p.totalCost - p.amtPaid), 0);
+        const now = new Date();
+        const ms = new Date(now.getFullYear(), now.getMonth(), 1);
+        const expMonth = state.shop.expenses
+          .filter((e) => new Date(e.date) >= ms)
+          .reduce((a, e) => a + e.amount, 0);
         document.getElementById("s-dry").textContent = drying;
-        document.getElementById("s-stock").textContent = fmtKg(
-          state.shop.dryStockKg,
-        );
-        document.getElementById("s-owedto").textContent = fmt(
-          serviceDebt + salesDebt,
-        );
-        document.getElementById("s-youowe").textContent = fmt(youOwe);
-        const debtCount =
-          state.items.filter(
-            (i) =>
-              i.status === "collected" && !i.settledShort && balance(i) > 0,
-          ).length +
-          state.shop.sales.filter((s) => s.type === "credit" && !s.paid).length;
+        document.getElementById("s-ready").textContent = ready;
+        document.getElementById("s-owedto").textContent = fmt(serviceDebt);
+        document.getElementById("s-expmo").textContent = fmt(expMonth);
+        const debtCount = state.items.filter(
+          (i) => i.status === "collected" && !i.settledShort && balance(i) > 0,
+        ).length;
         let ah = "";
         if (debtCount > 0)
           ah += `<div class="abar"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="abar-text">${debtCount} outstanding debt${debtCount > 1 ? "s" : ""} — check Debts</div></div>`;
         if (ready > 0)
           ah += `<div class="abar" style="background:var(--teal-l);border-color:rgba(29,158,117,.25)"><svg viewBox="0 0 24 24" style="stroke:var(--teal)"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg><div class="abar-text" style="color:var(--teal-d)">${ready} item${ready > 1 ? "s" : ""} ready — notify customers</div></div>`;
-        if (state.shop.dryStockKg > 0 && state.shop.dryStockKg <= 2)
-          ah += `<div class="abar" style="background:var(--red-l);border-color:rgba(226,75,74,.3)"><svg viewBox="0 0 24 24" style="stroke:var(--red)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg><div class="abar-text" style="color:var(--red)">Low stock — only ${fmtKg(state.shop.dryStockKg)} dry fish left</div></div>`;
         document.getElementById("home-alerts").innerHTML = ah;
-        const all = [
-          ...state.items.map((i) => ({
-            ...i,
-            _type: "service",
-            _date: i.createdAt,
-          })),
-          ...state.shop.purchases.map((p) => ({
-            ...p,
-            _type: "purchase",
-            _date: p.date,
-          })),
-          ...state.shop.sales.map((s) => ({
-            ...s,
-            _type: "sale",
-            _date: s.date,
-          })),
-        ]
+        const all = state.items
+          .map((i) => ({ ...i, _type: "service", _date: i.createdAt }))
           .sort((a, b) => new Date(b._date) - new Date(a._date))
           .slice(0, 6);
         const recent = document.getElementById("home-recent");
@@ -2559,17 +2938,12 @@
         }
         recent.innerHTML = all
           .map((r) => {
-            if (r._type === "service") {
-              const ps = payStatus(r);
-              const fish =
-                (r.fishRows || []).map((x) => x.type).join(", ") ||
-                r.type ||
-                "Fish";
-              return `<div class="itr" onclick="openItem(${r.id})"><div><div class="itr-name">${r.name}</div><div class="itr-meta">${fish} · ${timeAgo(r._date)}</div><div class="itr-meta"><span class="pill ${r.status}">${statusLabel(r.status)}</span>${ps ? ' <span class="pill ' + ps + '">' + payLabel(r) + "</span>" : ""}</div></div><div class="itr-right"><div class="itr-amt">${fmt(r.total)}</div></div></div>`;
-            }
-            if (r._type === "purchase")
-              return `<div class="itr" onclick="openPurchase(${r.id})"><div><div class="itr-name">Bought: ${r.supplierName}</div><div class="itr-meta">${fmtKg(r.freshKg)} fresh · ${timeAgo(r._date)}</div><div class="itr-meta"><span class="pill ${r.paymentType === "credit" ? "credit" : "cash"}">${r.paymentType === "credit" ? "Credit buy" : "Cash buy"}</span></div></div><div class="itr-right"><div class="itr-amt">${fmt(r.totalCost)}</div></div></div>`;
-            return `<div class="itr" onclick="openSale(${r.id})"><div><div class="itr-name">Sold: ${r.buyerName || "Walk-in"}</div><div class="itr-meta">${fmtKg(r.weightKg)} dry fish · ${timeAgo(r._date)}</div><div class="itr-meta"><span class="pill ${r.type}">${r.type === "credit" ? "Credit sale" : "Cash sale"}</span></div></div><div class="itr-right"><div class="itr-amt">${fmt(r.amount)}</div></div></div>`;
+            const ps = payStatus(r);
+            const fish =
+              (r.fishRows || []).map((x) => x.type).join(", ") ||
+              r.type ||
+              "Fish";
+            return `<div class="itr" onclick="openItem(${r.id})"><div><div class="itr-name">${r.name}</div><div class="itr-meta">${fish} · ${timeAgo(r._date)}</div><div class="itr-meta"><span class="pill ${r.status}">${statusLabel(r.status)}</span>${ps ? ' <span class="pill ' + ps + '">' + payLabel(r) + "</span>" : ""}</div></div><div class="itr-right"><div class="itr-amt">${fmt(r.total)}</div></div></div>`;
           })
           .join("");
       }
@@ -2601,353 +2975,80 @@
         renderInventory(f);
       }
 
-      let currentShopTab = "overview";
-      function showShopTab(tab, btn) {
-        document
-          .querySelectorAll("#shop-tabs .tab")
-          .forEach((t) => t.classList.remove("active"));
-        btn.classList.add("active");
-        renderShopTab(tab);
-      }
-      function renderShopTab(tab) {
-        currentShopTab = tab;
+      // ─── EXPENSES SCREEN ────────────────────────────────────────────────
+      // Buying/selling dry fish was removed — this screen is just for
+      // recording and reviewing expenses (drying charges, cleaning, etc.)
+      // alongside how the drying service itself is doing.
+      function renderShopScreen() {
         const el = document.getElementById("shop-content");
-        if (tab === "overview") renderShopOverview(el);
-        else if (tab === "buy") renderBuyForm(el);
-        else if (tab === "sell") renderSellForm(el);
-        else if (tab === "expenses") renderExpenses(el);
-        else if (tab === "profit") renderProfit(el);
-      }
-
-      function renderShopOverview(el) {
-        recalcDryStock();
-        const totalBought = state.shop.purchases.reduce(
-          (a, p) => a + (p.actualDryKg || p.estimatedDryKg || 0),
-          0,
-        );
-        const totalSold = state.shop.sales.reduce((a, s) => a + s.weightKg, 0);
-        const salesRev = state.shop.sales.reduce((a, s) => a + s.amount, 0);
-        el.innerHTML = `<div class="stock-hero"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="stock-hero-val">${fmtKg(state.shop.dryStockKg)}</div><div class="stock-hero-label">Dry fish in stock</div></div><div style="text-align:right;font-size:12px;opacity:.8"><div>Bought: ${fmtKg(totalBought)}</div><div>Sold: ${fmtKg(totalSold)}</div></div></div><div class="stock-hero-sub">Est. value: ${fmt(state.shop.dryStockKg * state.shop.pricePerKg)} at ${fmt(state.shop.pricePerKg)}/kg</div></div>
-  <div class="sgrid"><div class="stat"><div class="stat-label">Total sales</div><div class="stat-val ct">${fmt(salesRev)}</div></div><div class="stat"><div class="stat-label">Price/kg</div><div class="stat-val ct">${fmt(state.shop.pricePerKg)}</div></div><div class="stat"><div class="stat-label">Purchases</div><div class="stat-val ca">${state.shop.purchases.length}</div></div><div class="stat"><div class="stat-label">Sales</div><div class="stat-val ct">${state.shop.sales.length}</div></div></div>
-  ${
-    state.shop.purchases.length
-      ? `<div class="slabel">Recent purchases</div>${state.shop.purchases
-          .slice(0, 3)
-          .map(
-            (p) =>
-              `<div class="card" style="cursor:pointer;margin-bottom:8px" onclick="openPurchase(${p.id})"><div style="display:flex;justify-content:space-between"><div><div class="itr-name">${p.supplierName}</div><div class="itr-meta">${fmtKg(p.freshKg)} fresh → est. ${fmtKg(p.estimatedDryKg)} dry · ${shortDate(p.date)}</div><div class="itr-meta"><span class="pill ${p.paymentType === "credit" ? "credit" : "cash"}">${p.paymentType === "credit" ? "Credit" : "Cash"}</span>${!p.paid && p.paymentType === "credit" ? ` <span class="pill debt">Owes: ${fmt(p.totalCost - p.amtPaid)}</span>` : ""}</div></div><div style="text-align:right"><div class="itr-amt">${fmt(p.totalCost)}</div></div></div></div>`,
-          )
-          .join("")}`
-      : ""
-  }
-  ${
-    state.shop.sales.length
-      ? `<div class="slabel">Recent sales</div>${state.shop.sales
-          .slice(0, 3)
-          .map(
-            (s) =>
-              `<div class="card" style="cursor:pointer;margin-bottom:8px" onclick="openSale(${s.id})"><div style="display:flex;justify-content:space-between"><div><div class="itr-name">${s.buyerName || "Walk-in customer"}</div><div class="itr-meta">${fmtKg(s.weightKg)} · ${shortDate(s.date)}</div><div class="itr-meta"><span class="pill ${s.type}">${s.type === "credit" ? "Credit" : "Cash"}</span>${s.type === "credit" && !s.paid ? ` <span class="pill debt">Owes: ${fmt(s.amount - s.amtPaid)}</span>` : ""}</div></div><div style="text-align:right"><div class="itr-amt">${fmt(s.amount)}</div></div></div></div>`,
-          )
-          .join("")}`
-      : ""
-  }`;
-      }
-
-      function renderBuyForm(el) {
-        el.innerHTML = `<div class="card"><div class="card-title">Record fish purchase</div>
-  <div class="fg"><label class="fl">Supplier name *</label><div style="position:relative">
-  <input class="fi" id="buy-supplier" type="text" placeholder="e.g. Joy" autocomplete="off" oninput="showSupplierSuggestions()" onblur="setTimeout(hideSupplierSuggestions,200)">
-  <div id="supplier-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rsm);z-index:30;box-shadow:0 4px 12px rgba(0,0,0,0.1);max-height:160px;overflow-y:auto"></div>
-</div></div>
-  <div class="fg"><label class="fl">Supplier phone</label>
-  <div class="irow">
-    <input class="fi" id="buy-phone" type="tel" placeholder="e.g. 08012345678">
-    <button class="cb" onclick="pickBuyContact()" title="Pick from contacts"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></button>
-  </div>
-</div>
-  <div class="r2"><div class="fg"><label class="fl">Fresh weight (kg) *</label><input class="fi" id="buy-freshkg" type="number" placeholder="0.0" step="0.1" min="0" inputmode="decimal" oninput="calcBuyEst()"></div><div class="fg"><label class="fl">Price per kg (₦) *</label><input class="fi" id="buy-pricepkg" type="number" placeholder="0" min="0" inputmode="numeric" oninput="calcBuyEst()"></div></div>
-  <div class="total-box"><span class="total-label">Total cost</span><span class="total-amt" id="buy-total">₦0</span></div>
-  <div class="fg"><label class="fl">Est. dry weight (kg — auto ~35%)</label><input class="fi" id="buy-dryest" type="number" placeholder="0.0" step="0.1" min="0" inputmode="decimal"></div>
-  <div class="fg"><label class="fl">Actual dry weight (fill after drying)</label><input class="fi" id="buy-dryact" type="number" placeholder="Leave empty until dried" step="0.1" min="0" inputmode="decimal"></div>
-  <div class="fg"><label class="fl">Payment type</label><select class="fi" id="buy-paytype" onchange="toggleBuyCredit()"><option value="cash">Cash — paid fully</option><option value="credit">Credit — pay later</option></select></div>
-  <div id="buy-credit-section" style="display:none"><div class="fg"><label class="fl">Amount paid now (₦)</label><input class="fi" id="buy-amtpaid" type="number" placeholder="0" min="0" inputmode="numeric"></div></div>
-  <div class="fg"><label class="fl">Date</label><input class="fi" id="buy-date" type="date"></div>
-  <div class="fg"><label class="fl">Notes</label><input class="fi" id="buy-notes" type="text" placeholder="Optional..."></div>
-  <button class="btn primary" onclick="savePurchase()"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>Save purchase</button></div>
-  <div class="slabel">All purchases</div><div id="purchases-list"></div>`;
-        document.getElementById("buy-date").value = new Date()
-          .toISOString()
-          .split("T")[0];
-        renderPurchasesList();
-      }
-      function calcBuyEst() {
-        const kg =
-          parseFloat(document.getElementById("buy-freshkg")?.value) || 0;
-        const p =
-          parseFloat(document.getElementById("buy-pricepkg")?.value) || 0;
-        if (document.getElementById("buy-total")) {
-          document.getElementById("buy-total").textContent = fmt(kg * p);
-        }
-        const estEl = document.getElementById("buy-dryest");
-        if (estEl) {
-          estEl.value = kg ? +(kg * 0.35).toFixed(2) : "";
-        }
-      }
-      function toggleBuyCredit() {
-        const t = document.getElementById("buy-paytype")?.value;
-        const s = document.getElementById("buy-credit-section");
-        if (s) s.style.display = t === "credit" ? "block" : "none";
-      }
-      function savePurchase() {
-        const supplier = document
-          .getElementById("buy-supplier")
-          .value.trim()
-          .replace(/\b\w/g, (c) => c.toUpperCase());
-        const phone = document.getElementById("buy-phone").value.trim();
-        const freshKg =
-          parseFloat(document.getElementById("buy-freshkg").value) || 0;
-        const pricePerKg =
-          parseFloat(document.getElementById("buy-pricepkg").value) || 0;
-        const dryEst =
-          parseFloat(document.getElementById("buy-dryest").value) ||
-          +(freshKg * 0.35).toFixed(2);
-        const dryAct =
-          parseFloat(document.getElementById("buy-dryact").value) || 0;
-        const payType = document.getElementById("buy-paytype").value;
-        const amtPaid =
-          payType === "credit"
-            ? parseFloat(document.getElementById("buy-amtpaid")?.value) || 0
-            : freshKg * pricePerKg;
-        const date =
-          document.getElementById("buy-date").value ||
-          new Date().toISOString().split("T")[0];
-        const notes = document.getElementById("buy-notes").value.trim();
-        if (!supplier) {
-          showToast("Enter supplier name");
-          return;
-        }
-        if (!freshKg || !pricePerKg) {
-          showToast("Enter weight and price");
-          return;
-        }
-        const totalCost = freshKg * pricePerKg;
-        state.shop.purchases.unshift({
-          id: state.shop.purNextId++,
-          supplierName: supplier,
-          phone,
-          freshKg,
-          pricePerKg,
-          totalCost,
-          estimatedDryKg: dryEst,
-          actualDryKg: dryAct || null,
-          paymentType: payType,
-          amtPaid,
-          paid: payType === "cash" || amtPaid >= totalCost,
-          date: new Date(date).toISOString(),
-          notes,
-          addedBy: userName,
-          payments:
-            payType === "credit" && amtPaid > 0
-              ? [{ amount: amtPaid, date: new Date().toISOString() }]
-              : [],
-        });
-        recalcDryStock();
-        lsave();
-        scheduleSync();
-        showToast("✓ Purchase saved");
-        [
-          "buy-supplier",
-          "buy-phone",
-          "buy-freshkg",
-          "buy-pricepkg",
-          "buy-dryest",
-          "buy-dryact",
-          "buy-amtpaid",
-          "buy-notes",
-        ].forEach((id) => {
-          const e = document.getElementById(id);
-          if (e) e.value = "";
-        });
-        document.getElementById("buy-paytype").value = "cash";
-        document.getElementById("buy-credit-section").style.display = "none";
-        document.getElementById("buy-total").textContent = "₦0";
-        document.getElementById("buy-date").value = new Date()
-          .toISOString()
-          .split("T")[0];
-        renderPurchasesList();
-      }
-      function renderPurchasesList() {
-        const el = document.getElementById("purchases-list");
         if (!el) return;
-        if (!state.shop.purchases.length) {
-          el.innerHTML =
-            '<div class="empty"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line></svg><p>No purchases yet</p></div>';
-          return;
-        }
-        el.innerHTML = state.shop.purchases
-          .map(
-            (p) =>
-              `<div class="card" style="cursor:pointer;margin-bottom:8px" onclick="openPurchase(${p.id})"><div style="display:flex;justify-content:space-between"><div><div class="itr-name">${p.supplierName}</div><div class="itr-meta">${fmtKg(p.freshKg)} fresh → ${p.actualDryKg ? fmtKg(p.actualDryKg) : "est. " + fmtKg(p.estimatedDryKg)} dry</div><div class="itr-meta">${shortDate(p.date)} · <span class="pill ${p.paymentType === "credit" ? "credit" : "cash"}">${p.paymentType === "credit" ? "Credit" : "Cash"}</span>${p.paymentType === "credit" && !p.paid ? ` <span class="pill debt">Owes: ${fmt(p.totalCost - p.amtPaid)}</span>` : ""}</div></div><div style="text-align:right"><div class="itr-amt">${fmt(p.totalCost)}</div></div></div></div>`,
-          )
-          .join("");
-      }
-
-      function renderSellForm(el) {
-        el.innerHTML = `<div class="card"><div class="card-title">Record sale</div>
-  <div style="background:var(--teal-l);border-radius:var(--rsm);padding:10px 13px;margin-bottom:12px;display:flex;justify-content:space-between"><span style="font-size:13px;color:var(--teal-d);font-weight:500">Stock available</span><span style="font-size:16px;font-weight:700;color:var(--teal)">${fmtKg(state.shop.dryStockKg)}</span></div>
-  <div class="fg"><label class="fl">Buyer name</label><div style="position:relative">
-  <input class="fi" id="sell-buyer" type="text" placeholder="Leave empty for walk-in" autocomplete="off" oninput="showBuyerSuggestions()" onblur="setTimeout(hideBuyerSuggestions,200)">
-  <div id="buyer-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rsm);z-index:30;box-shadow:0 4px 12px rgba(0,0,0,0.1);max-height:160px;overflow-y:auto"></div></div>
-  <div class="fg"><label class="fl">Buyer phone</label>
-  <div class="irow">
-    <input class="fi" id="sell-phone" type="tel" placeholder="Optional">
-    <button class="cb" onclick="pickSellContact()" title="Pick from contacts"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></button>
-  </div>
-</div>
-  <div class="r2"><div class="fg"><label class="fl">Weight sold (kg) *</label><input class="fi" id="sell-kg" type="number" placeholder="0.0" step="0.1" min="0" inputmode="decimal" oninput="calcSaleTotal()"></div><div class="fg"><label class="fl">Price/kg (₦)</label><input class="fi" id="sell-price" type="number" value="${state.shop.pricePerKg}" inputmode="numeric" oninput="calcSaleTotal()"></div></div>
-  <div class="total-box"><span class="total-label">Sale total</span><span class="total-amt" id="sell-total">₦0</span></div>
-  <div class="fg"><label class="fl">Payment type</label><select class="fi" id="sell-paytype" onchange="toggleSellCredit()"><option value="cash">Cash — paid now</option><option value="credit">Credit — pay later</option></select></div>
-  <div id="sell-credit-section" style="display:none"><div class="fg"><label class="fl">Amount paid now (₦)</label><input class="fi" id="sell-amtpaid" type="number" placeholder="0" min="0" inputmode="numeric"></div></div>
-  <div class="fg"><label class="fl">Date</label><input class="fi" id="sell-date" type="date"></div>
-  <div class="fg"><label class="fl">Notes</label><input class="fi" id="sell-notes" type="text" placeholder="Optional..."></div>
-  <button class="btn primary" onclick="saveSale()"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>Save sale</button></div>
-  <div class="slabel">Recent sales</div><div id="sales-list"></div>`;
-        document.getElementById("sell-date").value = new Date()
-          .toISOString()
-          .split("T")[0];
-        calcSaleTotal();
-        renderSalesList();
-      }
-      function calcSaleTotal() {
-        const k = parseFloat(document.getElementById("sell-kg")?.value) || 0;
-        const p =
-          parseFloat(document.getElementById("sell-price")?.value) ||
-          state.shop.pricePerKg;
-        if (document.getElementById("sell-total"))
-          document.getElementById("sell-total").textContent = fmt(k * p);
-      }
-      function toggleSellCredit() {
-        const t = document.getElementById("sell-paytype")?.value;
-        const s = document.getElementById("sell-credit-section");
-        if (s) s.style.display = t === "credit" ? "block" : "none";
-      }
-      function saveSale() {
-        const buyer = document
-          .getElementById("sell-buyer")
-          .value.trim()
-          .replace(/\b\w/g, (c) => c.toUpperCase());
-        const phone = document.getElementById("sell-phone").value.trim();
-        const kg = parseFloat(document.getElementById("sell-kg").value) || 0;
-        const price =
-          parseFloat(document.getElementById("sell-price").value) ||
-          state.shop.pricePerKg;
-        const payType = document.getElementById("sell-paytype").value;
-        const amtPaid =
-          payType === "credit"
-            ? parseFloat(document.getElementById("sell-amtpaid")?.value) || 0
-            : kg * price;
-        const date =
-          document.getElementById("sell-date").value ||
-          new Date().toISOString().split("T")[0];
-        const notes = document.getElementById("sell-notes").value.trim();
-        if (!kg) {
-          showToast("Enter weight sold");
-          return;
-        }
-        if (kg > state.shop.dryStockKg + 0.01) {
-          showToast(
-            "Not enough stock! Only " +
-              fmtKg(state.shop.dryStockKg) +
-              " available",
-          );
-          return;
-        }
-        const amount = kg * price;
-        state.shop.sales.unshift({
-          id: state.shop.saleNextId++,
-          buyerName: buyer || "",
-          phone,
-          weightKg: kg,
-          pricePerKg: price,
-          amount,
-          type: payType,
-          amtPaid,
-          paid: payType === "cash" || amtPaid >= amount,
-          date: new Date(date).toISOString(),
-          notes,
-          addedBy: userName,
-          payments:
-            payType === "credit" && amtPaid > 0
-              ? [{ amount: amtPaid, date: new Date().toISOString() }]
-              : [],
-        });
-        recalcDryStock();
-        lsave();
-        scheduleSync();
-        showToast("✓ Sale saved — stock now " + fmtKg(state.shop.dryStockKg));
-        [
-          "sell-buyer",
-          "sell-phone",
-          "sell-kg",
-          "sell-amtpaid",
-          "sell-notes",
-        ].forEach((id) => {
-          const e = document.getElementById(id);
-          if (e) e.value = "";
-        });
-        document.getElementById("sell-paytype").value = "cash";
-        document.getElementById("sell-credit-section").style.display = "none";
-        document.getElementById("sell-date").value = new Date()
-          .toISOString()
-          .split("T")[0];
-        renderSellForm(el);
-      }
-      function renderSalesList() {
-        const el = document.getElementById("sales-list");
-        if (!el) return;
-        if (!state.shop.sales.length) {
-          el.innerHTML =
-            '<div class="empty"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg><p>No sales yet</p></div>';
-          return;
-        }
-        el.innerHTML = state.shop.sales
-          .map(
-            (s) =>
-              `<div class="card" style="cursor:pointer;margin-bottom:8px" onclick="openSale(${s.id})"><div style="display:flex;justify-content:space-between"><div><div class="itr-name">${s.buyerName || "Walk-in customer"}</div><div class="itr-meta">${fmtKg(s.weightKg)} at ${fmt(s.pricePerKg)}/kg · ${shortDate(s.date)}</div><div class="itr-meta"><span class="pill ${s.type}">${s.type === "credit" ? "Credit" : "Cash"}</span>${s.type === "credit" && !s.paid ? ` <span class="pill debt">Owes: ${fmt(s.amount - s.amtPaid)}</span>` : ""}</div></div><div style="text-align:right"><div class="itr-amt">${fmt(s.amount)}</div></div></div></div>`,
-          )
-          .join("");
-      }
-
-      function renderExpenses(el) {
         el.innerHTML = `<div class="card"><div class="card-title">Record expense</div>
-  <div class="r2"><div class="fg"><label class="fl">Type</label><select class="fi" id="exp-type"><option>Salt</option><option>Charcoal</option><option>Labour</option><option>Transport</option><option>Other</option></select></div><div class="fg"><label class="fl">Amount (₦) *</label><input class="fi" id="exp-amount" type="number" placeholder="0" min="0" inputmode="numeric"></div></div>
+  <div class="r2"><div class="fg"><label class="fl">Type</label><select class="fi" id="exp-type"><option>Drying</option><option>Cleaning</option><option>Salt</option><option>Charcoal</option><option>Labour</option><option>Transport</option><option>Other</option></select></div><div class="fg"><label class="fl">Amount (₦) *</label><input class="fi" id="exp-amount" type="number" placeholder="0" min="0" inputmode="numeric"></div></div>
   <div class="fg"><label class="fl">Description</label><input class="fi" id="exp-desc" type="text" placeholder="e.g. 2 bags of salt"></div>
   <div class="fg"><label class="fl">Date</label><input class="fi" id="exp-date" type="date"></div>
   <button class="btn primary" onclick="saveExpense()"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>Save expense</button></div>
+  ${renderMoneySummary()}
   <div class="slabel">All expenses</div><div id="exp-list"></div>`;
-        document.getElementById("exp-date").value = new Date()
-          .toISOString()
-          .split("T")[0];
+        document.getElementById("exp-date").value = todayStr();
         renderExpenseList();
+      }
+      function moneyFor(start, end) {
+        const items = state.items.filter((i) => {
+          const d = new Date(i.createdAt);
+          return d >= start && d <= end;
+        });
+        const exp = state.shop.expenses.filter((e) => {
+          const d = new Date(e.date);
+          return d >= start && d <= end;
+        });
+        const revenue = items
+          .filter((i) => i.status === "collected")
+          .reduce((a, i) => a + totalPaid(i), 0);
+        const expCost = exp.reduce((a, e) => a + e.amount, 0);
+        return { revenue, expCost, net: revenue - expCost };
+      }
+      function renderMoneySummary() {
+        const now = new Date();
+        const ms = new Date(now.getFullYear(), now.getMonth(), 1);
+        const lms = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const lme = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+        const tm = moneyFor(ms, now);
+        const lm = moneyFor(lms, lme);
+        const at = moneyFor(new Date(0), now);
+        const box = (label, d) => {
+          const pos = d.net >= 0;
+          return `<div class="profit-box ${pos ? "positive" : "negative"}"><div class="profit-label" style="color:${pos ? "var(--green)" : "var(--red)"}">${label}</div><div class="profit-val" style="color:${pos ? "var(--green)" : "var(--red)"}">${d.net < 0 ? "-" : ""}${fmt(Math.abs(d.net))}</div><div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap"><div style="font-size:12px"><span style="color:var(--t3)">Collected</span><br><strong style="color:var(--green)">${fmt(d.revenue)}</strong></div><div style="font-size:12px"><span style="color:var(--t3)">Expenses</span><br><strong style="color:var(--red)">-${fmt(d.expCost)}</strong></div></div></div>`;
+        };
+        return (
+          box(
+            "This month — " +
+              now.toLocaleDateString("en-NG", { month: "long", year: "numeric" }),
+            tm,
+          ) +
+          box(
+            "Last month — " +
+              lms.toLocaleDateString("en-NG", { month: "long", year: "numeric" }),
+            lm,
+          ) +
+          box("All time", at)
+        );
       }
       function saveExpense() {
         const type = document.getElementById("exp-type").value;
         const amount =
           parseFloat(document.getElementById("exp-amount").value) || 0;
-        const desc = document.getElementById("exp-desc").value.trim();
-        const date =
-          document.getElementById("exp-date").value ||
-          new Date().toISOString().split("T")[0];
+        const desc = clean(document.getElementById("exp-desc").value);
+        const date = document.getElementById("exp-date").value;
         if (!amount) {
           showToast("Enter expense amount");
           return;
         }
         state.shop.expenses.unshift({
-          id: state.shop.expNextId++,
+          id: newId(),
           type,
           amount,
           desc,
-          date: new Date(date).toISOString(),
+          date: dateToISO(date),
           addedBy: userName,
         });
         lsave();
@@ -2956,6 +3057,7 @@
         document.getElementById("exp-amount").value = "";
         document.getElementById("exp-desc").value = "";
         renderExpenseList();
+        renderHome();
       }
       function renderExpenseList() {
         const el = document.getElementById("exp-list");
@@ -2976,262 +3078,24 @@
             .join("");
       }
 
-      function renderProfit(el) {
-        const now = new Date();
-        const ms = new Date(now.getFullYear(), now.getMonth(), 1);
-        const lms = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        const lme = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
-        function calc(s, e) {
-          const sales = state.shop.sales.filter(
-            (x) => new Date(x.date) >= s && new Date(x.date) <= e,
-          );
-          const purch = state.shop.purchases.filter(
-            (x) => new Date(x.date) >= s && new Date(x.date) <= e,
-          );
-          const exp = state.shop.expenses.filter(
-            (x) => new Date(x.date) >= s && new Date(x.date) <= e,
-          );
-          const rev = sales.reduce((a, x) => a + x.amount, 0);
-          const cost = purch.reduce((a, x) => a + x.totalCost, 0);
-          const expCost = exp.reduce((a, x) => a + x.amount, 0);
-          return { rev, cost, expCost, profit: rev - cost - expCost };
-        }
-        const tm = calc(ms, now);
-        const lm = calc(lms, lme);
-        const at = calc(new Date(0), now);
-        function pCard(label, d) {
-          const pos = d.profit >= 0;
-          return `<div class="profit-box ${pos ? "positive" : "negative"}"><div class="profit-label" style="color:${pos ? "var(--green)" : "var(--red)"}">${label}</div><div class="profit-val" style="color:${pos ? "var(--green)" : "var(--red)"}">${d.profit < 0 ? "-" : ""}${fmt(Math.abs(d.profit))}</div><div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap"><div style="font-size:12px"><span style="color:var(--t3)">Sales</span><br><strong style="color:var(--green)">${fmt(d.rev)}</strong></div><div style="font-size:12px"><span style="color:var(--t3)">Fish cost</span><br><strong style="color:var(--red)">-${fmt(d.cost)}</strong></div><div style="font-size:12px"><span style="color:var(--t3)">Expenses</span><br><strong style="color:var(--purple,#6B3FA0)">-${fmt(d.expCost)}</strong></div></div></div>`;
-        }
-        el.innerHTML =
-          pCard(
-            "This month — " +
-              now.toLocaleDateString("en-NG", {
-                month: "long",
-                year: "numeric",
-              }),
-            tm,
-          ) +
-          pCard(
-            "Last month — " +
-              lms.toLocaleDateString("en-NG", {
-                month: "long",
-                year: "numeric",
-              }),
-            lm,
-          ) +
-          pCard("All time", at) +
-          `<div class="card"><div class="card-title">Expense breakdown</div>${
-            ["Salt", "Charcoal", "Labour", "Transport", "Other"]
-              .map((t) => {
-                const tot = state.shop.expenses
-                  .filter((e) => e.type === t)
-                  .reduce((a, e) => a + e.amount, 0);
-                return tot > 0
-                  ? `<div class="sum-row"><span class="sl">${t}</span><span class="sv" style="color:var(--purple,#6B3FA0)">${fmt(tot)}</span></div>`
-                  : "";
-              })
-              .join("") ||
-            "<div class='itr-meta' style='padding:8px 0'>No expenses yet</div>"
-          }</div>`;
-      }
-      function openPurchase(id) {
-        const p = state.shop.purchases.find((x) => x.id === id);
-        if (!p) return;
-        const owes =
-          p.paymentType === "credit" && !p.paid ? p.totalCost - p.amtPaid : 0;
-        document.getElementById("modal-body").innerHTML = `
-    <button class="mclose" onclick="closeModal()">Close</button>
-    <div class="mtitle">${p.supplierName}</div><div class="msub">Fish purchase · ${shortDate(p.date)}</div>
-    <table class="dtbl">
-      <tr><td class="dl">Fresh weight</td><td class="dv">${fmtKg(p.freshKg)}</td></tr>
-      <tr><td class="dl">Price/kg</td><td class="dv">${fmt(p.pricePerKg)}</td></tr>
-      <tr><td class="dl">Total cost</td><td class="dv" style="color:var(--teal);font-weight:700">${fmt(p.totalCost)}</td></tr>
-      <tr><td class="dl">Est. dry weight</td><td class="dv">${fmtKg(p.estimatedDryKg)}</td></tr>
-      <tr><td class="dl">Actual dry weight</td><td class="dv">${p.actualDryKg ? fmtKg(p.actualDryKg) : "Not entered yet"}</td></tr>
-      <tr><td class="dl">Payment</td><td class="dv"><span class="pill ${p.paymentType === "credit" ? "credit" : "cash"}">${p.paymentType === "credit" ? "Credit" : "Cash"}</span></td></tr>
-      ${p.paymentType === "credit" ? `<tr><td class="dl">Paid so far</td><td class="dv" style="color:var(--green)">${fmt(p.amtPaid)}</td></tr>` : ""}
-      ${owes > 0 ? `<tr><td class="dl">You owe</td><td class="dv" style="color:var(--red);font-weight:700">${fmt(owes)}</td></tr>` : ""}
-      ${p.phone ? `<tr><td class="dl">Phone</td><td class="dv">${p.phone}</td></tr>` : ""}
-      ${p.notes ? `<tr><td class="dl">Notes</td><td class="dv">${p.notes}</td></tr>` : ""}
-    </table>
-    <div class="dvdr"></div>
-    ${!p.actualDryKg ? `<div class="fg"><label class="fl">Enter actual dry weight (kg)</label><div style="display:flex;gap:8px"><input class="fi" id="actual-dry-input" type="number" placeholder="0.0" step="0.1" min="0" inputmode="decimal" style="flex:1"><button class="btn sm primary" onclick="saveActualDry(${p.id})">Save</button></div></div>` : ""}
-    ${owes > 0 ? `<button class="btn primary" style="margin-bottom:8px" onclick="paySupplier(${p.id})"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>Record payment to supplier</button>` : ""}
-    ${p.phone ? `<button class="btn" style="margin-bottom:8px" onclick="callCustomer('${p.phone}','${p.supplierName}')"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.36 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>Call supplier</button>` : ""}
-    <button class="btn danger" onclick="confirmDelete(${p.id},'purchase')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path></svg>Delete</button>`;
-        document.getElementById("modal-bg").classList.add("open");
-      }
 
-      function saveActualDry(id) {
-        const p = state.shop.purchases.find((x) => x.id === id);
-        if (!p) return;
-        const val =
-          parseFloat(document.getElementById("actual-dry-input")?.value) || 0;
-        if (!val) {
-          showToast("Enter the actual dry weight");
-          return;
-        }
-        p.actualDryKg = val;
-        p.editedAt = new Date().toISOString();
-        recalcDryStock();
-        lsave();
-        scheduleSync();
-        showToast("✓ Dry weight updated");
-        closeModal();
-        renderHome();
-      }
-
-      function paySupplier(id) {
-        const p = state.shop.purchases.find((x) => x.id === id);
-        if (!p) return;
-        const owes = p.totalCost - p.amtPaid;
-        document.getElementById("pay-body").innerHTML = `
-    <button class="mclose" onclick="closePayModal()">Close</button>
-    <div class="mtitle">Pay supplier</div><div class="msub">${p.supplierName} — you owe ${fmt(owes)}</div>
-    <div class="fg"><label class="fl">Amount paying (₦)</label><input class="fi" id="sup-pay-amt" type="number" value="${owes}" min="0" inputmode="numeric"></div>
-    <div class="fg"><label class="fl">Note</label><input class="fi" id="sup-pay-note" type="text" placeholder="Optional..."></div>
-    <button class="btn primary" onclick="recordSupplierPayment(${id})"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>Record payment</button>`;
-        document.getElementById("pay-mbg").classList.add("open");
-      }
-      function recordSupplierPayment(id) {
-        const p = state.shop.purchases.find((x) => x.id === id);
-        if (!p) return;
-        const amt =
-          parseFloat(document.getElementById("sup-pay-amt")?.value) || 0;
-        if (!amt) {
-          showToast("Enter amount");
-          return;
-        }
-        p.amtPaid += amt;
-        if (!p.payments) p.payments = [];
-        p.payments.push({ amount: amt, date: new Date().toISOString() });
-        if (p.amtPaid >= p.totalCost) p.paid = true;
-        p.editedAt = new Date().toISOString();
-        lsave();
-        scheduleSync();
-        closePayModal();
-        closeModal();
-        showToast("✓ Payment to supplier recorded");
-        renderHome();
-      }
-
-      function openSale(id) {
-        const s = state.shop.sales.find((x) => x.id === id);
-        if (!s) return;
-        const owes = s.type === "credit" && !s.paid ? s.amount - s.amtPaid : 0;
-        document.getElementById("modal-body").innerHTML = `
-    <button class="mclose" onclick="closeModal()">Close</button>
-    <div class="mtitle">${s.buyerName || "Walk-in customer"}</div><div class="msub">Dry fish sale · ${shortDate(s.date)}</div>
-    <table class="dtbl">
-      <tr><td class="dl">Weight sold</td><td class="dv">${fmtKg(s.weightKg)}</td></tr>
-      <tr><td class="dl">Price/kg</td><td class="dv">${fmt(s.pricePerKg)}</td></tr>
-      <tr><td class="dl">Total amount</td><td class="dv" style="color:var(--teal);font-weight:700">${fmt(s.amount)}</td></tr>
-      <tr><td class="dl">Payment type</td><td class="dv"><span class="pill ${s.type}">${s.type === "credit" ? "Credit" : "Cash"}</span></td></tr>
-      ${s.type === "credit" ? `<tr><td class="dl">Paid so far</td><td class="dv" style="color:var(--green)">${fmt(s.amtPaid)}</td></tr>` : ""}
-      ${owes > 0 ? `<tr><td class="dl">Owes you</td><td class="dv" style="color:var(--red);font-weight:700">${fmt(owes)}</td></tr>` : ""}
-      ${s.phone ? `<tr><td class="dl">Phone</td><td class="dv">${s.phone}</td></tr>` : ""}
-      ${s.notes ? `<tr><td class="dl">Notes</td><td class="dv">${s.notes}</td></tr>` : ""}
-    </table>
-    <div class="dvdr"></div>
-    ${owes > 0 ? `<button class="btn primary" style="margin-bottom:8px" onclick="paySale(${s.id})"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>Record payment received</button>` : ""}
-    ${s.phone ? `<button class="btn whatsapp" style="margin-bottom:8px" onclick="sendWhatsApp('${s.phone}','${s.buyerName || ""}','saledebt',${s.id})"><svg viewBox="0 0 24 24" style="fill:none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>WhatsApp reminder</button>` : ""}
-    <button class="btn danger" onclick="confirmDelete(${s.id},'sale')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path></svg>Delete</button>`;
-        document.getElementById("modal-bg").classList.add("open");
-      }
-      function paySale(id) {
-        const s = state.shop.sales.find((x) => x.id === id);
-        if (!s) return;
-        const owes = s.amount - s.amtPaid;
-        document.getElementById("pay-body").innerHTML =
-          `<button class="mclose" onclick="closePayModal()">Close</button><div class="mtitle">Record payment</div><div class="msub">${s.buyerName || "Customer"} — owes ${fmt(owes)}</div><div class="fg"><label class="fl">Amount received (₦)</label><input class="fi" id="sale-pay-amt" type="number" value="${owes}" min="0" inputmode="numeric"></div><div class="fg"><label class="fl">Note</label><input class="fi" id="sale-pay-note" type="text" placeholder="Optional..."></div><button class="btn primary" onclick="recordSalePayment(${id},false)" style="margin-bottom:8px">Save payment</button><button class="btn" onclick="recordSalePayment(${id},true)" style="border-color:var(--green);color:var(--green)">Save &amp; mark fully settled</button>`;
-        document.getElementById("pay-mbg").classList.add("open");
-      }
-      function recordSalePayment(id, settle) {
-        const s = state.shop.sales.find((x) => x.id === id);
-        if (!s) return;
-        const amt =
-          parseFloat(document.getElementById("sale-pay-amt")?.value) || 0;
-        if (!amt) {
-          showToast("Enter amount");
-          return;
-        }
-        s.amtPaid += amt;
-        if (!s.payments) s.payments = [];
-        s.payments.push({ amount: amt, date: new Date().toISOString() });
-        if (settle || s.amtPaid >= s.amount) s.paid = true;
-        s.editedAt = new Date().toISOString();
-        lsave();
-        scheduleSync();
-        closePayModal();
-        closeModal();
-        showToast("✓ Payment recorded");
-        renderHome();
-      }
-
-      function filterDebts(filter, btn) {
-        document
-          .querySelectorAll("#screen-debts .tab")
-          .forEach((t) => t.classList.remove("active"));
-        btn.classList.add("active");
-        renderDebts(filter);
-      }
-      function renderDebts(filter = "all") {
+      function renderDebts() {
         const svcDebts = state.items.filter(
           (i) => i.status === "collected" && !i.settledShort && balance(i) > 0,
         );
-        const salesDebts = state.shop.sales.filter(
-          (s) => s.type === "credit" && !s.paid,
-        );
-        const supDebts = state.shop.purchases.filter(
-          (p) => p.paymentType === "credit" && !p.paid,
-        );
-        const owedToMe =
-          svcDebts.reduce((a, i) => a + balance(i), 0) +
-          salesDebts.reduce((a, s) => a + (s.amount - s.amtPaid), 0);
-        const youOwe = supDebts.reduce(
-          (a, p) => a + (p.totalCost - p.amtPaid),
-          0,
-        );
+        const owedToMe = svcDebts.reduce((a, i) => a + balance(i), 0);
         let ah = "";
-        if (svcDebts.length + salesDebts.length > 0)
-          ah += `<div class="abar"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="abar-text">${svcDebts.length + salesDebts.length} customer${svcDebts.length + salesDebts.length > 1 ? "s" : ""} owe you ${fmt(owedToMe)}</div></div>`;
-        if (supDebts.length > 0)
-          ah += `<div class="abar" style="background:var(--amber-l)"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="abar-text">You owe ${supDebts.length} supplier${supDebts.length > 1 ? "s" : ""} ${fmt(youOwe)}</div></div>`;
+        if (svcDebts.length > 0)
+          ah += `<div class="abar"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="abar-text">${svcDebts.length} customer${svcDebts.length > 1 ? "s" : ""} owe you ${fmt(owedToMe)}</div></div>`;
         document.getElementById("debt-alert").innerHTML = ah;
         let html = "";
-        if (filter === "all" || filter === "service") {
-          if (svcDebts.length) {
-            html += `<div class="slabel">Drying service debts</div>`;
-            html += svcDebts
-              .map(
-                (i) =>
-                  `<div class="card" style="margin-bottom:9px;cursor:pointer" onclick="openItem(${i.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:14px;font-weight:700">${i.name}</div><div class="itr-meta">Service · ${shortDate(i.createdAt)}</div>${i.phone ? `<div class="itr-meta">${i.phone}</div>` : ""}</div><div style="text-align:right"><div style="font-size:11px;color:var(--t3)">Owes</div><div style="font-size:16px;font-weight:700;color:var(--red)">${fmt(balance(i))}</div></div></div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">${i.phone ? `<button class="btn sm whatsapp" onclick="event.stopPropagation();sendWhatsApp('${i.phone}','${i.name}','debt',${i.id})">WhatsApp</button><button class="btn sm" onclick="event.stopPropagation();callCustomer('${i.phone}','${i.name}')">Call</button>` : ""}<button class="btn sm primary" onclick="event.stopPropagation();openItem(${i.id})">Pay</button></div></div>`,
-              )
-              .join("");
-          }
-        }
-        if (filter === "all" || filter === "sales") {
-          if (salesDebts.length) {
-            html += `<div class="slabel">Sales credit debts</div>`;
-            html += salesDebts
-              .map(
-                (s) =>
-                  `<div class="card" style="margin-bottom:9px;cursor:pointer" onclick="openSale(${s.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:14px;font-weight:700">${s.buyerName || "Walk-in"}</div><div class="itr-meta">Dry fish sale · ${shortDate(s.date)}</div>${s.phone ? `<div class="itr-meta">${s.phone}</div>` : ""}</div><div style="text-align:right"><div style="font-size:11px;color:var(--t3)">Owes</div><div style="font-size:16px;font-weight:700;color:var(--red)">${fmt(s.amount - s.amtPaid)}</div></div></div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">${s.phone ? `<button class="btn sm whatsapp" onclick="event.stopPropagation();sendWhatsApp('${s.phone}','${s.buyerName || ""}','saledebt',${s.id})">WhatsApp</button><button class="btn sm" onclick="event.stopPropagation();callCustomer('${s.phone}','${s.buyerName || ""}')">Call</button>` : ""}<button class="btn sm primary" onclick="event.stopPropagation();paySale(${s.id})">Pay</button></div></div>`,
-              )
-              .join("");
-          }
-        }
-        if (filter === "all" || filter === "supplier") {
-          if (supDebts.length) {
-            html += `<div class="slabel">What you owe suppliers</div>`;
-            html += supDebts
-              .map(
-                (p) =>
-                  `<div class="card" style="margin-bottom:9px;cursor:pointer" onclick="openPurchase(${p.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:14px;font-weight:700">${p.supplierName}</div><div class="itr-meta">Fish purchase · ${shortDate(p.date)}</div>${p.phone ? `<div class="itr-meta">${p.phone}</div>` : ""}</div><div style="text-align:right"><div style="font-size:11px;color:var(--t3)">You owe</div><div style="font-size:16px;font-weight:700;color:var(--amber)">${fmt(p.totalCost - p.amtPaid)}</div></div></div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">${p.phone ? `<button class="btn sm" onclick="event.stopPropagation();callCustomer('${p.phone}','${p.supplierName}')">Call</button>` : ""}<button class="btn sm primary" onclick="event.stopPropagation();paySupplier(${p.id})">Pay supplier</button></div></div>`,
-              )
-              .join("");
-          }
+        if (svcDebts.length) {
+          html += svcDebts
+            .map(
+              (i) =>
+                `<div class="card" style="margin-bottom:9px;cursor:pointer" onclick="openItem(${i.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:14px;font-weight:700">${i.name}</div><div class="itr-meta">Service · ${shortDate(i.createdAt)}</div>${i.phone ? `<div class="itr-meta">${i.phone}</div>` : ""}</div><div style="text-align:right"><div style="font-size:11px;color:var(--t3)">Owes</div><div style="font-size:16px;font-weight:700;color:var(--red)">${fmt(balance(i))}</div></div></div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">${i.phone ? `<button class="btn sm whatsapp" onclick="event.stopPropagation();sendWhatsApp('${i.phone}','${i.name}','debt',${i.id})">WhatsApp</button><button class="btn sm" onclick="event.stopPropagation();callCustomer('${i.phone}','${i.name}')">Call</button>` : ""}<button class="btn sm primary" onclick="event.stopPropagation();openItem(${i.id})">Pay</button></div></div>`,
+            )
+            .join("");
         }
         if (!html)
           html =
@@ -3276,22 +3140,12 @@
           const d = new Date(i.createdAt);
           return d >= start && d <= end;
         });
-        const sales = state.shop.sales.filter((s) => {
-          const d = new Date(s.date);
-          return d >= start && d <= end;
-        });
-        const purchases = state.shop.purchases.filter((p) => {
-          const d = new Date(p.date);
-          return d >= start && d <= end;
-        });
         const expenses = state.shop.expenses.filter((e) => {
           const d = new Date(e.date);
           return d >= start && d <= end;
         });
         const collected = items.filter((i) => i.status === "collected");
         const serviceRev = collected.reduce((a, i) => a + totalPaid(i), 0);
-        const salesRev = sales.reduce((a, s) => a + s.amount, 0);
-        const buyingCost = purchases.reduce((a, p) => a + p.totalCost, 0);
         const expCost = expenses.reduce((a, e) => a + e.amount, 0);
         const el = document.getElementById("sum-content");
         el.innerHTML = `<div class="sum-card">
@@ -3301,11 +3155,9 @@
     <div class="sum-row"><span class="sl">Revenue collected</span><span class="sv ct">${fmt(serviceRev)}</span></div>
     <div class="sum-row"><span class="sl">Still drying</span><span class="sv ca">${items.filter((i) => i.status === "drying").length}</span></div>
     <div class="sum-row"><span class="sl">Ready to collect</span><span class="sv ct">${items.filter((i) => i.status === "ready").length}</span></div>
-    <div class="slabel" style="margin-top:12px">Shop (buy & sell)</div>
-    <div class="sum-row"><span class="sl">Fish sales</span><span class="sv ct">${fmt(salesRev)}</span></div>
-    <div class="sum-row"><span class="sl">Fish bought (cost)</span><span class="sv cr">-${fmt(buyingCost)}</span></div>
-    <div class="sum-row"><span class="sl">Expenses</span><span class="sv" style="color:var(--purple,#6B3FA0)">-${fmt(expCost)}</span></div>
-    <div class="sum-row" style="border-top:1px solid var(--bdr2);margin-top:4px;padding-top:10px"><span class="sl" style="font-weight:600">Shop profit</span><span class="sv" style="color:${salesRev - buyingCost - expCost >= 0 ? "var(--green)" : "var(--red)"};font-size:16px">${fmt(salesRev - buyingCost - expCost)}</span></div>
+    <div class="slabel" style="margin-top:12px">Expenses</div>
+    <div class="sum-row"><span class="sl">Total expenses</span><span class="sv" style="color:var(--purple,#6B3FA0)">-${fmt(expCost)}</span></div>
+    <div class="sum-row" style="border-top:1px solid var(--bdr2);margin-top:4px;padding-top:10px"><span class="sl" style="font-weight:600">Net</span><span class="sv" style="color:${serviceRev - expCost >= 0 ? "var(--green)" : "var(--red)"};font-size:16px">${fmt(serviceRev - expCost)}</span></div>
   </div>`;
       }
 
@@ -3315,6 +3167,7 @@
         ).toLowerCase();
         const map = {};
         state.items.forEach((i) => {
+          if (!i.name) return;
           const k = i.name.toLowerCase();
           if (!map[k])
             map[k] = {
@@ -3331,24 +3184,6 @@
           if (i.status === "collected" && !i.settledShort)
             map[k].totalBal += balance(i);
         });
-        state.shop.sales.forEach((s) => {
-          if (!s.buyerName) return;
-          const key = s.buyerName.toLowerCase();
-          if (!map[key])
-            map[key] = {
-              name: s.buyerName,
-              phone: s.phone || "",
-              items: [],
-              totalBiz: 0,
-              totalPaidAmt: 0,
-              totalBal: 0,
-              salesAmt: 0,
-            };
-          map[key].salesAmt = (map[key].salesAmt || 0) + s.amount;
-          map[key].totalBiz += s.amount;
-          map[key].totalPaidAmt += s.amtPaid;
-          if (!s.paid) map[key].totalBal += s.amount - s.amtPaid;
-        });
         let custs = Object.values(map).sort((a, b) => b.totalBiz - a.totalBiz);
         if (q)
           custs = custs.filter(
@@ -3363,13 +3198,14 @@
         el.innerHTML = custs
           .map(
             (c) =>
-              `<div class="cust-card" onclick="openCustomer('${c.name.replace(/'/g, "\\'")}')"><div class="cust-name">${c.name}</div><div class="cust-meta">${c.phone || "No phone"} · ${c.items.length} visit${c.items.length !== 1 ? "s" : ""}</div><div class="cust-stats"><div class="cst">Biz: <strong>${fmt(c.totalBiz)}</strong></div><div class="cst">Paid: <strong style="color:var(--green)">${fmt(c.totalPaidAmt)}</strong></div>${c.totalBal > 0 ? `<div class="cst">Owes: <strong style="color:var(--red)">${fmt(c.totalBal)}</strong></div>` : ""}</div></div>`,
+              `<div class="cust-card" onclick="openCustomer('${c.name}')"><div class="cust-name">${c.name}</div><div class="cust-meta">${c.phone || "No phone"} · ${c.items.length} visit${c.items.length !== 1 ? "s" : ""}</div><div class="cust-stats"><div class="cst">Biz: <strong>${fmt(c.totalBiz)}</strong></div><div class="cst">Paid: <strong style="color:var(--green)">${fmt(c.totalPaidAmt)}</strong></div>${c.totalBal > 0 ? `<div class="cst">Owes: <strong style="color:var(--red)">${fmt(c.totalBal)}</strong></div>` : ""}</div></div>`,
           )
           .join("");
       }
       function openCustomer(name) {
+        const key = String(name || "").toLowerCase();
         const items = state.items.filter(
-          (i) => i.name.toLowerCase() === name.toLowerCase(),
+          (i) => (i.name || "").toLowerCase() === key,
         );
         if (!items.length) return;
         const c = items[0];
@@ -3382,7 +3218,7 @@
           `<button class="mclose" onclick="closeCustModal()">Close</button><div class="mtitle">${c.name}</div><div class="msub">${c.phone || "No phone saved"}</div>
   <div class="sgrid" style="margin-bottom:11px"><div class="stat"><div class="stat-label">Total business</div><div class="stat-val ct" style="font-size:15px">${fmt(totalBiz)}</div></div><div class="stat"><div class="stat-label">Total paid</div><div class="stat-val" style="font-size:15px;color:var(--green)">${fmt(tPaid)}</div></div><div class="stat"><div class="stat-label">Visits</div><div class="stat-val ct" style="font-size:15px">${items.length}</div></div><div class="stat"><div class="stat-label">Outstanding</div><div class="stat-val cr" style="font-size:15px">${fmt(tBal)}</div></div></div>
   ${c.phone ? `<div style="display:flex;gap:8px;margin-bottom:12px"><button class="btn" style="flex:1" onclick="callCustomer('${c.phone}','${c.name}')"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.36 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>Call</button><button class="btn whatsapp" style="flex:1" onclick="sendWhatsApp('${c.phone}','${c.name}','reminder')"><svg viewBox="0 0 24 24" style="fill:none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>WhatsApp</button></div>` : ""}
-  <div class="slabel">All visits</div>${items
+  ${items
     .map((i) => {
       const fish =
         (i.fishRows || []).map((r) => r.type).join(", ") || i.type || "Fish";
@@ -3397,13 +3233,14 @@
 
       function renderAnalytics() {
         const el = document.getElementById("analytics-content");
-        if (!state.items.length && !state.shop.sales.length) {
+        if (!state.items.length) {
           el.innerHTML =
             '<div class="empty"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><p>No data yet</p></div>';
           return;
         }
         const map = {};
         state.items.forEach((i) => {
+          if (!i.name) return;
           if (!map[i.name])
             map[i.name] = { name: i.name, total: 0, paid: 0, visits: 0 };
           map[i.name].total += i.total;
@@ -3421,11 +3258,14 @@
       return `<div class="bar-wrap"><div class="bar-label"><span>${c.name}</span><span>${pct}% paid</span></div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${pct >= 100 ? "var(--green)" : pct >= 50 ? "var(--amber)" : "var(--red)"}"></div></div></div>`;
     })
     .join("")}</div>
-  <div class="card"><div class="card-title">Overview</div><div class="sum-row"><span class="sl">Service customers</span><span class="sv">${Object.keys(map).length}</span></div><div class="sum-row"><span class="sl">Total intakes</span><span class="sv">${state.items.length}</span></div><div class="sum-row"><span class="sl">Total charged</span><span class="sv ct">${fmt(state.items.reduce((a, i) => a + i.total, 0))}</span></div><div class="sum-row"><span class="sl">Total collected</span><span class="sv" style="color:var(--green)">${fmt(state.items.reduce((a, i) => a + totalPaid(i), 0))}</span></div><div class="sum-row"><span class="sl">Fish sales (all time)</span><span class="sv ct">${fmt(state.shop.sales.reduce((a, s) => a + s.amount, 0))}</span></div></div>`;
+  <div class="card"><div class="card-title">Overview</div><div class="sum-row"><span class="sl">Service customers</span><span class="sv">${Object.keys(map).length}</span></div><div class="sum-row"><span class="sl">Total intakes</span><span class="sv">${state.items.length}</span></div><div class="sum-row"><span class="sl">Total charged</span><span class="sv ct">${fmt(state.items.reduce((a, i) => a + i.total, 0))}</span></div><div class="sum-row"><span class="sl">Total collected</span><span class="sv" style="color:var(--green)">${fmt(state.items.reduce((a, i) => a + totalPaid(i), 0))}</span></div></div>`;
       }
       function renderSettings() {
-        document.getElementById("settings-name").value = userName;
-        document.getElementById("settings-price").value = state.shop.pricePerKg;
+        setVal("settings-name", userName);
+        setVal("settings-dryrate", state.shop.dryingRatePerKg);
+        const zl = document.getElementById("zoom-label");
+        if (zl) zl.textContent = Math.round(getZoom() * 100) + "%";
+        renderSyncInfo();
       }
       function openItem(id) {
         const i = state.items.find((x) => x.id === id);
@@ -3554,7 +3394,7 @@
         const i = state.items.find((x) => x.id === id);
         if (!i) return;
         const amt = parseFloat(document.getElementById("pay-amt")?.value) || 0;
-        const note = document.getElementById("pay-note")?.value.trim() || "";
+        const note = clean(document.getElementById("pay-note")?.value);
         if (amt <= 0) {
           showToast("Enter the amount received");
           return;
@@ -3590,10 +3430,6 @@
           const fish =
             (item?.fishRows || []).map((r) => r.type).join(", ") || "your fish";
           msg = `Hello ${name}, good news! ${fish} is ready for collection at Mummy J's Fish Store. Please come to collect. Thank you!`;
-        } else if (type === "saledebt" && itemId) {
-          const sale = state.shop.sales.find((x) => x.id === itemId);
-          const owes = sale ? sale.amount - sale.amtPaid : 0;
-          msg = `Hello ${name}, this is a reminder that you have an outstanding balance of ${fmt(owes)} for dry fish purchased from Mummy J's Fish Store. Kindly settle at your earliest convenience. Thank you!`;
         } else {
           msg = `Hello ${name}, please note you have an outstanding balance at Mummy J's Fish Store. Kindly come and settle. Thank you!`;
         }
@@ -3623,7 +3459,7 @@
     <div class="mtitle">Receipt</div>
     <div id="receipt-card" style="background:var(--surf);border-radius:var(--r);border:1px solid var(--bdr2);padding:20px;margin:12px 0">
       <div style="text-align:center;margin-bottom:16px">
-        <div style="font-size:22px;margin-bottom:4px">🐟</div>
+        <div style="font-size:26px;margin-bottom:4px">🐟</div>
         <div style="font-size:17px;font-weight:700;color:var(--t1)">Mummy J's Fish Store</div>
         <div style="font-size:11px;color:var(--t3);margin-top:2px">Fish Drying Service Receipt</div>
         <div style="height:1px;background:var(--bdr2);margin:12px 0"></div>
@@ -3925,7 +3761,7 @@
     <div class="mtitle">Acknowledgement</div>
     <div id="ack-card" style="background:var(--surf);border-radius:var(--r);border:1px solid var(--bdr2);padding:20px;margin:12px 0">
       <div style="text-align:center;margin-bottom:16px">
-        <div style="font-size:22px;margin-bottom:4px">🐟</div>
+        <div style="font-size:26px;margin-bottom:4px">🐟</div>
         <div style="font-size:17px;font-weight:700;color:var(--t1)">Mummy J's Fish Store</div>
         <div style="font-size:11px;color:var(--t3);margin-top:2px">${getServiceType(item)} — Acknowledgement Slip</div>
         <div style="height:1px;background:var(--bdr2);margin:12px 0"></div>
@@ -4247,6 +4083,7 @@
       }
       function showToast(msg) {
         const t = document.getElementById("toast");
+        if (!t) return;
         t.textContent = msg;
         t.classList.add("show");
         clearTimeout(t._t);
@@ -4275,26 +4112,74 @@
         if (newWorker) newWorker.postMessage("skipWaiting");
       }
 
+      function exportBackup() {
+        try {
+          const blob = new Blob([JSON.stringify(state, null, 2)], {
+            type: "application/json",
+          });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "fish-store-backup-" + todayStr() + ".json";
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 2000);
+          showToast("Backup downloaded");
+        } catch (e) {
+          showToast("Could not create backup");
+        }
+      }
+
+      function restoreBackup(input) {
+        const file = input.files && input.files[0];
+        input.value = "";
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          let data;
+          try {
+            data = JSON.parse(reader.result);
+          } catch (e) {
+            showToast("That file is not a valid backup");
+            return;
+          }
+          if (!data || !Array.isArray(data.items)) {
+            showToast("That file is not a valid backup");
+            return;
+          }
+          document.getElementById("cfm-title").textContent = "Restore backup?";
+          document.getElementById("cfm-msg").textContent =
+            "Records from the backup will be added to what is already on this phone. Nothing currently saved is removed.";
+          document.getElementById("cfm-ok").textContent = "Restore";
+          document.getElementById("cfm-ok").onclick = () => {
+            mergeRemote(data);
+            cleanExisting();
+            lsave();
+            scheduleSync();
+            closeCfm();
+            refreshCurrentScreen();
+            showToast("Backup restored");
+          };
+          document.getElementById("cfm").classList.add("open");
+        };
+        reader.readAsText(file);
+      }
+
       function confirmClearAll() {
         document.getElementById("cfm-title").textContent = "Clear all records?";
         document.getElementById("cfm-msg").textContent =
-          "This will permanently delete ALL drying service records, purchases, sales and expenses. This cannot be undone. Are you absolutely sure?";
+          "This will permanently delete ALL drying service records and expenses. This cannot be undone. Are you absolutely sure?";
         document.getElementById("cfm-ok").textContent = "Yes, clear everything";
         document.getElementById("cfm-ok").onclick = () => {
+          // tombstone everything, otherwise the next sync pulls it all back
+          state.items.forEach((x) => tombstone("service", x.id));
+          state.shop.expenses.forEach((x) => tombstone("expense", x.id));
           state.items = [];
-          state.nextId = 1;
-          state.shop.purchases = [];
-          state.shop.sales = [];
           state.shop.expenses = [];
-          state.shop.purNextId = 1;
-          state.shop.saleNextId = 1;
-          state.shop.expNextId = 1;
-          state.shop.dryStockKg = 0;
           lsave();
           scheduleSync();
           closeCfm();
           showScreen("home");
-          showToast("All records cleared");
+          showToast("All records cleared on every device");
         };
         document.getElementById("cfm").classList.add("open");
       }
