@@ -1,8 +1,8 @@
 {
-  "name": "Mama's Fish Store",
+  "name": "Mummy J's Fish Store",
   "short_name": "Fish Store",
-  "description": "Fish business tracker — stock, sales, and debts",
-  "start_url": "/",
+  "description": "Fish drying, sales, purchases and debts",
+  "start_url": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#F5F5F0",
@@ -21,6 +21,16 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["business", "finance", "productivity"],
-  "lang": "en-NG"
+  "categories": [
+    "business",
+    "finance",
+    "productivity"
+  ],
+  "lang": "en-NG",
+  "id": "./",
+  "scope": "./",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ]
 }

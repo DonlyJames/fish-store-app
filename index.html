@@ -1157,9 +1157,21 @@
               <div class="stat-val cr" id="s-owedto">₦0</div>
             </div>
             <div class="stat">
+              <div class="stat-label">You owe</div>
+              <div class="stat-val ca" id="s-iowe">₦0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Fish sold (mo)</div>
+              <div class="stat-val ct" id="s-salesmo">₦0</div>
+            </div>
+            <div class="stat">
               <div class="stat-label">Expenses (mo)</div>
               <div class="stat-val ca" id="s-expmo">₦0</div>
             </div>
+          </div>
+          <div class="r2" style="margin-bottom: 11px">
+            <button class="btn primary" onclick="openTradeForm('sale')">+ Record sale</button>
+            <button class="btn" onclick="openTradeForm('purchase')">+ Record purchase</button>
           </div>
           <div class="card">
             <div class="card-title">
@@ -1285,8 +1297,9 @@
                   type="number"
                   min="0"
                   inputmode="numeric"
-                  oninput="this.dataset.touched='1'"
+                  oninput="onDryingAmtInput(this)"
                 />
+                <div class="fl" id="drying-rate-hint" style="margin-top: 6px; color: var(--t3)"></div>
               </div>
             </div>
             <div class="fg">
@@ -1368,7 +1381,7 @@
               class="search-input"
               id="cust-search"
               type="text"
-              placeholder="Search customers..."
+              placeholder="Search people..."
               oninput="renderCustomers()"
             />
           </div>
@@ -1378,6 +1391,12 @@
         <section class="screen" id="screen-debts">
           <div id="debt-alert"></div>
           <div id="debt-list"></div>
+        </section>
+
+        <section class="screen" id="screen-sales"></section>
+        <section class="screen" id="screen-purchases"></section>
+        <section class="screen" id="screen-trade">
+          <div id="trade-content"></div>
         </section>
 
         <section class="screen" id="screen-analytics">
@@ -1416,6 +1435,17 @@
               <div class="fl" style="margin-top: 6px; color: var(--t3)">
                 Used to pre-fill the drying expense when you save a new
                 intake.
+              </div>
+            </div>
+            <div class="fg">
+              <label class="fl">Sale prices (₦) — stay until you change them</label>
+              <div class="r2">
+                <div><div class="fl" style="color: var(--t3)">Dried catfish / kg</div><input class="fi" id="sp-dried" type="number" inputmode="numeric" /></div>
+                <div><div class="fl" style="color: var(--t3)">Fresh catfish / kg</div><input class="fi" id="sp-fresh" type="number" inputmode="numeric" /></div>
+              </div>
+              <div style="display: flex; gap: 8px; margin-top: 8px">
+                <div style="flex: 1"><div class="fl" style="color: var(--t3)">Kpomo / piece</div><input class="fi" id="sp-kpomo" type="number" inputmode="numeric" /></div>
+                <button class="btn sm primary" style="align-self: flex-end" onclick="saveSalePrices()">Save</button>
               </div>
             </div>
             <div class="fg">
@@ -1512,11 +1542,11 @@
             ></path></svg
           >Stock
         </button>
-        <button class="nb" onclick="showScreen('shop')">
+        <button class="nb" onclick="showScreen('debts')">
           <svg viewBox="0 0 24 24">
-            <rect x="2" y="7" width="20" height="14" rx="2"></rect>
-            <path d="M16 3H8a2 2 0 0 0-2 2v2h12V5a2 2 0 0 0-2-2z"></path></svg
-          >Expenses
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg
+          >Debts
         </button>
         <button class="nb" onclick="showMoreMenu()">
           <svg viewBox="0 0 24 24">
@@ -1537,6 +1567,8 @@
       <div class="modal">
         <div class="mhandle"></div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+          <button class="btn" onclick="closeMore(); showScreen('sales');">Sales</button>
+          <button class="btn" onclick="closeMore(); showScreen('purchases');">Purchases</button>
           <button
             class="btn"
             onclick="
@@ -1549,21 +1581,9 @@
               <circle cx="9" cy="7" r="4"></circle>
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg
-            >Customers
+            >People
           </button>
-          <button
-            class="btn"
-            onclick="
-              closeMore();
-              showScreen('debts');
-            "
-          >
-            <svg viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line></svg
-            >Debts
-          </button>
+          <button class="btn" onclick="closeMore(); showScreen('shop');">Expenses</button>
           <button
             class="btn"
             onclick="
@@ -1671,10 +1691,17 @@
         gTokenClient = null,
         gTokenExpiry = 0,
         silentSignInTimer = null,
-        tokenRefreshTimer = null;
+        tokenRefreshTimer = null,
+        needsReauth = false,
+        signingIn = false,
+        lastAuthFail = 0,
+        signInRetries = 0;
 
       let state = {
         items: [],
+        sales: [],
+        purchases: [],
+        adjustments: [],
         nextId: 1,
         deleted: {},
         updatedAt: null,
@@ -1682,6 +1709,7 @@
           expenses: [],
           dryingRatePerKg: 50,
           priceDefaults: { Catfish: 350 },
+          tradeDefaults: {},
           settingsAt: null,
         },
       };
@@ -1739,6 +1767,10 @@
           (i.fishRows || []).forEach((r) => f(r, ["type"]));
         });
         state.shop.expenses.forEach((e) => f(e, ["type", "desc", "addedBy"]));
+        state.sales.concat(state.purchases).forEach((r) => {
+          f(r, ["name", "phone", "notes", "addedBy"]);
+          (r.lines || []).forEach((l) => f(l, ["type", "custom"]));
+        });
       }
 
       function todayStr(d) {
@@ -1802,8 +1834,13 @@
         )
           state.shop.priceDefaults = { Catfish: 350 };
         if (!state.nextId) state.nextId = 1;
+        if (!Array.isArray(state.sales)) state.sales = [];
+        if (!Array.isArray(state.purchases)) state.purchases = [];
+        if (!Array.isArray(state.adjustments)) state.adjustments = [];
+        if (!state.shop.tradeDefaults || typeof state.shop.tradeDefaults !== "object")
+          state.shop.tradeDefaults = {};
         // guard against records saved without payment arrays
-        state.items.forEach((i) => {
+        state.items.concat(state.sales, state.purchases).forEach((i) => {
           if (!Array.isArray(i.payments)) i.payments = [];
         });
       }
@@ -1829,9 +1866,11 @@
 
       window.addEventListener("online", () => {
         if (!isSignedIn()) return;
-        setSyncStatus("syncing", "Signing in...");
-        if (!isTokenValid()) signInGoogle(true);
-        else syncNow();
+        if (!isTokenValid()) needReauth();
+        else {
+          setSyncStatus("syncing", "Syncing...");
+          syncNow();
+        }
       });
 
       window.addEventListener("offline", () => {
@@ -1844,7 +1883,7 @@
         if (document.visibilityState !== "visible") return;
         updateViewportVars();
         if (!isSignedIn() || !navigator.onLine) return;
-        if (!isTokenValid()) signInGoogle(true);
+        if (!isTokenValid()) needReauth();
         else if (pendingChanges) syncNow();
         else pullLatestFromDrive();
       });
@@ -1987,11 +2026,14 @@
             month: "long",
           }),
         );
+        loadStoredToken();
         if (!navigator.onLine) setSyncStatus("", "Offline");
-        else if (isSignedIn()) setSyncStatus("syncing", "Signing in...");
+        else if (isSignedIn())
+          setSyncStatus("", isTokenValid() ? "Connecting..." : "Tap to sync");
         renderSyncInfo();
         setVal("settings-name", userName);
         setVal("settings-dryrate", state.shop.dryingRatePerKg);
+        fillSalePrices();
         initFishRows();
         renderHome();
         if (GOOGLE_CLIENT_ID) {
@@ -2002,8 +2044,10 @@
               return;
             }
             if (window.google && google.accounts && google.accounts.oauth2) {
-              if (isSignedIn()) signInGoogle(true);
-              else setSyncStatus("", "Sign in");
+              if (isSignedIn()) {
+                if (isTokenValid()) syncNow();
+                else needReauth();
+              } else setSyncStatus("", "Sign in");
             } else if (tries++ < 20) setTimeout(tryAutoSignIn, 500);
             else setSyncStatus("", "Sign in");
           };
@@ -2017,7 +2061,7 @@
           if (document.visibilityState !== "visible") return;
           if (!navigator.onLine || isSyncing) return;
           if (!isTokenValid()) {
-            if (isSignedIn()) signInGoogle(true);
+            if (isSignedIn()) needReauth();
             return;
           }
           if (pendingChanges) syncNow();
@@ -2056,6 +2100,9 @@
         state.shop.settingsAt = new Date().toISOString();
         lsave();
         scheduleSync();
+        const da = document.getElementById("in-drying-amt");
+        if (da) da.dataset.touched = "";
+        updateDryingPreview();
         showToast("Drying charge updated to " + fmt(r) + "/kg");
       }
 
@@ -2086,7 +2133,7 @@
         el.className = "fish-row";
         el.id = "fish-row-" + id;
         el.innerHTML = `<div class="fish-row-header"><span class="fish-row-label">Fish #${id}</span>${id > 1 ? `<button class="fish-row-del" onclick="removeFishRow(${id})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6M14 11v6M9 6V4h6v2"></path></svg></button>` : ""}</div>
-  <div class="fg"><select class="fi" id="fr-type-${id}" onchange="onFishTypeChange(${id})"><option>Catfish</option><option>Tilapia</option><option>Titus</option><option>Panla</option><option>Mixed fish</option><option>Goat Meat</option><option>Cow Meat</option><option value="">Other / select...</option></select></div>
+  <div class="fg"><select class="fi" id="fr-type-${id}" onchange="onFishTypeChange(${id})"><option>Catfish</option><option>Chicken</option><option>Titus</option><option>Panla</option><option>Mixed fish</option><option>Goat Meat</option><option>Cow Meat</option></select></div>
   <div class="fg"><input class="fi" id="fr-custom-${id}" type="text" placeholder="Custom name (optional)"></div>
   <div class="r2"><div class="fg"><label class="fl">Weight (kg)</label><input class="fi" id="fr-weight-${id}" type="number" placeholder="0.0" step="0.1" min="0" inputmode="decimal" oninput="calcVisitTotal()"></div><div class="fg"><label class="fl">Count (pcs)</label><input class="fi" id="fr-count-${id}" type="number" placeholder="0" min="0" inputmode="numeric"></div></div>
   <div class="r2"><div class="fg"><label class="fl">Price/kg (₦)</label><input class="fi" id="fr-price-${id}" type="number" placeholder="0" min="0" inputmode="numeric" oninput="calcVisitTotal()"></div><div class="fg"><label class="fl">Discount (₦)</label><input class="fi" id="fr-disc-${id}" type="number" placeholder="0" min="0" inputmode="numeric" oninput="calcVisitTotal()"></div></div>
@@ -2174,10 +2221,12 @@
       function updateDryingPreview() {
         const amtEl = document.getElementById("in-drying-amt");
         if (!amtEl) return;
-        // don't clobber a value the user already customised by hand
+        const rate = state.shop.dryingRatePerKg, w = totalIntakeWeight();
+        const hint = document.getElementById("drying-rate-hint");
+        if (hint) hint.textContent = "Settings rate: " + fmt(rate) + "/kg" + (w ? " × " + fmtKg(w) : "");
+        // a value typed by hand is left alone; otherwise it always follows Settings
         if (amtEl.dataset.touched === "1") return;
-        const w = totalIntakeWeight();
-        amtEl.value = w ? +(w * state.shop.dryingRatePerKg).toFixed(2) : "";
+        amtEl.value = w ? +(w * rate).toFixed(2) : "";
       }
       function toggleDryingAmt() {
         const on = document.getElementById("in-drying-pay")?.checked;
@@ -2277,45 +2326,91 @@
         isSyncing = false;
       }
 
+      // ─── GOOGLE SIGN-IN (v5) ──────────────────────────────────────────────
+      // Google's browser sign-in hands out a pass that lasts one hour and
+      // cannot be renewed in the background on a phone: the renewal needs a
+      // popup, and phones block popups that do not come from a finger tap.
+      // That is what caused the white screen and the "fails, then tries
+      // again" loop. So now: (1) the pass is kept on the phone, so reopening
+      // the app within the hour needs nothing; (2) it is renewed on the next
+      // tap, never from a timer; (3) a failed or closed popup can no longer
+      // leave the app stuck on "Signing in...".
+      function loadStoredToken() {
+        try {
+          const t = localStorage.getItem("fd_gtoken");
+          const e = parseInt(localStorage.getItem("fd_gexp") || "0", 10);
+          if (t && e > Date.now()) { gToken = t; gTokenExpiry = e; }
+        } catch (err) {}
+      }
+      function storeToken() {
+        try {
+          localStorage.setItem("fd_gtoken", gToken);
+          localStorage.setItem("fd_gexp", String(gTokenExpiry));
+        } catch (err) {}
+      }
+      function clearStoredToken() {
+        try { localStorage.removeItem("fd_gtoken"); localStorage.removeItem("fd_gexp"); } catch (err) {}
+      }
+      function needReauth() {
+        needsReauth = true;
+        setSyncStatus("", "Tap to sync");
+      }
+      // renew on the next tap anywhere in the app (a tap is what lets the
+      // popup open), at most once every 10 minutes after a failure
+      document.addEventListener("click", () => {
+        if (!needsReauth || signingIn) return;
+        if (!isSignedIn() || isTokenValid() || !navigator.onLine) { needsReauth = false; return; }
+        if (Date.now() - lastAuthFail < 10 * 60 * 1000) return;
+        needsReauth = false;
+        signInGoogle(true);
+      }, true);
+
       function signInGoogle(silent = false) {
+        if (signingIn) return;
         if (!window.google || !google.accounts || !google.accounts.oauth2) {
           if (!silent) showToast("Loading Google — try again in a moment");
-          if (navigator.onLine) setTimeout(() => signInGoogle(silent), 1200);
+          if (navigator.onLine && signInRetries++ < 5) setTimeout(() => signInGoogle(silent), 1500);
           return;
         }
+        signInRetries = 0;
+        signingIn = true;
+        const finish = (failed) => {
+          signingIn = false;
+          clearTimeout(silentSignInTimer);
+          if (failed) {
+            lastAuthFail = Date.now();
+            setSyncStatus("", isSignedIn() ? "Tap to sync" : "Sign in");
+          }
+        };
         const client = google.accounts.oauth2.initTokenClient({
           client_id: GOOGLE_CLIENT_ID,
           scope: SCOPES,
           callback: async (r) => {
-            clearTimeout(silentSignInTimer);
             if (r.error) {
-              // a silent refresh can fail simply because consent expired;
-              // that is not an error worth shouting about
+              finish(true);
               if (!silent) showToast("Sign in failed — please try again");
-              setSyncStatus("", silent && isSignedIn() ? "Tap to sync" : "Sign in");
               return;
             }
+            finish(false);
+            lastAuthFail = 0;
             gToken = r.access_token;
             gTokenExpiry = Date.now() + (r.expires_in - 120) * 1000;
+            storeToken();
             localStorage.setItem("fd_gsignin", "1");
+            needsReauth = false;
             setSyncStatus("syncing", "Syncing...");
             await syncNow();
-            scheduleTokenRefresh(r.expires_in - 180);
+          },
+          // popup blocked / closed — without this the app waited forever
+          error_callback: () => {
+            finish(true);
+            if (!silent) showToast("Google sign-in was closed or blocked — tap Sync to try again");
           },
         });
-        // The old code never stored the client, so every later token refresh
-        // called a null object and quietly did nothing — after about an hour
-        // the app stopped syncing without telling anyone.
         gTokenClient = client;
-        if (silent) {
-          silentSignInTimer = setTimeout(
-            () => setSyncStatus("", "Tap to sync"),
-            8000,
-          );
-          client.requestAccessToken({ prompt: "none" });
-        } else {
-          client.requestAccessToken({ prompt: "select_account" });
-        }
+        // never leave the button stuck on "Signing in..."
+        silentSignInTimer = setTimeout(() => finish(true), 25000);
+        client.requestAccessToken({ prompt: silent ? "none" : isSignedIn() ? "" : "select_account" });
       }
 
       function isSignedIn() {
@@ -2333,19 +2428,15 @@
         gTokenClient = null;
         clearTimeout(tokenRefreshTimer);
         localStorage.removeItem("fd_gsignin");
+        clearStoredToken();
+        needsReauth = false;
         setSyncStatus("", "Sign in");
         showToast("Signed out — records stay on this phone");
         renderSyncInfo();
       }
 
-      function scheduleTokenRefresh(sec) {
-        clearTimeout(tokenRefreshTimer);
-        tokenRefreshTimer = setTimeout(
-          () => {
-            if (isSignedIn() && navigator.onLine) signInGoogle(true);
-          },
-          Math.max(30, sec) * 1000,
-        );
+      function scheduleTokenRefresh() {
+        /* no longer used — renewal now happens on the next tap */
       }
 
       function isTokenValid() {
@@ -2378,8 +2469,8 @@
           return;
         }
         if (!isTokenValid()) {
-          if (isSignedIn()) signInGoogle(true);
-          else if (manual) signInGoogle(false);
+          if (manual) signInGoogle(false);
+          else if (isSignedIn()) needReauth();
           return;
         }
         isSyncing = true;
@@ -2424,7 +2515,7 @@
         const seen = {};
         (a || []).concat(b || []).forEach((p) => {
           if (!p || typeof p.amount !== "number") return;
-          const k = (p.date || "") + "|" + p.amount + "|" + (p.note || "");
+          const k = p.id ? "id:" + p.id : (p.date || "") + "|" + p.amount + "|" + (p.note || "");
           if (seen[k]) return;
           seen[k] = 1;
           out.push(p);
@@ -2486,6 +2577,12 @@
 
         if (mergeList(state.items, remote.items, "service", "createdAt"))
           changed = true;
+        if (mergeList(state.sales, remote.sales, "sale", "date")) changed = true;
+        if (mergeList(state.purchases, remote.purchases, "purchase", "date"))
+          changed = true;
+        if (!Array.isArray(state.adjustments)) state.adjustments = [];
+        if (mergeList(state.adjustments, remote.adjustments, "adjustment", "date"))
+          changed = true;
         if (remote.nextId > state.nextId) state.nextId = remote.nextId;
 
         if (remote.shop && typeof remote.shop === "object") {
@@ -2513,6 +2610,12 @@
                 {},
                 state.shop.priceDefaults,
                 remote.shop.priceDefaults,
+              );
+            if (remote.shop.tradeDefaults && typeof remote.shop.tradeDefaults === "object")
+              state.shop.tradeDefaults = Object.assign(
+                {},
+                state.shop.tradeDefaults,
+                remote.shop.tradeDefaults,
               );
             state.shop.settingsAt = remote.shop.settingsAt;
             changed = true;
@@ -2554,7 +2657,7 @@
         clearTimeout(syncTmr);
         syncTmr = setTimeout(() => {
           if (!navigator.onLine) return;
-          if (!isTokenValid()) signInGoogle(true);
+          if (!isTokenValid()) needReauth();
           else syncNow();
         }, 1500);
       }
@@ -2588,7 +2691,9 @@
             );
           } else if (id === "shop") renderShopScreen();
           else if (id === "customers") renderCustomers();
-          else if (id === "debts") renderDebts("all");
+          else if (id === "debts") renderDebts();
+          else if (id === "sales") renderSales();
+          else if (id === "purchases") renderPurchases();
           else if (id === "summary") renderSummary(currentSumPeriod);
           else if (id === "analytics") renderAnalytics();
           else if (id === "settings") renderSettings();
@@ -2672,7 +2777,7 @@
           return;
         }
         const seen = {};
-        state.items.forEach((i) => {
+        seedPeopleRecords().forEach((i) => {
           if (!i.name) return;
           const k = i.name.toLowerCase();
           if (!seen[k]) seen[k] = { name: i.name, phone: i.phone || "" };
@@ -2701,7 +2806,7 @@
         document.getElementById("name-suggestions").style.display = "none";
       }
 
-      const NAV_SCREENS = ["home", "intake", "inventory", "shop", "more"];
+      const NAV_SCREENS = ["home", "intake", "inventory", "debts", "more"];
       function showScreen(name) {
         document
           .querySelectorAll(".screen")
@@ -2721,6 +2826,14 @@
           summary: () => renderSummary("week"),
           analytics: renderAnalytics,
           shop: renderShopScreen,
+          sales: renderSales,
+          purchases: renderPurchases,
+          trade: renderTradeForm,
+          intake: () => {
+            const da = document.getElementById("in-drying-amt");
+            if (da && totalIntakeWeight() === 0) da.dataset.touched = "";
+            updateDryingPreview();
+          },
           settings: renderSettings,
         })[name]?.();
         pushState();
@@ -2886,6 +2999,10 @@
           tombstone(type, id);
           if (type === "service")
             state.items = state.items.filter((x) => x.id !== id);
+          else if (type === "sale")
+            state.sales = state.sales.filter((x) => x.id !== id);
+          else if (type === "purchase")
+            state.purchases = state.purchases.filter((x) => x.id !== id);
           else if (type === "expense")
             state.shop.expenses = state.shop.expenses.filter(
               (x) => x.id !== id,
@@ -2905,31 +3022,40 @@
       function renderHome() {
         const drying = state.items.filter((i) => i.status === "drying").length;
         const ready = state.items.filter((i) => i.status === "ready").length;
-        const serviceDebt = state.items
-          .filter((i) => i.status === "collected" && !i.settledShort)
-          .reduce((a, i) => a + balance(i), 0);
+        const led = ledgerEntries();
+        const owedToMe = led.filter((e) => e.dir > 0).reduce((a, e) => a + e.owing, 0);
+        const iOwe = led.filter((e) => e.dir < 0).reduce((a, e) => a + e.owing, 0);
         const now = new Date();
         const ms = new Date(now.getFullYear(), now.getMonth(), 1);
         const expMonth = state.shop.expenses
           .filter((e) => new Date(e.date) >= ms)
           .reduce((a, e) => a + e.amount, 0);
+        const soldMonth = state.sales
+          .filter((r) => !r.legacy && new Date(recDate(r)) >= ms)
+          .reduce((a, r) => a + r.total, 0);
         document.getElementById("s-dry").textContent = drying;
         document.getElementById("s-ready").textContent = ready;
-        document.getElementById("s-owedto").textContent = fmt(serviceDebt);
+        document.getElementById("s-owedto").textContent = fmt(owedToMe);
+        document.getElementById("s-iowe").textContent = fmt(iOwe);
+        document.getElementById("s-salesmo").textContent = fmt(soldMonth);
         document.getElementById("s-expmo").textContent = fmt(expMonth);
-        const debtCount = state.items.filter(
-          (i) => i.status === "collected" && !i.settledShort && balance(i) > 0,
-        ).length;
+        const ps = buildPeople();
+        const debtors = ps.filter((p) => p.owedToMe > 0).length;
+        const creditors = ps.filter((p) => p.iOwe > 0).length;
         let ah = "";
-        if (debtCount > 0)
-          ah += `<div class="abar"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="abar-text">${debtCount} outstanding debt${debtCount > 1 ? "s" : ""} — check Debts</div></div>`;
+        if (debtors > 0)
+          ah += `<div class="abar" onclick="showScreen('debts')" style="cursor:pointer"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="abar-text">${debtors} ${debtors > 1 ? "people owe" : "person owes"} you ${fmt(owedToMe)} — check Debts</div></div>`;
+        if (creditors > 0)
+          ah += `<div class="abar" onclick="showScreen('debts');setDebtTab('owe')" style="cursor:pointer"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="abar-text">You owe ${creditors} ${creditors > 1 ? "suppliers" : "supplier"} ${fmt(iOwe)}</div></div>`;
         if (ready > 0)
           ah += `<div class="abar" style="background:var(--teal-l);border-color:rgba(29,158,117,.25)"><svg viewBox="0 0 24 24" style="stroke:var(--teal)"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg><div class="abar-text" style="color:var(--teal-d)">${ready} item${ready > 1 ? "s" : ""} ready — notify customers</div></div>`;
         document.getElementById("home-alerts").innerHTML = ah;
         const all = state.items
-          .map((i) => ({ ...i, _type: "service", _date: i.createdAt }))
-          .sort((a, b) => new Date(b._date) - new Date(a._date))
-          .slice(0, 6);
+          .map((r) => ({ kind: "service", rec: r, d: r.createdAt }))
+          .concat(state.sales.map((r) => ({ kind: "sale", rec: r, d: r.createdAt || r.date })))
+          .concat(state.purchases.map((r) => ({ kind: "purchase", rec: r, d: r.createdAt || r.date })))
+          .sort((a, b) => new Date(b.d) - new Date(a.d))
+          .slice(0, 8);
         const recent = document.getElementById("home-recent");
         if (!all.length) {
           recent.innerHTML =
@@ -2937,13 +3063,15 @@
           return;
         }
         recent.innerHTML = all
-          .map((r) => {
-            const ps = payStatus(r);
-            const fish =
-              (r.fishRows || []).map((x) => x.type).join(", ") ||
-              r.type ||
-              "Fish";
-            return `<div class="itr" onclick="openItem(${r.id})"><div><div class="itr-name">${r.name}</div><div class="itr-meta">${fish} · ${timeAgo(r._date)}</div><div class="itr-meta"><span class="pill ${r.status}">${statusLabel(r.status)}</span>${ps ? ' <span class="pill ' + ps + '">' + payLabel(r) + "</span>" : ""}</div></div><div class="itr-right"><div class="itr-amt">${fmt(r.total)}</div></div></div>`;
+          .map((e) => {
+            const r = e.rec;
+            if (e.kind === "service") {
+              const ps2 = payStatus(r);
+              const fish = (r.fishRows || []).map((x) => x.type).join(", ") || r.type || "Fish";
+              return `<div class="itr" onclick="openItem(${r.id})"><div><div class="itr-name">${esc(r.name)}</div><div class="itr-meta">Drying · ${esc(fish)} · ${timeAgo(e.d)}</div><div class="itr-meta"><span class="pill ${r.status}">${statusLabel(r.status)}</span>${ps2 ? ' <span class="pill ' + ps2 + '">' + payLabel(r) + "</span>" : ""}</div></div><div class="itr-right"><div class="itr-amt">${fmt(r.total)}</div></div></div>`;
+            }
+            const st = tradeStatus(r);
+            return `<div class="itr" onclick="openTradeDetail('${e.kind}',${r.id})"><div><div class="itr-name">${esc(r.name)}</div><div class="itr-meta">${KINDS[e.kind].word} · ${esc(tradeSummary(e.kind, r))} · ${timeAgo(e.d)}</div><div class="itr-meta"><span class="pill ${st}">${tradeStatusLabel(st)}</span></div></div><div class="itr-right"><div class="itr-amt">${fmt(r.total)}</div></div></div>`;
           })
           .join("");
       }
@@ -2973,6 +3101,897 @@
           .forEach((t) => t.classList.remove("active"));
         btn.classList.add("active");
         renderInventory(f);
+      }
+
+      // ═══════════════════════════════════════════════════════════════════
+      // v5 — SALES, PURCHASES, PEOPLE & DEBTS
+      // One "person" can be a drying customer, a buyer of fish and a fish
+      // supplier at the same time. People are matched by phone number first,
+      // then by name, so one running balance can be netted off.
+      // ═══════════════════════════════════════════════════════════════════
+      const TRADE_PRODUCTS = {
+        catfish: { type: "Catfish", unit: "kg" },
+        kpomo: { type: "Kpomo", unit: "pc" },
+      };
+      const isKpomo = (l) => l.unit === "pc" || l.type === "Kpomo";
+      const lineQty = (l) => (isKpomo(l) ? (l.qty != null ? l.qty : l.kg) : l.kg);
+      const qtyText = (l) => {
+        if (!isKpomo(l)) return fmtKg(l.kg);
+        const q = +lineQty(l);
+        return q + (q === 1 ? " piece" : " pieces");
+      };
+      const unitText = (l) => (isKpomo(l) ? "piece" : "kg");
+      const KINDS = {
+        sale: { list: "sales", word: "Sale", who: "Customer" },
+        purchase: { list: "purchases", word: "Purchase", who: "Supplier" },
+      };
+      const cap1 = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+      const phoneKey = (p) => {
+        const d = String(p || "").replace(/\D/g, "");
+        return d.length >= 10 ? d.slice(-10) : d;
+      };
+      const nameKey = (n) => String(n || "").toLowerCase().replace(/\s+/g, " ").trim();
+      const titleCase = (s) => clean(s).replace(/(^|\s)\S/g, (c) => c.toUpperCase());
+      const methodLabel = (m) => ({ cash: "Cash", transfer: "Transfer", setoff: "Set off" })[m] || "";
+
+      function getRec(kind, id) {
+        const list = kind === "sale" ? state.sales : kind === "purchase" ? state.purchases : state.items;
+        return list.find((x) => x.id == id);
+      }
+      // how much is still outstanding on a record
+      function owing(kind, r) {
+        if (kind === "service") return r.status === "collected" && !r.settledShort ? balance(r) : 0;
+        return r.settledShort ? 0 : balance(r);
+      }
+      function tradeStatus(r) {
+        const p = totalPaid(r);
+        if (r.settledShort || p >= r.total) return "paid";
+        return p <= 0 ? "debt" : "partial";
+      }
+      const tradeStatusLabel = (s) => ({ paid: "Paid", partial: "Part paid", debt: "Unpaid" })[s] || "";
+      function lineName(l) {
+        return l.type === "Other" ? l.custom || "Fish" : l.type || "Fish";
+      }
+      function lineLabel(kind, l) {
+        const f = kind === "sale" && l.form && !isKpomo(l) ? (l.form === "dried" ? "Dried " : "Fresh ") : "";
+        return f + lineName(l);
+      }
+      function tradeSummary(kind, r) {
+        if (r.legacy) return "Old balance (before the app)";
+        return (r.lines || []).map((l) => lineLabel(kind, l) + " " + qtyText(l)).join(", ");
+      }
+      const recDate = (r) => r.date || r.createdAt;
+
+      function ledgerEntries() {
+        const out = [];
+        state.items.forEach((r) =>
+          out.push({ kind: "service", rec: r, dir: 1, date: r.createdAt, total: r.total, owing: owing("service", r) }),
+        );
+        state.sales.forEach((r) =>
+          out.push({ kind: "sale", rec: r, dir: 1, date: recDate(r), total: r.total, owing: owing("sale", r) }),
+        );
+        state.purchases.forEach((r) =>
+          out.push({ kind: "purchase", rec: r, dir: -1, date: recDate(r), total: r.total, owing: owing("purchase", r) }),
+        );
+        return out;
+      }
+
+      function buildPeople() {
+        const people = [], byPhone = {}, byName = {};
+        const entries = ledgerEntries().sort((a, b) => new Date(a.date) - new Date(b.date));
+        entries.forEach((e) => {
+          const nm = e.rec.name || "", pk = phoneKey(e.rec.phone), nk = nameKey(nm);
+          let p = pk ? byPhone[pk] : null;
+          if (!p && nk && byName[nk]) {
+            const c = byName[nk];
+            // same name but a different phone number = most likely a different person
+            if (!pk || !c.phoneKeys.size || c.phoneKeys.has(pk)) p = c;
+          }
+          if (!p) {
+            p = { name: nm, phone: "", phoneKeys: new Set(), nameKeys: new Set(), entries: [], owedToMe: 0, iOwe: 0, biz: 0 };
+            people.push(p);
+          }
+          if (pk) { p.phoneKeys.add(pk); byPhone[pk] = p; }
+          if (nk) { p.nameKeys.add(nk); if (!byName[nk]) byName[nk] = p; }
+          if (nm) p.name = nm;
+          if (e.rec.phone) p.phone = e.rec.phone;
+          p.entries.push(e);
+          if (e.dir > 0) p.owedToMe += e.owing; else p.iOwe += e.owing;
+          p.biz += e.total;
+        });
+        people.forEach((p) => {
+          p.net = p.owedToMe - p.iOwe;
+          p.key = p.phoneKeys.size ? [...p.phoneKeys][0] : [...p.nameKeys][0] || "";
+          p.entries.reverse(); // newest first
+        });
+        return people;
+      }
+      function findPerson(key) {
+        const k = String(key || "");
+        const ps = buildPeople();
+        return ps.find((p) => p.phoneKeys.has(k)) || ps.find((p) => p.nameKeys.has(k) || p.nameKeys.has(nameKey(k)));
+      }
+      function seedPeopleRecords() {
+        return state.items.concat(state.sales, state.purchases);
+      }
+      function daysAgoText(iso) {
+        const d = Math.floor((Date.now() - new Date(iso)) / 86400000);
+        return d <= 0 ? "today" : d === 1 ? "1 day ago" : d + " days ago";
+      }
+
+      // ─── PAYMENTS (record-level and person-level) ───────────────────────
+      function addPayment(rec, amount, method, note, when) {
+        if (!Array.isArray(rec.payments)) rec.payments = [];
+        rec.payments.push({ id: newId(), amount, date: when || new Date().toISOString(), method, note: note || "" });
+        rec.editedAt = new Date().toISOString();
+      }
+      // pays the oldest debts first; returns whatever could not be applied
+      function applyPayment(person, dir, amount, method, note) {
+        let left = amount;
+        person.entries
+          .filter((e) => e.dir === dir && e.owing > 0)
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .forEach((e) => {
+            if (left <= 0) return;
+            const pay = Math.min(left, e.owing);
+            addPayment(e.rec, pay, method, note);
+            left -= pay;
+          });
+        return left;
+      }
+      function openPersonPay(key, dir) {
+        const p = findPerson(key);
+        if (!p) return;
+        const owed = dir > 0 ? p.owedToMe : p.iOwe;
+        if (owed <= 0) return;
+        document.getElementById("pay-body").innerHTML = `
+    <button class="mclose" onclick="closePayModal()">Close</button>
+    <div class="mtitle">${dir > 0 ? "Payment from" : "Payment to"} ${esc(p.name)}</div>
+    <div class="msub">${dir > 0 ? "They owe you" : "You owe them"} <strong>${fmt(owed)}</strong>. It is applied to the oldest debts first.</div>
+    <div class="fg"><label class="fl">Amount (₦) *</label><input class="fi" id="pp-amt" type="number" min="0" inputmode="numeric" value="${owed}"></div>
+    <div class="fg"><label class="fl">Paid by</label><select class="fi" id="pp-method"><option value="cash">Cash</option><option value="transfer">Transfer</option></select></div>
+    <div class="fg"><label class="fl">Note (optional)</label><input class="fi" id="pp-note" type="text" placeholder="e.g. balance for last week"></div>
+    <button class="btn primary" onclick="savePersonPay('${jss(p.key)}',${dir})">Save payment</button>`;
+        document.getElementById("pay-mbg").classList.add("open");
+      }
+      function savePersonPay(key, dir) {
+        const p = findPerson(key);
+        if (!p) return;
+        const owed = dir > 0 ? p.owedToMe : p.iOwe;
+        const amt = parseFloat(document.getElementById("pp-amt").value) || 0;
+        if (amt <= 0) return showToast("Enter the amount");
+        if (amt > owed) return showToast("That is more than the " + fmt(owed) + " outstanding");
+        applyPayment(p, dir, amt, document.getElementById("pp-method").value, clean(document.getElementById("pp-note").value));
+        lsave();
+        scheduleSync();
+        closePayModal();
+        showToast("✓ " + fmt(amt) + " recorded");
+        afterMoneyChange();
+      }
+      function afterMoneyChange() {
+        const cm = document.getElementById("cust-mbg");
+        if (cm && cm.classList.contains("open") && window._personKey) openPerson(window._personKey);
+        refreshCurrentScreen();
+      }
+      function confirmSetOff(key) {
+        const p = findPerson(key);
+        if (!p) return;
+        const amt = Math.min(p.owedToMe, p.iOwe);
+        if (amt <= 0) return;
+        const left = p.owedToMe - p.iOwe;
+        document.getElementById("cfm-title").textContent = "Set off " + fmt(amt) + "?";
+        document.getElementById("cfm-msg").textContent =
+          `${p.name} owes you ${fmt(p.owedToMe)} and you owe them ${fmt(p.iOwe)}. This cancels ${fmt(amt)} on both sides. ` +
+          (left > 0 ? `After this they still owe you ${fmt(left)}.` : left < 0 ? `After this you still owe them ${fmt(-left)}.` : "After this nothing is owed either way.");
+        document.getElementById("cfm-ok").textContent = "Set off";
+        document.getElementById("cfm-ok").onclick = () => {
+          const fresh = findPerson(key);
+          if (!fresh) return closeCfm();
+          const a = Math.min(fresh.owedToMe, fresh.iOwe);
+          applyPayment(fresh, 1, a, "setoff", "Set off against what you owe them");
+          applyPayment(fresh, -1, a, "setoff", "Set off against what they owe you");
+          lsave();
+          scheduleSync();
+          closeCfm();
+          showToast("✓ " + fmt(a) + " set off");
+          afterMoneyChange();
+        };
+        document.getElementById("cfm").classList.add("open");
+      }
+      function whatsappPersonDebt(key) {
+        const p = findPerson(key);
+        if (!p || !p.phone) return;
+        const cp = p.phone.replace(/\D/g, "").replace(/^0/, "234");
+        const msg = `Hello ${p.name}, this is a friendly reminder that you have an outstanding balance of ${fmt(p.owedToMe)} at Mummy J's Fish Store. Kindly settle at your earliest convenience. Thank you!`;
+        window.open(`https://wa.me/${cp}?text=${encodeURIComponent(msg)}`, "_blank");
+      }
+
+      // generic single-record payment (drying job, sale or purchase)
+      function openPayModal(id, kind = "service") {
+        const i = getRec(kind, id);
+        if (!i) return;
+        const bal = balance(i), paid = totalPaid(i), isBuy = kind === "purchase";
+        document.getElementById("pay-body").innerHTML = `
+    <button class="mclose" onclick="closePayModal()">Close</button>
+    <div class="mtitle">${isBuy ? "Record payment to supplier" : "Record payment"}</div><div class="msub">${esc(i.name)} — ${fmt(i.total)} total</div>
+    <table class="dtbl" style="margin-bottom:11px">
+      ${paid > 0 ? `<tr><td class="dl">Already paid</td><td class="dv" style="color:var(--green)">${fmt(paid)}</td></tr>` : ""}
+      <tr><td class="dl" style="font-weight:600">Balance ${isBuy ? "you owe" : "owed"}</td><td class="dv" style="font-weight:700;color:var(--red)">${fmt(bal)}</td></tr>
+    </table>
+    <div class="fg"><label class="fl">${isBuy ? "Amount you paid (₦) *" : "Amount received (₦) *"}</label><input class="fi" id="pay-amt" type="number" placeholder="0" min="0" inputmode="numeric" value="${bal}" oninput="updatePayPreview(${i.id},'${kind}')"></div>
+    <div class="fg"><label class="fl">Paid by</label><select class="fi" id="pay-method"><option value="cash">Cash</option><option value="transfer">Transfer</option></select></div>
+    <div class="fg"><label class="fl">Note (optional)</label><input class="fi" id="pay-note" type="text" placeholder="e.g. half payment, balance Friday..."></div>
+    <div id="pay-preview" style="margin-bottom:11px"></div>
+    <button class="btn primary" onclick="recordPayment(${i.id},false,'${kind}')" style="margin-bottom:8px">Save payment</button>
+    <button class="btn" id="settle-btn" onclick="recordPayment(${i.id},true,'${kind}')" style="display:none;margin-bottom:8px;border-color:var(--green);color:var(--green)">Save &amp; mark fully settled</button>`;
+        document.getElementById("pay-mbg").classList.add("open");
+        updatePayPreview(id, kind);
+      }
+      function updatePayPreview(id, kind = "service") {
+        const i = getRec(kind, id);
+        if (!i) return;
+        const amt = parseFloat(document.getElementById("pay-amt")?.value) || 0;
+        const bal = balance(i);
+        const sb = document.getElementById("settle-btn");
+        let html = "";
+        if (amt > 0) {
+          if (amt >= bal) {
+            html = `<div class="bal-box clear"><span style="font-size:12px;font-weight:600;color:var(--green)">Fully paid ✓</span><span style="font-size:14px;font-weight:700;color:var(--green)">No balance</span></div>`;
+            if (sb) sb.style.display = "none";
+          } else {
+            html = `<div class="bal-box"><span style="font-size:12px;font-weight:600;color:var(--red)">Remaining balance</span><span style="font-size:14px;font-weight:700;color:var(--red)">${fmt(bal - amt)}</span></div>`;
+            if (sb) sb.style.display = "";
+          }
+        }
+        document.getElementById("pay-preview").innerHTML = html;
+      }
+      function recordPayment(id, settle, kind = "service") {
+        const i = getRec(kind, id);
+        if (!i) return;
+        const amt = parseFloat(document.getElementById("pay-amt")?.value) || 0;
+        const note = clean(document.getElementById("pay-note")?.value);
+        if (amt <= 0) return showToast("Enter the amount");
+        addPayment(i, amt, document.getElementById("pay-method")?.value || "cash", note);
+        if (settle) i.settledShort = true;
+        lsave();
+        scheduleSync();
+        closePayModal();
+        closeModal();
+        showToast(settle ? "✓ Record settled" : "✓ Payment of " + fmt(amt) + " recorded");
+        afterMoneyChange();
+      }
+
+      // ─── ENTRY FORM (sale / purchase / old debt) ─────────────────────────
+      let trade = null;
+      const newTradeLine = (kind, product = "catfish") => ({
+        product, form: kind === "sale" && product === "catfish" ? "dried" : "",
+        qty: "", price: "", amt: "", driver: "qty", legacyType: "",
+      });
+      function tradeDefaultPrice(kind, l) {
+        const d = state.shop.tradeDefaults || {};
+        return d[kind + "|" + (l.form || "") + "|" + TRADE_PRODUCTS[l.product].type] || "";
+      }
+      function lineTotal(l) {
+        const q = parseFloat(l.qty) || 0, p = parseFloat(l.price) || 0;
+        if (l.product === "catfish" && l.driver === "amt" && parseFloat(l.amt)) return Math.round(parseFloat(l.amt));
+        return Math.round(q * p);
+      }
+      function openTradeForm(kind, opts = {}) {
+        trade = {
+          kind, editId: null, legacy: !!opts.legacy, name: opts.name || "", phone: opts.phone || "",
+          date: todayStr(), lines: [newTradeLine(kind)], discount: "", notes: "",
+          payMode: "full", payAmt: "", method: "cash", legacyAmt: "",
+        };
+        if (opts.editId) {
+          const r = getRec(kind, opts.editId);
+          if (r) {
+            trade.editId = r.id;
+            trade.legacy = !!r.legacy;
+            trade.name = r.name;
+            trade.phone = r.phone || "";
+            trade.date = todayStr(recDate(r));
+            trade.lines = r.legacy || !(r.lines || []).length ? [newTradeLine(kind)] : r.lines.map((l) =>
+              isKpomo(l)
+                ? { product: "kpomo", form: "", qty: lineQty(l), price: l.price, amt: l.total, driver: "qty", legacyType: "" }
+                : { product: "catfish", form: l.form || "", qty: l.kg, price: l.price, amt: l.total, driver: "amt", legacyType: l.type && l.type !== "Catfish" ? l.type : "" });
+            trade.discount = r.discount || "";
+            trade.notes = r.notes || "";
+            trade.legacyAmt = r.legacy ? r.total : "";
+          }
+        } else if (!trade.legacy) {
+          trade.lines[0].price = tradeDefaultPrice(kind, trade.lines[0]);
+        }
+        closeModal(); closeCustModal(); closeMore();
+        showScreen("trade");
+      }
+      function syncTradeFromDOM() {
+        if (!trade) return;
+        const g = (id) => document.getElementById(id);
+        const set = (k, id) => { if (g(id)) trade[k] = g(id).value; };
+        set("name", "tr-name"); set("phone", "tr-phone"); set("date", "tr-date");
+        set("discount", "tr-disc"); set("notes", "tr-notes"); set("legacyAmt", "tr-legacy"); set("payAmt", "tr-payamt");
+        trade.lines.forEach((l, i) => {
+          if (g("tr-qty-" + i)) l.qty = g("tr-qty-" + i).value;
+          if (g("tr-price-" + i)) l.price = g("tr-price-" + i).value;
+          if (g("tr-amt-" + i)) l.amt = g("tr-amt-" + i).value;
+        });
+      }
+      function tradeTotals() {
+        syncTradeFromDOM();
+        let sub = 0;
+        trade.lines.forEach((l) => { sub += lineTotal(l); });
+        const disc = parseFloat(trade.discount) || 0;
+        return { sub, disc, total: Math.max(0, sub - disc) };
+      }
+      function calcTrade() {
+        if (!trade) return;
+        const t = tradeTotals();
+        const tt = document.getElementById("tr-total");
+        if (tt) tt.textContent = fmt(t.total);
+      }
+      // quantity, price and amount are linked: type any two and the third follows
+      function lineEls(i) {
+        const g = (id) => document.getElementById(id);
+        return { q: g("tr-qty-" + i), p: g("tr-price-" + i), a: g("tr-amt-" + i), n: g("tr-note-" + i) };
+      }
+      function onTradeQty(i) {
+        const l = trade.lines[i], e = lineEls(i);
+        l.driver = "qty";
+        const q = parseFloat(e.q.value) || 0, p = parseFloat(e.p.value) || 0;
+        e.a.value = q && p ? Math.round(q * p) : "";
+        if (e.n) e.n.textContent = "";
+        calcTrade();
+      }
+      function onTradePrice(i) {
+        const l = trade.lines[i], e = lineEls(i);
+        const p = parseFloat(e.p.value) || 0;
+        if (l.driver === "amt" && parseFloat(e.a.value) && p) {
+          const q = parseFloat(e.a.value) / p;
+          e.q.value = l.product === "kpomo" ? Math.floor(q + 1e-9) : +q.toFixed(3);
+        } else {
+          const q = parseFloat(e.q.value) || 0;
+          e.a.value = q && p ? Math.round(q * p) : "";
+        }
+        calcTrade();
+      }
+      function onTradeAmt(i) {
+        const l = trade.lines[i], e = lineEls(i);
+        l.driver = "amt";
+        const a = parseFloat(e.a.value) || 0, p = parseFloat(e.p.value) || 0;
+        if (!(a && p)) { e.q.value = ""; if (e.n) e.n.textContent = ""; calcTrade(); return; }
+        const q = a / p;
+        if (l.product === "kpomo") {
+          const w = Math.floor(q + 1e-9);
+          e.q.value = w;
+          if (e.n) e.n.textContent = w * p === a ? "" : `${fmt(a)} is not a whole number of pieces — ${w} piece${w === 1 ? "" : "s"} = ${fmt(w * p)}`;
+          l.driver = "qty";
+        } else {
+          e.q.value = +q.toFixed(3);
+          if (e.n) e.n.textContent = "";
+        }
+        calcTrade();
+      }
+      function setTradeProduct(i, prod) {
+        syncTradeFromDOM();
+        const l = trade.lines[i];
+        l.product = prod;
+        l.form = trade.kind === "sale" && prod === "catfish" ? l.form || "dried" : "";
+        l.qty = ""; l.amt = ""; l.driver = "qty";
+        l.price = tradeDefaultPrice(trade.kind, l);
+        renderTradeForm();
+      }
+      function setTradeForm(i, f) {
+        syncTradeFromDOM();
+        const l = trade.lines[i];
+        l.form = f;
+        const d = tradeDefaultPrice(trade.kind, l);
+        if (d) l.price = d;
+        const q = parseFloat(l.qty) || 0, p = parseFloat(l.price) || 0;
+        if (q && p) l.amt = Math.round(q * p);
+        l.driver = "qty";
+        renderTradeForm();
+      }
+      function addTradeLine() {
+        syncTradeFromDOM();
+        const l = newTradeLine(trade.kind, "kpomo");
+        l.price = tradeDefaultPrice(trade.kind, l);
+        trade.lines.push(l);
+        renderTradeForm();
+      }
+      function removeTradeLine(i) { syncTradeFromDOM(); trade.lines.splice(i, 1); renderTradeForm(); }
+      function setPayMode(m) { syncTradeFromDOM(); trade.payMode = m; renderTradeForm(); }
+      function setPayMethod(m) { syncTradeFromDOM(); trade.method = m; renderTradeForm(); }
+      function tradeNameChanged() {
+        const v = document.getElementById("tr-name").value;
+        const k = nameKey(v);
+        const p = k && buildPeople().find((x) => x.nameKeys.has(k));
+        const ph = document.getElementById("tr-phone");
+        if (p && p.phone && ph && !ph.value) ph.value = p.phone;
+      }
+      function cancelTrade() {
+        const k = trade ? trade.kind : "sale";
+        trade = null;
+        showScreen(KINDS[k].list);
+      }
+
+      function renderTradeForm() {
+        const el = document.getElementById("trade-content");
+        if (!el) return;
+        if (!trade) { el.innerHTML = ""; return; }
+        const t = trade, isSale = t.kind === "sale", K = KINDS[t.kind];
+        const people = buildPeople();
+        let title;
+        if (t.legacy) title = (t.editId ? "Edit old debt" : isSale ? "Old debt — they owe you" : "Old debt — you owe them");
+        else title = (t.editId ? "Edit " : "New ") + K.word.toLowerCase();
+        let h = `<div class="card"><div class="card-title">${title}</div>
+  <div class="fg"><label class="fl">${K.who} name *</label><input class="fi" id="tr-name" list="tr-people" type="text" autocomplete="off" placeholder="Start typing to pick someone saved" value="${esc(t.name)}" oninput="tradeNameChanged()"><datalist id="tr-people">${people.map((p) => `<option value="${esc(p.name)}"></option>`).join("")}</datalist></div>
+  <div class="r2"><div class="fg"><label class="fl">Phone</label><input class="fi" id="tr-phone" type="tel" inputmode="tel" placeholder="080..." value="${esc(t.phone)}"></div>
+  <div class="fg"><label class="fl">${t.legacy ? "Date it started" : "Date"}</label><input class="fi" id="tr-date" type="date" value="${esc(t.date)}"></div></div>`;
+        if (t.legacy) {
+          h += `<div class="fg"><label class="fl">Amount still owed (₦) *</label><input class="fi" id="tr-legacy" type="number" min="0" inputmode="numeric" placeholder="0" value="${esc(t.legacyAmt)}"></div>`;
+        } else {
+          t.lines.forEach((l, i) => {
+            const kp = l.product === "kpomo";
+            h += `<div style="background:var(--surf2);border-radius:var(--rsm);padding:10px;margin-bottom:8px">`;
+            h += `<div class="tabs" style="margin-bottom:8px"><button class="tab ${!kp ? "active" : ""}" onclick="setTradeProduct(${i},'catfish')">Catfish</button><button class="tab ${kp ? "active" : ""}" onclick="setTradeProduct(${i},'kpomo')">Kpomo</button></div>`;
+            if (isSale && !kp)
+              h += `<div class="tabs" style="margin-bottom:8px"><button class="tab ${l.form === "dried" ? "active" : ""}" onclick="setTradeForm(${i},'dried')">Dried</button><button class="tab ${l.form === "fresh" ? "active" : ""}" onclick="setTradeForm(${i},'fresh')">Fresh</button></div>`;
+            h += `<div class="r2"><div class="fg"><label class="fl">${kp ? "Pieces" : "Weight (kg)"}</label><input class="fi" id="tr-qty-${i}" type="number" step="${kp ? 1 : 0.1}" min="0" inputmode="${kp ? "numeric" : "decimal"}" placeholder="0" value="${esc(l.qty)}" oninput="onTradeQty(${i})"></div>
+  <div class="fg"><label class="fl">${kp ? "Price per piece (₦)" : "Price per kg (₦)"}</label><input class="fi" id="tr-price-${i}" type="number" min="0" inputmode="numeric" placeholder="0" value="${esc(l.price)}" oninput="onTradePrice(${i})"></div></div>
+  <div class="fg"><label class="fl">Amount (₦)</label><input class="fi" id="tr-amt-${i}" type="number" min="0" inputmode="numeric" placeholder="or type the amount and ${kp ? "pieces" : "kg"} fills in" value="${esc(l.amt)}" oninput="onTradeAmt(${i})"></div>
+  <div class="itr-meta" id="tr-note-${i}" style="color:var(--amber)"></div>
+  ${t.lines.length > 1 ? `<div style="text-align:right;margin-top:4px"><button class="btn sm danger" onclick="removeTradeLine(${i})">Remove</button></div>` : ""}</div>`;
+          });
+          h += `<button class="btn" style="margin-bottom:10px" onclick="addTradeLine()">+ Add another item</button>
+  <div class="fg"><label class="fl">Discount (₦, optional)</label><input class="fi" id="tr-disc" type="number" min="0" inputmode="numeric" placeholder="0" value="${esc(t.discount)}" oninput="calcTrade()"></div>
+  <div class="bal-box clear" style="margin-bottom:12px"><span style="font-size:13px;font-weight:600">Total</span><span id="tr-total" style="font-size:18px;font-weight:700;color:var(--teal)">₦0</span></div>`;
+          if (!t.editId) {
+            h += `<div class="slabel">${isSale ? "Payment received" : "Payment made"}</div>
+  <div class="tabs"><button class="tab ${t.payMode === "full" ? "active" : ""}" onclick="setPayMode('full')">Paid in full</button><button class="tab ${t.payMode === "part" ? "active" : ""}" onclick="setPayMode('part')">Part payment</button><button class="tab ${t.payMode === "credit" ? "active" : ""}" onclick="setPayMode('credit')">On credit</button></div>`;
+            if (t.payMode === "part") h += `<div class="fg"><label class="fl">Amount paid now (₦)</label><input class="fi" id="tr-payamt" type="number" min="0" inputmode="numeric" placeholder="0" value="${esc(t.payAmt)}"></div>`;
+            if (t.payMode !== "credit")
+              h += `<div class="tabs"><button class="tab ${t.method === "cash" ? "active" : ""}" onclick="setPayMethod('cash')">Cash</button><button class="tab ${t.method === "transfer" ? "active" : ""}" onclick="setPayMethod('transfer')">Transfer</button></div>`;
+          } else h += `<div class="itr-meta" style="margin-bottom:10px">Payments are added from the record itself, not here.</div>`;
+        }
+        h += `<div class="fg"><label class="fl">Notes (optional)</label><input class="fi" id="tr-notes" type="text" placeholder="Any detail worth remembering" value="${esc(t.notes)}"></div>
+  <button class="btn primary" onclick="saveTrade()">Save ${t.legacy ? "old debt" : K.word.toLowerCase()}</button>
+  <button class="btn" style="margin-top:8px" onclick="cancelTrade()">Cancel</button></div>`;
+        el.innerHTML = h;
+        calcTrade();
+      }
+
+      function saveTrade() {
+        if (!trade) return;
+        syncTradeFromDOM();
+        const t = trade, kind = t.kind, K = KINDS[kind];
+        const name = titleCase(t.name), phone = clean(t.phone), notes = clean(t.notes);
+        if (!name) return showToast("Enter the " + K.who.toLowerCase() + "'s name");
+        let lines = [], total = 0, disc = 0;
+        if (t.legacy) {
+          total = parseFloat(t.legacyAmt) || 0;
+          if (total <= 0) return showToast("Enter the amount owed");
+        } else {
+          for (const l of t.lines) {
+            const q = parseFloat(l.qty) || 0, pr = parseFloat(l.price) || 0;
+            if (!q && !pr) continue;
+            if (!q || !pr) return showToast("Each item needs the quantity and the price");
+            if (l.product === "kpomo" && q % 1 !== 0) return showToast("Kpomo is counted in whole pieces");
+            const tot = lineTotal(l);
+            lines.push(l.product === "kpomo"
+              ? { type: "Kpomo", unit: "pc", qty: q, price: pr, total: tot, form: "" }
+              : { form: kind === "sale" ? l.form || "dried" : "", type: l.legacyType || "Catfish", custom: "", kg: q, price: pr, total: tot });
+          }
+          if (!lines.length) return showToast("Add the quantity and price");
+          const sub = lines.reduce((a, l) => a + l.total, 0);
+          disc = parseFloat(t.discount) || 0;
+          if (disc > sub) return showToast("Discount is bigger than the total");
+          total = sub - disc;
+          // selling more kpomo than is in stock: allowed, but ask first
+          if (kind === "sale" && !window._forceSale) {
+            const need = lines.filter(isKpomo).reduce((a, l) => a + l.qty, 0);
+            if (need) {
+              let avail = kpomoStats().stock;
+              if (t.editId) ((getRec(kind, t.editId) || {}).lines || []).forEach((l) => { if (isKpomo(l)) avail += lineQty(l); });
+              if (need > avail) {
+                document.getElementById("cfm-title").textContent = "Not enough kpomo in stock";
+                document.getElementById("cfm-msg").textContent = `You are selling ${need} pieces but only ${Math.max(0, avail)} are in stock. This can happen if a purchase has not been recorded yet. Save anyway?`;
+                document.getElementById("cfm-ok").textContent = "Save anyway";
+                document.getElementById("cfm-ok").onclick = () => {
+                  closeCfm();
+                  window._forceSale = true;
+                  try { saveTrade(); } finally { window._forceSale = false; }
+                };
+                document.getElementById("cfm").classList.add("open");
+                return;
+              }
+            }
+          }
+        }
+        const dateISO = t.date === todayStr() ? new Date().toISOString() : dateToISO(t.date);
+        let rec;
+        if (t.editId) {
+          rec = getRec(kind, t.editId);
+          if (!rec) return;
+          Object.assign(rec, { name, phone, lines, discount: disc, total, notes, date: dateISO, editedAt: new Date().toISOString() });
+        } else {
+          rec = { id: newId(), name, phone, date: dateISO, createdAt: new Date().toISOString(), lines, discount: disc, total, notes, payments: [], addedBy: userName };
+          if (t.legacy) rec.legacy = true;
+          if (!t.legacy) {
+            let paid = 0;
+            if (t.payMode === "full") paid = total;
+            else if (t.payMode === "part") {
+              paid = parseFloat(t.payAmt) || 0;
+              if (paid <= 0 || paid >= total) return showToast("Part payment must be more than 0 and less than the total");
+            }
+            if (paid > 0) addPayment(rec, paid, t.method, "", dateISO);
+            delete rec.editedAt;
+          }
+          (kind === "sale" ? state.sales : state.purchases).unshift(rec);
+        }
+        if (!state.shop.tradeDefaults) state.shop.tradeDefaults = {};
+        lines.forEach((l) => { state.shop.tradeDefaults[kind + "|" + (l.form || "") + "|" + (isKpomo(l) ? "Kpomo" : l.type)] = l.price; });
+        if (lines.length) state.shop.settingsAt = new Date().toISOString();
+        lsave();
+        scheduleSync();
+        trade = null;
+        showToast("✓ " + (t.legacy ? "Old debt" : K.word) + " saved");
+        showScreen(K.list);
+        setTimeout(() => openTradeDetail(kind, rec.id), 150);
+      }
+
+      // ─── LIST SCREENS ───────────────────────────────────────────────────
+      const tradeFilter = { sale: "all", purchase: "all" };
+      const tradeQuery = { sale: "", purchase: "" };
+      function renderSales() { renderTradeList("sale"); }
+      function renderPurchases() { renderTradeList("purchase"); }
+      function setTradeFilter(kind, f) { tradeFilter[kind] = f; renderTradeList(kind); }
+      function setTradeQuery(kind, q) { tradeQuery[kind] = q; renderTradeBody(kind); }
+      function renderTradeList(kind) {
+        const el = document.getElementById("screen-" + KINDS[kind].list);
+        if (!el) return;
+        const isSale = kind === "sale";
+        const list = isSale ? state.sales : state.purchases;
+        const ms = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        const month = list.filter((r) => !r.legacy && new Date(recDate(r)) >= ms).reduce((a, r) => a + r.total, 0);
+        const owed = list.reduce((a, r) => a + owing(kind, r), 0);
+        const tab = (f, l) => `<button class="tab ${tradeFilter[kind] === f ? "active" : ""}" onclick="setTradeFilter('${kind}','${f}')">${l}</button>`;
+        el.innerHTML = `<div class="sgrid"><div class="stat"><div class="stat-label">${isSale ? "Sold" : "Bought"} this month</div><div class="stat-val ct">${fmt(month)}</div></div><div class="stat"><div class="stat-label">${isSale ? "Customers owe" : "You owe suppliers"}</div><div class="stat-val cr">${fmt(owed)}</div></div></div>
+  ${kpomoCardHTML()}
+  <div class="r2" style="margin-bottom:11px"><button class="btn primary" onclick="openTradeForm('${kind}')">+ New ${KINDS[kind].word.toLowerCase()}</button><button class="btn" onclick="openTradeForm('${kind}',{legacy:true})">+ Old debt</button></div>
+  <div class="search-wrap"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input class="search-input" type="text" placeholder="Search by name..." value="${esc(tradeQuery[kind])}" oninput="setTradeQuery('${kind}',this.value)"></div>
+  <div class="tabs">${tab("all", "All")}${tab("unpaid", "Unpaid / part")}${tab("paid", "Paid")}</div><div id="tl-body-${kind}"></div>`;
+        renderTradeBody(kind);
+      }
+      function renderTradeBody(kind) {
+        const el = document.getElementById("tl-body-" + kind);
+        if (!el) return;
+        const isSale = kind === "sale", q = nameKey(tradeQuery[kind]);
+        let list = (isSale ? state.sales : state.purchases).slice().sort((a, b) => new Date(recDate(b)) - new Date(recDate(a)));
+        if (q) list = list.filter((r) => nameKey(r.name).includes(q) || String(r.phone || "").includes(q));
+        if (tradeFilter[kind] === "unpaid") list = list.filter((r) => owing(kind, r) > 0);
+        if (tradeFilter[kind] === "paid") list = list.filter((r) => owing(kind, r) <= 0);
+        if (!list.length) {
+          el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg><p>Nothing here yet</p></div>`;
+          return;
+        }
+        el.innerHTML = list.slice(0, 200).map((r) => {
+          const st = tradeStatus(r), bal = owing(kind, r);
+          return `<div class="card" style="cursor:pointer;margin-bottom:8px" onclick="openTradeDetail('${kind}',${r.id})"><div style="display:flex;justify-content:space-between;gap:10px"><div style="flex:1;min-width:0"><div class="itr-name">${esc(r.name)}</div><div class="itr-meta">${esc(tradeSummary(kind, r))}</div><div class="itr-meta">${shortDate(recDate(r))}</div><div style="margin-top:5px">${r.legacy ? '<span class="pill collected">Old debt</span> ' : ""}<span class="pill ${st}">${tradeStatusLabel(st)}</span></div></div><div style="text-align:right;flex-shrink:0"><div class="itr-amt">${fmt(r.total)}</div>${bal > 0 ? `<div class="itr-meta" style="color:var(--red)">Bal: ${fmt(bal)}</div>` : ""}</div></div></div>`;
+        }).join("");
+      }
+
+      // ─── DETAIL MODAL ───────────────────────────────────────────────────
+      const WA_ICON = `<svg viewBox="0 0 24 24" style="fill:none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>`;
+      function openTradeDetail(kind, id) {
+        const r = getRec(kind, id);
+        if (!r) return;
+        const isSale = kind === "sale", st = tradeStatus(r), bal = owing(kind, r), paid = totalPaid(r);
+        const clear = bal <= 0;
+        document.getElementById("modal-body").innerHTML = `
+    <button class="mclose" onclick="closeModal()">Close</button>
+    <div class="mtitle">${esc(r.name)}</div>
+    <div class="msub">${KINDS[kind].word}${r.legacy ? " · Old debt" : ""} · <span class="pill ${st}">${tradeStatusLabel(st)}</span></div>
+    ${(r.lines || []).length ? `<div class="slabel">Fish</div>${r.lines.map((l) => `<div style="background:var(--surf2);border-radius:var(--rsm);padding:8px 11px;margin-bottom:6px;font-size:13px;display:flex;justify-content:space-between"><div><div style="font-weight:600">${esc(lineLabel(kind, l))}</div><div class="itr-meta">${qtyText(l)} × ${fmt(l.price)}/${unitText(l)}</div></div><div style="font-weight:600">${fmt(l.total)}</div></div>`).join("")}` : ""}
+    <table class="dtbl">
+      ${r.discount ? `<tr><td class="dl">Discount</td><td class="dv" style="color:var(--red)">- ${fmt(r.discount)}</td></tr>` : ""}
+      <tr><td class="dl" style="font-weight:600">Total</td><td class="dv" style="font-size:15px;font-weight:700;color:var(--teal)">${fmt(r.total)}</td></tr>
+      ${r.phone ? `<tr><td class="dl">Phone</td><td class="dv" style="color:var(--teal)">${esc(r.phone)}</td></tr>` : ""}
+      <tr><td class="dl">Date</td><td class="dv">${shortDate(recDate(r))}</td></tr>
+      ${r.addedBy ? `<tr><td class="dl">Added by</td><td class="dv">${esc(r.addedBy)}</td></tr>` : ""}
+      ${r.notes ? `<tr><td class="dl">Notes</td><td class="dv">${esc(r.notes)}</td></tr>` : ""}
+    </table>
+    ${(r.payments || []).length ? `<div class="slabel">Payments</div>${r.payments.map((p) => `<div class="pay-row"><div><div class="pay-amt">${fmt(p.amount)}</div><div class="pay-meta">${shortDate(p.date)}${p.method ? " · " + methodLabel(p.method) : ""}${p.note ? " · " + esc(p.note) : ""}</div></div></div>`).join("")}` : ""}
+    <div class="bal-box ${clear ? "clear" : ""}"><span style="font-size:12px;font-weight:600;color:${clear ? "var(--green)" : "var(--red)"}">${clear ? "Fully settled ✓" : isSale ? "Balance owed to you" : "Balance you owe"}</span><span style="font-size:16px;font-weight:700;color:${clear ? "var(--green)" : "var(--red)"}">${clear ? fmt(paid) + " paid" : fmt(bal)}</span></div>
+    <div class="dvdr"></div>
+    ${bal > 0 ? `<button class="btn primary" style="margin-bottom:8px" onclick="openPayModal(${r.id},'${kind}')">Record payment</button>` : ""}
+    ${bal > 0 && isSale && r.phone ? `<button class="btn whatsapp" style="margin-bottom:8px" onclick="sendWhatsApp('${jss(r.phone)}','${jss(r.name)}','reminder')">${WA_ICON}WhatsApp — remind payment</button>` : ""}
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      ${r.legacy ? "" : `<button class="btn" style="flex:1" onclick="closeModal();showTradeReceipt('${kind}',${r.id})">Receipt</button>`}
+      <button class="btn" style="flex:1" onclick="openTradeForm('${kind}',{editId:${r.id}})">Edit</button>
+    </div>
+    <button class="btn danger" onclick="confirmDelete(${r.id},'${kind}')">Delete</button>`;
+        document.getElementById("modal-bg").classList.add("open");
+      }
+
+      // ─── RECEIPTS FOR SALES / PURCHASES ──────────────────────────────────
+      function showTradeReceipt(kind, id) {
+        const r = getRec(kind, id);
+        if (!r) return;
+        const isSale = kind === "sale", paid = totalPaid(r), bal = owing(kind, r);
+        document.getElementById("receipt-body").innerHTML = `
+    <button class="mclose" onclick="closeReceipt()">Close</button>
+    <div class="mtitle">${isSale ? "Sales receipt" : "Purchase record"}</div>
+    <div id="receipt-card" style="background:var(--surf);border-radius:var(--r);border:1px solid var(--bdr2);padding:20px;margin:12px 0">
+      <div style="text-align:center;margin-bottom:14px"><div style="font-size:26px;margin-bottom:4px">🐟</div><div style="font-size:17px;font-weight:700">Mummy J's Fish Store</div><div style="font-size:11px;color:var(--t3);margin-top:2px">${isSale ? "Sales Receipt" : "Purchase Record"}</div></div>
+      <div style="font-size:12px;color:var(--t3)">${KINDS[kind].who}</div><div style="font-size:16px;font-weight:700">${esc(r.name)}</div>${r.phone ? `<div style="font-size:12px;color:var(--t3)">${esc(r.phone)}</div>` : ""}
+      <div style="height:1px;background:var(--bdr2);margin:12px 0"></div>
+      ${(r.lines || []).map((l) => `<div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px"><div><span style="font-weight:600">${esc(lineLabel(kind, l))}</span><span style="color:var(--t3)"> ${qtyText(l)} × ${fmt(l.price)}</span></div><div style="font-weight:600">${fmt(l.total)}</div></div>`).join("")}
+      ${r.discount ? `<div style="font-size:12px;color:var(--red);text-align:right">Discount: -${fmt(r.discount)}</div>` : ""}
+      <div style="height:1px;background:var(--bdr2);margin:12px 0"></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px"><span style="color:var(--t2)">Total</span><span style="font-weight:700;color:var(--teal);font-size:16px">${fmt(r.total)}</span></div>
+      ${paid > 0 ? `<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px"><span style="color:var(--t2)">Amount paid</span><span style="font-weight:600;color:var(--green)">${fmt(paid)}</span></div>` : ""}
+      ${bal > 0 ? `<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px"><span style="color:var(--t2)">Balance</span><span style="font-weight:700;color:var(--red)">${fmt(bal)}</span></div>` : `<div style="text-align:center;background:var(--green-l);border-radius:var(--rsm);padding:6px;font-size:13px;font-weight:600;color:var(--green)">✓ Fully paid</div>`}
+      <div style="font-size:11px;color:var(--t3);margin-top:10px">Date: ${shortDate(recDate(r))}</div>
+      ${r.notes ? `<div style="margin-top:6px;font-size:11px;color:var(--t3)">Note: ${esc(r.notes)}</div>` : ""}
+      <div style="text-align:center;margin-top:14px;font-size:11px;color:var(--t3)">Thank you for your business! 🙏</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:4px"><button class="btn primary" style="flex:1" onclick="shareTradeReceipt('${kind}',${r.id})">Share image</button><button class="btn whatsapp" style="flex:1" onclick="whatsappTradeReceipt('${kind}',${r.id})">${WA_ICON}WhatsApp</button></div>`;
+        document.getElementById("receipt-mbg").classList.add("open");
+      }
+      function whatsappTradeReceipt(kind, id) {
+        const r = getRec(kind, id);
+        if (!r) return;
+        const paid = totalPaid(r), bal = owing(kind, r), isSale = kind === "sale";
+        const cp = (r.phone || "").replace(/\D/g, "").replace(/^0/, "234");
+        let msg = `🐟 *Mummy J's Fish Store*\n*${isSale ? "Sales Receipt" : "Purchase Record"}*\n\n*${KINDS[kind].who}:* ${r.name}\n*Date:* ${shortDate(recDate(r))}\n\n`;
+        (r.lines || []).forEach((l) => { msg += `• ${lineLabel(kind, l)} — ${qtyText(l)} × ${fmt(l.price)} = ${fmt(l.total)}\n`; });
+        if (r.discount) msg += `*Discount:* -${fmt(r.discount)}\n`;
+        msg += `\n*Total:* ${fmt(r.total)}\n`;
+        if (paid > 0) msg += `*Paid:* ${fmt(paid)}\n`;
+        msg += bal > 0 ? `*Balance:* ${fmt(bal)}\n` : `*Status:* ✅ Fully paid\n`;
+        msg += `\nThank you for your business! 🙏`;
+        window.open(cp ? `https://wa.me/${cp}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+      }
+      async function shareTradeReceipt(kind, id) {
+        const r = getRec(kind, id);
+        if (!r) return;
+        showToast("Generating image...");
+        try {
+          const canvas = buildTradeCanvas(kind, r);
+          canvas.toBlob(async (blob) => {
+            const file = new File([blob], `receipt-${r.name}-${Date.now()}.png`, { type: "image/png" });
+            try {
+              if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({ files: [file], title: "Receipt — " + r.name });
+              } else {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url; a.download = `receipt-${r.name}.png`; a.click();
+                setTimeout(() => URL.revokeObjectURL(url), 2000);
+                showToast("Receipt saved to downloads");
+              }
+            } catch (e) { /* share cancelled */ }
+          }, "image/png");
+        } catch (e) { showToast("Could not make the image — try WhatsApp"); }
+      }
+      function buildTradeCanvas(kind, r) {
+        const isSale = kind === "sale", paid = totalPaid(r), bal = owing(kind, r);
+        const lines = (r.lines || []).map((l) => ({ a: `${lineLabel(kind, l)} ${qtyText(l)} × ${fmt(l.price)}`, b: fmt(l.total) }));
+        const W = 640, pad = 40;
+        const H = 430 + lines.length * 36 + (r.discount ? 30 : 0) + (paid > 0 ? 30 : 0) + (r.notes ? 30 : 0);
+        const c = document.createElement("canvas");
+        c.width = W; c.height = H;
+        const x = c.getContext("2d");
+        x.fillStyle = "#fff"; x.fillRect(0, 0, W, H);
+        x.fillStyle = "#1D9E75"; x.fillRect(0, 0, W, 8);
+        let y = 56;
+        x.textAlign = "center"; x.font = "bold 26px sans-serif"; x.fillText("🐟 Mummy J's Fish Store", W / 2, y);
+        y += 28; x.fillStyle = "#888"; x.font = "15px sans-serif"; x.fillText(isSale ? "Sales Receipt" : "Purchase Record", W / 2, y);
+        y += 40; x.textAlign = "left"; x.fillStyle = "#888"; x.font = "13px sans-serif"; x.fillText(KINDS[kind].who, pad, y);
+        y += 24; x.fillStyle = "#111"; x.font = "bold 20px sans-serif"; x.fillText(r.name, pad, y);
+        if (r.phone) { y += 22; x.fillStyle = "#888"; x.font = "14px sans-serif"; x.fillText(r.phone, pad, y); }
+        y += 18; x.fillStyle = "#ddd"; x.fillRect(pad, y, W - pad * 2, 1); y += 30;
+        x.font = "15px sans-serif";
+        lines.forEach((l) => {
+          x.textAlign = "left"; x.fillStyle = "#222"; x.fillText(l.a, pad, y);
+          x.textAlign = "right"; x.font = "bold 15px sans-serif"; x.fillText(l.b, W - pad, y); x.font = "15px sans-serif";
+          y += 36;
+        });
+        if (r.discount) { x.textAlign = "right"; x.fillStyle = "#c0392b"; x.fillText("Discount: -" + fmt(r.discount), W - pad, y); y += 30; }
+        x.fillStyle = "#ddd"; x.fillRect(pad, y - 14, W - pad * 2, 1); y += 18;
+        const row = (l, v, col, big) => {
+          x.textAlign = "left"; x.fillStyle = "#555"; x.font = "15px sans-serif"; x.fillText(l, pad, y);
+          x.textAlign = "right"; x.fillStyle = col; x.font = (big ? "bold 20px" : "bold 16px") + " sans-serif"; x.fillText(v, W - pad, y); y += 32;
+        };
+        row("Total", fmt(r.total), "#1D9E75", true);
+        if (paid > 0) row("Amount paid", fmt(paid), "#2e8b57");
+        if (bal > 0) row("Balance", fmt(bal), "#c0392b");
+        else { x.textAlign = "center"; x.fillStyle = "#2e8b57"; x.font = "bold 16px sans-serif"; x.fillText("✓ Fully paid", W / 2, y); y += 32; }
+        x.textAlign = "left"; x.fillStyle = "#888"; x.font = "13px sans-serif"; x.fillText("Date: " + shortDate(recDate(r)), pad, y); y += 26;
+        if (r.notes) { x.fillText("Note: " + r.notes, pad, y); y += 26; }
+        x.textAlign = "center"; x.fillText("Thank you for your business! 🙏", W / 2, y + 16);
+        return c;
+      }
+
+      // ─── PEOPLE SCREEN ──────────────────────────────────────────────────
+      function renderCustomers() {
+        const q = nameKey(document.getElementById("cust-search").value || "");
+        let ps = buildPeople();
+        if (q) ps = ps.filter((p) => [...p.nameKeys].some((n) => n.includes(q)) || p.phoneKeys.has(q) || (p.phone || "").includes(q));
+        ps.sort((a, b) => (b.owedToMe + b.iOwe > 0) - (a.owedToMe + a.iOwe > 0) || b.biz - a.biz);
+        const el = document.getElementById("cust-list");
+        if (!ps.length) {
+          el.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg><p>No people yet</p></div>';
+          return;
+        }
+        el.innerHTML = ps.map((p) => `<div class="cust-card" onclick="openPerson('${jss(p.key)}')"><div class="cust-name">${esc(p.name)}</div><div class="cust-meta">${esc(p.phone || "No phone")} · ${p.entries.length} record${p.entries.length !== 1 ? "s" : ""}</div><div class="cust-stats"><div class="cst">Biz: <strong>${fmt(p.biz)}</strong></div>${p.owedToMe > 0 ? `<div class="cst">Owes you: <strong style="color:var(--red)">${fmt(p.owedToMe)}</strong></div>` : ""}${p.iOwe > 0 ? `<div class="cst">You owe: <strong style="color:var(--amber)">${fmt(p.iOwe)}</strong></div>` : ""}</div></div>`).join("");
+      }
+      function openCustomer(key) { openPerson(key); }
+      function openPerson(key) {
+        const p = findPerson(key);
+        if (!p) return;
+        window._personKey = p.key;
+        const kindTag = { service: "Drying", sale: "Sale", purchase: "Purchase" };
+        const rows = p.entries.map((e) => {
+          const r = e.rec, st = e.kind === "service" ? payStatus(r) : tradeStatus(r);
+          const open = e.kind === "service" ? `openItem(${r.id})` : `openTradeDetail('${e.kind}',${r.id})`;
+          const what = e.kind === "service" ? (r.fishRows || []).map((f) => f.type).join(", ") || r.type || "Fish" : tradeSummary(e.kind, r);
+          return `<div class="card" style="cursor:pointer;margin-bottom:7px" onclick="closeCustModal();${open}"><div style="display:flex;justify-content:space-between;gap:8px"><div style="min-width:0"><div style="font-size:13px;font-weight:600">${esc(what)}</div><div class="itr-meta">${kindTag[e.kind]}${r.legacy ? " · Old debt" : ""} · ${shortDate(e.date)}${st ? ` · <span class="pill ${st}">${e.kind === "service" ? payLabel(r) : tradeStatusLabel(st)}</span>` : ""}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-size:13px;font-weight:600">${fmt(e.total)}</div>${e.owing > 0 ? `<div class="itr-meta" style="color:${e.dir > 0 ? "var(--red)" : "var(--amber)"}">${e.dir > 0 ? "Owes" : "You owe"}: ${fmt(e.owing)}</div>` : ""}</div></div></div>`;
+        }).join("");
+        const k = jss(p.key);
+        document.getElementById("cust-body").innerHTML = `<button class="mclose" onclick="closeCustModal()">Close</button><div class="mtitle">${esc(p.name)}</div><div class="msub">${esc(p.phone || "No phone saved")}</div>
+  <div class="sgrid" style="margin-bottom:11px"><div class="stat"><div class="stat-label">Owes you</div><div class="stat-val cr" style="font-size:15px">${fmt(p.owedToMe)}</div></div><div class="stat"><div class="stat-label">You owe</div><div class="stat-val ca" style="font-size:15px">${fmt(p.iOwe)}</div></div></div>
+  ${p.owedToMe > 0 && p.iOwe > 0 ? `<div class="bal-box" style="margin-bottom:10px"><span style="font-size:12px;font-weight:600">Net cash</span><span style="font-size:14px;font-weight:700;color:${p.net > 0 ? "var(--red)" : "var(--amber)"}">${p.net > 0 ? "They owe you " + fmt(p.net) : p.net < 0 ? "You owe them " + fmt(-p.net) : "Even"}</span></div><button class="btn primary" style="margin-bottom:10px" onclick="closeCustModal();confirmSetOff('${k}')">Set off what each owes</button>` : ""}
+  ${p.owedToMe > 0 ? `<button class="btn" style="margin-bottom:8px" onclick="closeCustModal();openPersonPay('${k}',1)">Record payment from them</button>` : ""}
+  ${p.iOwe > 0 ? `<button class="btn" style="margin-bottom:8px" onclick="closeCustModal();openPersonPay('${k}',-1)">Record payment to them</button>` : ""}
+  <div style="display:flex;gap:8px;margin-bottom:8px"><button class="btn" style="flex:1" onclick="openTradeForm('sale',{name:'${jss(p.name)}',phone:'${jss(p.phone)}'})">+ Sale</button><button class="btn" style="flex:1" onclick="openTradeForm('purchase',{name:'${jss(p.name)}',phone:'${jss(p.phone)}'})">+ Purchase</button></div>
+  ${p.phone ? `<div style="display:flex;gap:8px;margin-bottom:12px"><button class="btn" style="flex:1" onclick="callCustomer('${jss(p.phone)}','${jss(p.name)}')">Call</button>${p.owedToMe > 0 ? `<button class="btn whatsapp" style="flex:1" onclick="whatsappPersonDebt('${k}')">${WA_ICON}WhatsApp</button>` : ""}</div>` : ""}
+  <div class="slabel">History</div>${rows}`;
+        document.getElementById("cust-mbg").classList.add("open");
+      }
+
+      // ─── DEBTS SCREEN ───────────────────────────────────────────────────
+      let debtTab = "owed";
+      function setDebtTab(t) { debtTab = t; renderDebts(); }
+      function renderDebts() {
+        const ps = buildPeople();
+        const owedList = ps.filter((p) => p.owedToMe > 0).sort((a, b) => b.owedToMe - a.owedToMe);
+        const oweList = ps.filter((p) => p.iOwe > 0).sort((a, b) => b.iOwe - a.iOwe);
+        const sumOwed = owedList.reduce((a, p) => a + p.owedToMe, 0), sumOwe = oweList.reduce((a, p) => a + p.iOwe, 0);
+        const net = sumOwed - sumOwe;
+        document.getElementById("debt-alert").innerHTML = `<div class="sgrid"><div class="stat"><div class="stat-label">Owed to you</div><div class="stat-val cr">${fmt(sumOwed)}</div></div><div class="stat"><div class="stat-label">You owe</div><div class="stat-val ca">${fmt(sumOwe)}</div></div></div>
+  <div class="bal-box ${net <= 0 ? "clear" : ""}" style="margin-bottom:11px"><span style="font-size:12px;font-weight:600">Net position</span><span style="font-size:15px;font-weight:700;color:${net > 0 ? "var(--green)" : net < 0 ? "var(--amber)" : "var(--t2)"}">${net >= 0 ? "+" : "-"}${fmt(Math.abs(net))}</span></div>
+  <div class="r2" style="margin-bottom:11px"><button class="btn" onclick="openTradeForm('sale',{legacy:true})">+ Old debt (they owe me)</button><button class="btn" onclick="openTradeForm('purchase',{legacy:true})">+ Old debt (I owe them)</button></div>
+  <div class="tabs"><button class="tab ${debtTab === "owed" ? "active" : ""}" onclick="setDebtTab('owed')">Owed to you (${owedList.length})</button><button class="tab ${debtTab === "owe" ? "active" : ""}" onclick="setDebtTab('owe')">You owe (${oweList.length})</button></div>`;
+        const list = debtTab === "owed" ? owedList : oweList, dir = debtTab === "owed" ? 1 : -1;
+        let html = "";
+        list.forEach((p) => {
+          const k = jss(p.key), amt = dir > 0 ? p.owedToMe : p.iOwe;
+          const open = p.entries.filter((e) => e.dir === dir && e.owing > 0);
+          const oldest = open.reduce((m, e) => (new Date(e.date) < new Date(m) ? e.date : m), open[0].date);
+          const other = dir > 0 ? p.iOwe : p.owedToMe;
+          html += `<div class="card" style="margin-bottom:9px;cursor:pointer" onclick="openPerson('${k}')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:14px;font-weight:700">${esc(p.name)}</div><div class="itr-meta">${open.length} unpaid record${open.length > 1 ? "s" : ""} · oldest ${daysAgoText(oldest)}</div>${p.phone ? `<div class="itr-meta">${esc(p.phone)}</div>` : ""}${other > 0 ? `<div class="itr-meta" style="color:var(--amber)">${dir > 0 ? "You also owe them" : "They also owe you"} ${fmt(other)}</div>` : ""}</div><div style="text-align:right"><div style="font-size:11px;color:var(--t3)">${dir > 0 ? "Owes" : "You owe"}</div><div style="font-size:16px;font-weight:700;color:${dir > 0 ? "var(--red)" : "var(--amber)"}">${fmt(amt)}</div></div></div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px"><button class="btn sm primary" onclick="event.stopPropagation();openPersonPay('${k}',${dir})">${dir > 0 ? "Receive payment" : "Pay"}</button>${other > 0 ? `<button class="btn sm" onclick="event.stopPropagation();confirmSetOff('${k}')">Set off</button>` : ""}${dir > 0 && p.phone ? `<button class="btn sm whatsapp" onclick="event.stopPropagation();whatsappPersonDebt('${k}')">WhatsApp</button><button class="btn sm" onclick="event.stopPropagation();callCustomer('${jss(p.phone)}','${jss(p.name)}')">Call</button>` : ""}</div></div>`;
+        });
+        if (!html) html = '<div class="empty"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg><p>Nothing here!<br>All clear 🎉</p></div>';
+        document.getElementById("debt-list").innerHTML = html;
+      }
+
+      // cash actually received / paid out in a period (set-offs are not cash)
+      function cashInOut(start, end) {
+        let inn = 0, out = 0, sold = 0, bought = 0;
+        const within = (iso) => { const d = new Date(iso); return d >= start && d <= end; };
+        state.sales.forEach((r) => {
+          (r.payments || []).forEach((p) => { if (p.method !== "setoff" && within(p.date)) inn += p.amount; });
+          if (!r.legacy && within(recDate(r))) sold += r.total;
+        });
+        state.purchases.forEach((r) => {
+          (r.payments || []).forEach((p) => { if (p.method !== "setoff" && within(p.date)) out += p.amount; });
+          if (!r.legacy && within(recDate(r))) bought += r.total;
+        });
+        return { inn, out, sold, bought };
+      }
+
+
+      // ═══════════════ KPOMO STOCK & PROFIT ═══════════════
+      // Kpomo is the one product counted in pieces, so it is the one product
+      // whose stock and profit can be worked out. Profit uses the average
+      // price paid per piece across every kpomo purchase recorded.
+      function lineNet(r, l) {
+        const sub = (r.lines || []).reduce((a, x) => a + (x.total || 0), 0);
+        return r.discount && sub ? l.total - (r.discount * l.total) / sub : l.total;
+      }
+      function kpomoStats(start, end) {
+        let bQty = 0, bCost = 0, sQty = 0, pSQty = 0, pSRev = 0, aQty = 0, pAQty = 0;
+        const inP = (iso) => !!start && new Date(iso) >= start && new Date(iso) <= end;
+        state.purchases.forEach((r) => (r.lines || []).forEach((l) => { if (isKpomo(l)) { bQty += +lineQty(l); bCost += lineNet(r, l); } }));
+        state.sales.forEach((r) => (r.lines || []).forEach((l) => {
+          if (!isKpomo(l)) return;
+          const q = +lineQty(l);
+          sQty += q;
+          if (inP(recDate(r))) { pSQty += q; pSRev += lineNet(r, l); }
+        }));
+        (state.adjustments || []).forEach((a) => { aQty += a.qty; if (inP(a.date)) pAQty += a.qty; });
+        const avg = bQty ? bCost / bQty : 0;
+        return { stock: bQty - sQty - aQty, avg, bQty, pSQty, pSRev, pCost: avg * pSQty, pProfit: pSRev - avg * pSQty, pAQty, pACost: avg * pAQty };
+      }
+      function kpomoCardHTML() {
+        const k = kpomoStats();
+        return `<div class="card" style="cursor:pointer;margin-bottom:11px" onclick="openKpomoStock()"><div style="display:flex;justify-content:space-between;align-items:center"><div><div class="itr-name">Kpomo in stock</div><div class="itr-meta">${k.bQty ? "Average cost " + fmt(k.avg) + " per piece" : "No kpomo purchases recorded yet"}</div></div><div style="font-size:20px;font-weight:700;color:${k.stock < 0 ? "var(--red)" : "var(--teal)"}">${+k.stock.toFixed(2)} pcs</div></div></div>`;
+      }
+      function openKpomoStock() {
+        const k = kpomoStats();
+        const adj = (state.adjustments || []).slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+        document.getElementById("modal-body").innerHTML = `
+    <button class="mclose" onclick="closeModal()">Close</button>
+    <div class="mtitle">Kpomo stock</div>
+    <div class="msub">Bought minus sold minus taken out</div>
+    <div class="sgrid" style="margin-bottom:11px"><div class="stat"><div class="stat-label">In stock</div><div class="stat-val ct" style="font-size:15px">${+k.stock.toFixed(2)} pcs</div></div><div class="stat"><div class="stat-label">Average cost</div><div class="stat-val" style="font-size:15px">${k.bQty ? fmt(k.avg) : "—"}</div></div></div>
+    <button class="btn primary" style="margin-bottom:12px" onclick="openKpomoAdjust()">Take out of stock (own use / spoiled)</button>
+    ${adj.length ? `<div class="slabel">Taken out</div>${adj.map((a) => `<div class="pay-row"><div><div class="pay-amt">${a.qty} piece${a.qty === 1 ? "" : "s"} — ${esc(a.reason || "Other")}</div><div class="pay-meta">${shortDate(a.date)}${a.note ? " · " + esc(a.note) : ""}</div></div><button class="btn sm danger" onclick="deleteKpomoAdjust(${a.id})">Del</button></div>`).join("")}` : ""}`;
+        document.getElementById("modal-bg").classList.add("open");
+      }
+      function openKpomoAdjust() {
+        document.getElementById("modal-body").innerHTML = `
+    <button class="mclose" onclick="openKpomoStock()">Back</button>
+    <div class="mtitle">Take kpomo out of stock</div>
+    <div class="fg"><label class="fl">Pieces *</label><input class="fi" id="ka-qty" type="number" min="1" step="1" inputmode="numeric" placeholder="0"></div>
+    <div class="fg"><label class="fl">Reason</label><select class="fi" id="ka-reason"><option>Own use</option><option>Spoiled / lost</option><option>Other</option></select></div>
+    <div class="fg"><label class="fl">Date</label><input class="fi" id="ka-date" type="date" value="${todayStr()}"></div>
+    <div class="fg"><label class="fl">Note (optional)</label><input class="fi" id="ka-note" type="text"></div>
+    <button class="btn primary" onclick="saveKpomoAdjust()">Save</button>`;
+        document.getElementById("modal-bg").classList.add("open");
+      }
+      function saveKpomoAdjust() {
+        const qty = parseInt(document.getElementById("ka-qty").value, 10) || 0;
+        if (qty <= 0) return showToast("Enter how many pieces");
+        const d = document.getElementById("ka-date").value;
+        if (!Array.isArray(state.adjustments)) state.adjustments = [];
+        state.adjustments.unshift({
+          id: newId(), product: "kpomo", qty, reason: document.getElementById("ka-reason").value,
+          date: d === todayStr() ? new Date().toISOString() : dateToISO(d),
+          createdAt: new Date().toISOString(), note: clean(document.getElementById("ka-note").value), addedBy: userName,
+        });
+        lsave();
+        scheduleSync();
+        showToast("✓ Taken out of stock");
+        openKpomoStock();
+        refreshCurrentScreen();
+      }
+      function deleteKpomoAdjust(id) {
+        tombstone("adjustment", id);
+        state.adjustments = (state.adjustments || []).filter((a) => a.id !== id);
+        lsave();
+        scheduleSync();
+        openKpomoStock();
+        refreshCurrentScreen();
+      }
+
+      // ─── SALE PRICES (Settings) ───────────────────────────────────────────
+      function fillSalePrices() {
+        const d = state.shop.tradeDefaults || {};
+        const set = (id, k) => { const el = document.getElementById(id); if (el) el.value = d[k] || ""; };
+        set("sp-dried", "sale|dried|Catfish");
+        set("sp-fresh", "sale|fresh|Catfish");
+        set("sp-kpomo", "sale||Kpomo");
+      }
+      function saveSalePrices() {
+        if (!state.shop.tradeDefaults) state.shop.tradeDefaults = {};
+        const d = state.shop.tradeDefaults;
+        const grab = (id, k) => { const v = parseFloat(document.getElementById(id).value) || 0; if (v > 0) d[k] = v; };
+        grab("sp-dried", "sale|dried|Catfish");
+        grab("sp-fresh", "sale|fresh|Catfish");
+        grab("sp-kpomo", "sale||Kpomo");
+        state.shop.settingsAt = new Date().toISOString();
+        lsave();
+        scheduleSync();
+        showToast("Sale prices saved");
+      }
+      function onDryingAmtInput(el) {
+        const auto = +(totalIntakeWeight() * state.shop.dryingRatePerKg).toFixed(2);
+        const v = parseFloat(el.value);
+        // only treat it as hand-edited when it really differs from the Settings rate
+        el.dataset.touched = !el.value || v === auto ? "" : "1";
       }
 
       // ─── EXPENSES SCREEN ────────────────────────────────────────────────
@@ -3005,7 +4024,11 @@
           .filter((i) => i.status === "collected")
           .reduce((a, i) => a + totalPaid(i), 0);
         const expCost = exp.reduce((a, e) => a + e.amount, 0);
-        return { revenue, expCost, net: revenue - expCost };
+        const c = cashInOut(start, end);
+        return {
+          revenue, expCost, salesIn: c.inn, purchOut: c.out,
+          net: revenue + c.inn - expCost - c.out,
+        };
       }
       function renderMoneySummary() {
         const now = new Date();
@@ -3017,7 +4040,7 @@
         const at = moneyFor(new Date(0), now);
         const box = (label, d) => {
           const pos = d.net >= 0;
-          return `<div class="profit-box ${pos ? "positive" : "negative"}"><div class="profit-label" style="color:${pos ? "var(--green)" : "var(--red)"}">${label}</div><div class="profit-val" style="color:${pos ? "var(--green)" : "var(--red)"}">${d.net < 0 ? "-" : ""}${fmt(Math.abs(d.net))}</div><div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap"><div style="font-size:12px"><span style="color:var(--t3)">Collected</span><br><strong style="color:var(--green)">${fmt(d.revenue)}</strong></div><div style="font-size:12px"><span style="color:var(--t3)">Expenses</span><br><strong style="color:var(--red)">-${fmt(d.expCost)}</strong></div></div></div>`;
+          return `<div class="profit-box ${pos ? "positive" : "negative"}"><div class="profit-label" style="color:${pos ? "var(--green)" : "var(--red)"}">${label}</div><div class="profit-val" style="color:${pos ? "var(--green)" : "var(--red)"}">${d.net < 0 ? "-" : ""}${fmt(Math.abs(d.net))}</div><div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap"><div style="font-size:12px"><span style="color:var(--t3)">Drying collected</span><br><strong style="color:var(--green)">${fmt(d.revenue)}</strong></div><div style="font-size:12px"><span style="color:var(--t3)">Expenses</span><br><strong style="color:var(--red)">-${fmt(d.expCost)}</strong></div><div style="font-size:12px"><span style="color:var(--t3)">Fish sales received</span><br><strong style="color:var(--green)">${fmt(d.salesIn)}</strong></div><div style="font-size:12px"><span style="color:var(--t3)">Fish bought (paid)</span><br><strong style="color:var(--red)">-${fmt(d.purchOut)}</strong></div></div></div>`;
         };
         return (
           box(
@@ -3030,7 +4053,8 @@
               lms.toLocaleDateString("en-NG", { month: "long", year: "numeric" }),
             lm,
           ) +
-          box("All time", at)
+          box("All time", at) +
+          `<div class="itr-meta" style="margin:-4px 2px 12px">Cash received minus cash spent. This is not profit — it ignores unsold fish and unpaid credit.</div>`
         );
       }
       function saveExpense() {
@@ -3079,30 +4103,6 @@
       }
 
 
-      function renderDebts() {
-        const svcDebts = state.items.filter(
-          (i) => i.status === "collected" && !i.settledShort && balance(i) > 0,
-        );
-        const owedToMe = svcDebts.reduce((a, i) => a + balance(i), 0);
-        let ah = "";
-        if (svcDebts.length > 0)
-          ah += `<div class="abar"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><div class="abar-text">${svcDebts.length} customer${svcDebts.length > 1 ? "s" : ""} owe you ${fmt(owedToMe)}</div></div>`;
-        document.getElementById("debt-alert").innerHTML = ah;
-        let html = "";
-        if (svcDebts.length) {
-          html += svcDebts
-            .map(
-              (i) =>
-                `<div class="card" style="margin-bottom:9px;cursor:pointer" onclick="openItem(${i.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:14px;font-weight:700">${i.name}</div><div class="itr-meta">Service · ${shortDate(i.createdAt)}</div>${i.phone ? `<div class="itr-meta">${i.phone}</div>` : ""}</div><div style="text-align:right"><div style="font-size:11px;color:var(--t3)">Owes</div><div style="font-size:16px;font-weight:700;color:var(--red)">${fmt(balance(i))}</div></div></div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">${i.phone ? `<button class="btn sm whatsapp" onclick="event.stopPropagation();sendWhatsApp('${i.phone}','${i.name}','debt',${i.id})">WhatsApp</button><button class="btn sm" onclick="event.stopPropagation();callCustomer('${i.phone}','${i.name}')">Call</button>` : ""}<button class="btn sm primary" onclick="event.stopPropagation();openItem(${i.id})">Pay</button></div></div>`,
-            )
-            .join("");
-        }
-        if (!html)
-          html =
-            '<div class="empty"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg><p>No debts here!<br>All clear 🎉</p></div>';
-        document.getElementById("debt-list").innerHTML = html;
-      }
-
       let currentSumPeriod = "week";
       function filterSum(period, btn) {
         document
@@ -3147,6 +4147,9 @@
         const collected = items.filter((i) => i.status === "collected");
         const serviceRev = collected.reduce((a, i) => a + totalPaid(i), 0);
         const expCost = expenses.reduce((a, e) => a + e.amount, 0);
+        const cio = cashInOut(start, end);
+        const kp = kpomoStats(start, end);
+        const netAll = serviceRev + cio.inn - cio.out - expCost;
         const el = document.getElementById("sum-content");
         el.innerHTML = `<div class="sum-card">
     <div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">${label}</div>
@@ -3155,78 +4158,26 @@
     <div class="sum-row"><span class="sl">Revenue collected</span><span class="sv ct">${fmt(serviceRev)}</span></div>
     <div class="sum-row"><span class="sl">Still drying</span><span class="sv ca">${items.filter((i) => i.status === "drying").length}</span></div>
     <div class="sum-row"><span class="sl">Ready to collect</span><span class="sv ct">${items.filter((i) => i.status === "ready").length}</span></div>
+    <div class="slabel" style="margin-top:12px">Fish sales</div>
+    <div class="sum-row"><span class="sl">Sold (all, incl. credit)</span><span class="sv">${fmt(cio.sold)}</span></div>
+    <div class="sum-row"><span class="sl">Cash received</span><span class="sv ct">${fmt(cio.inn)}</span></div>
+    <div class="slabel" style="margin-top:12px">Fish purchases</div>
+    <div class="sum-row"><span class="sl">Bought (all, incl. credit)</span><span class="sv">${fmt(cio.bought)}</span></div>
+    <div class="sum-row"><span class="sl">Cash paid out</span><span class="sv" style="color:var(--red)">-${fmt(cio.out)}</span></div>
+    <div class="slabel" style="margin-top:12px">Kpomo</div>
+    <div class="sum-row"><span class="sl">Pieces sold</span><span class="sv">${+kp.pSQty.toFixed(2)}</span></div>
+    <div class="sum-row"><span class="sl">Sales value</span><span class="sv ct">${fmt(kp.pSRev)}</span></div>
+    <div class="sum-row"><span class="sl">Cost of those pieces</span><span class="sv" style="color:var(--red)">-${fmt(kp.pCost)}</span></div>
+    <div class="sum-row"><span class="sl" style="font-weight:600">Profit on sales</span><span class="sv" style="font-weight:700;color:${kp.pProfit >= 0 ? "var(--green)" : "var(--red)"}">${fmt(kp.pProfit)}</span></div>
+    ${kp.pAQty ? `<div class="sum-row"><span class="sl">Taken out (${kp.pAQty} pcs, own use / spoiled)</span><span class="sv" style="color:var(--red)">-${fmt(kp.pACost)}</span></div><div class="sum-row"><span class="sl" style="font-weight:600">Profit after taking out</span><span class="sv" style="font-weight:700;color:${kp.pProfit - kp.pACost >= 0 ? "var(--green)" : "var(--red)"}">${fmt(kp.pProfit - kp.pACost)}</span></div>` : ""}
+    <div class="sum-row"><span class="sl">In stock now</span><span class="sv">${+kp.stock.toFixed(2)} pcs</span></div>
+    ${!kp.bQty && kp.pSQty ? `<div class="itr-meta">No kpomo purchases recorded, so the cost above is unknown — add a purchase (it can have an old date).</div>` : ""}
     <div class="slabel" style="margin-top:12px">Expenses</div>
     <div class="sum-row"><span class="sl">Total expenses</span><span class="sv" style="color:var(--purple,#6B3FA0)">-${fmt(expCost)}</span></div>
-    <div class="sum-row" style="border-top:1px solid var(--bdr2);margin-top:4px;padding-top:10px"><span class="sl" style="font-weight:600">Net</span><span class="sv" style="color:${serviceRev - expCost >= 0 ? "var(--green)" : "var(--red)"};font-size:16px">${fmt(serviceRev - expCost)}</span></div>
+    <div class="sum-row" style="border-top:1px solid var(--bdr2);margin-top:4px;padding-top:10px"><span class="sl" style="font-weight:600">Net cash</span><span class="sv" style="color:${netAll >= 0 ? "var(--green)" : "var(--red)"};font-size:16px">${fmt(netAll)}</span></div>
   </div>`;
       }
 
-      function renderCustomers() {
-        const q = (
-          document.getElementById("cust-search").value || ""
-        ).toLowerCase();
-        const map = {};
-        state.items.forEach((i) => {
-          if (!i.name) return;
-          const k = i.name.toLowerCase();
-          if (!map[k])
-            map[k] = {
-              name: i.name,
-              phone: i.phone || "",
-              items: [],
-              totalBiz: 0,
-              totalPaidAmt: 0,
-              totalBal: 0,
-            };
-          map[k].items.push(i);
-          map[k].totalBiz += i.total;
-          map[k].totalPaidAmt += totalPaid(i);
-          if (i.status === "collected" && !i.settledShort)
-            map[k].totalBal += balance(i);
-        });
-        let custs = Object.values(map).sort((a, b) => b.totalBiz - a.totalBiz);
-        if (q)
-          custs = custs.filter(
-            (c) => c.name.toLowerCase().includes(q) || c.phone.includes(q),
-          );
-        const el = document.getElementById("cust-list");
-        if (!custs.length) {
-          el.innerHTML =
-            '<div class="empty"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg><p>No customers yet</p></div>';
-          return;
-        }
-        el.innerHTML = custs
-          .map(
-            (c) =>
-              `<div class="cust-card" onclick="openCustomer('${c.name}')"><div class="cust-name">${c.name}</div><div class="cust-meta">${c.phone || "No phone"} · ${c.items.length} visit${c.items.length !== 1 ? "s" : ""}</div><div class="cust-stats"><div class="cst">Biz: <strong>${fmt(c.totalBiz)}</strong></div><div class="cst">Paid: <strong style="color:var(--green)">${fmt(c.totalPaidAmt)}</strong></div>${c.totalBal > 0 ? `<div class="cst">Owes: <strong style="color:var(--red)">${fmt(c.totalBal)}</strong></div>` : ""}</div></div>`,
-          )
-          .join("");
-      }
-      function openCustomer(name) {
-        const key = String(name || "").toLowerCase();
-        const items = state.items.filter(
-          (i) => (i.name || "").toLowerCase() === key,
-        );
-        if (!items.length) return;
-        const c = items[0];
-        const totalBiz = items.reduce((a, i) => a + i.total, 0);
-        const tPaid = items.reduce((a, i) => a + totalPaid(i), 0);
-        const tBal = items
-          .filter((i) => i.status === "collected" && !i.settledShort)
-          .reduce((a, i) => a + balance(i), 0);
-        document.getElementById("cust-body").innerHTML =
-          `<button class="mclose" onclick="closeCustModal()">Close</button><div class="mtitle">${c.name}</div><div class="msub">${c.phone || "No phone saved"}</div>
-  <div class="sgrid" style="margin-bottom:11px"><div class="stat"><div class="stat-label">Total business</div><div class="stat-val ct" style="font-size:15px">${fmt(totalBiz)}</div></div><div class="stat"><div class="stat-label">Total paid</div><div class="stat-val" style="font-size:15px;color:var(--green)">${fmt(tPaid)}</div></div><div class="stat"><div class="stat-label">Visits</div><div class="stat-val ct" style="font-size:15px">${items.length}</div></div><div class="stat"><div class="stat-label">Outstanding</div><div class="stat-val cr" style="font-size:15px">${fmt(tBal)}</div></div></div>
-  ${c.phone ? `<div style="display:flex;gap:8px;margin-bottom:12px"><button class="btn" style="flex:1" onclick="callCustomer('${c.phone}','${c.name}')"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.36 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>Call</button><button class="btn whatsapp" style="flex:1" onclick="sendWhatsApp('${c.phone}','${c.name}','reminder')"><svg viewBox="0 0 24 24" style="fill:none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>WhatsApp</button></div>` : ""}
-  ${items
-    .map((i) => {
-      const fish =
-        (i.fishRows || []).map((r) => r.type).join(", ") || i.type || "Fish";
-      return `<div class="card" style="cursor:pointer;margin-bottom:7px" onclick="closeCustModal();openItem(${i.id})"><div style="display:flex;justify-content:space-between"><div><div style="font-size:13px;font-weight:600">${fish}</div><div class="itr-meta">${shortDate(i.createdAt)} · <span class="pill ${i.status}">${statusLabel(i.status)}</span>${payStatus(i) ? ' <span class="pill ' + payStatus(i) + '">' + payLabel(i) + "</span>" : ""}</div>${i.notes ? `<div class="itr-meta">📝 ${i.notes}</div>` : ""}</div><div style="text-align:right"><div style="font-size:13px;font-weight:600">${fmt(i.total)}</div>${balance(i) > 0 && !i.settledShort ? `<div class="itr-meta" style="color:var(--red)">Bal: ${fmt(balance(i))}</div>` : ""}</div></div></div>`;
-    })
-    .join("")}`;
-        document.getElementById("cust-mbg").classList.add("open");
-      }
       function closeCustModal() {
         document.getElementById("cust-mbg").classList.remove("open");
       }
@@ -3263,6 +4214,7 @@
       function renderSettings() {
         setVal("settings-name", userName);
         setVal("settings-dryrate", state.shop.dryingRatePerKg);
+        fillSalePrices();
         const zl = document.getElementById("zoom-label");
         if (zl) zl.textContent = Math.round(getZoom() * 100) + "%";
         renderSyncInfo();
@@ -3351,69 +4303,6 @@
         renderHome();
       }
 
-      function openPayModal(id) {
-        const i = state.items.find((x) => x.id === id);
-        if (!i) return;
-        const bal = balance(i);
-        const paid = totalPaid(i);
-        document.getElementById("pay-body").innerHTML = `
-    <button class="mclose" onclick="closePayModal()">Close</button>
-    <div class="mtitle">Record payment</div><div class="msub">${i.name} — ${fmt(i.total)} total</div>
-    <table class="dtbl" style="margin-bottom:11px">
-      ${paid > 0 ? `<tr><td class="dl">Already paid</td><td class="dv" style="color:var(--green)">${fmt(paid)}</td></tr>` : ""}
-      <tr><td class="dl" style="font-weight:600">Balance owed</td><td class="dv" style="font-weight:700;color:var(--red)">${fmt(bal)}</td></tr>
-    </table>
-    <div class="fg"><label class="fl">Amount received (₦) *</label><input class="fi" id="pay-amt" type="number" placeholder="0" min="0" inputmode="numeric" value="${bal}" oninput="updatePayPreview(${i.id})"></div>
-    <div class="fg"><label class="fl">Note (optional)</label><input class="fi" id="pay-note" type="text" placeholder="e.g. half payment, balance Friday..."></div>
-    <div id="pay-preview" style="margin-bottom:11px"></div>
-    <button class="btn primary" onclick="recordPayment(${i.id},false)" style="margin-bottom:8px">Save payment</button>
-    <button class="btn" id="settle-btn" onclick="recordPayment(${i.id},true)" style="display:none;margin-bottom:8px;border-color:var(--green);color:var(--green)">Save &amp; mark fully settled</button>`;
-        document.getElementById("pay-mbg").classList.add("open");
-        updatePayPreview(id);
-      }
-      function updatePayPreview(id) {
-        const i = state.items.find((x) => x.id === id);
-        if (!i) return;
-        const amt = parseFloat(document.getElementById("pay-amt")?.value) || 0;
-        const bal = balance(i);
-        const nb = Math.max(0, bal - amt);
-        const sb = document.getElementById("settle-btn");
-        let html = "";
-        if (amt > 0) {
-          if (amt >= bal) {
-            html = `<div class="bal-box clear"><span style="font-size:12px;font-weight:600;color:var(--green)">Fully paid ✓</span><span style="font-size:14px;font-weight:700;color:var(--green)">No balance</span></div>`;
-            if (sb) sb.style.display = "none";
-          } else {
-            html = `<div class="bal-box"><span style="font-size:12px;font-weight:600;color:var(--red)">Remaining balance</span><span style="font-size:14px;font-weight:700;color:var(--red)">${fmt(nb)}</span></div>`;
-            if (sb) sb.style.display = "";
-          }
-        }
-        document.getElementById("pay-preview").innerHTML = html;
-      }
-      function recordPayment(id, settle) {
-        const i = state.items.find((x) => x.id === id);
-        if (!i) return;
-        const amt = parseFloat(document.getElementById("pay-amt")?.value) || 0;
-        const note = clean(document.getElementById("pay-note")?.value);
-        if (amt <= 0) {
-          showToast("Enter the amount received");
-          return;
-        }
-        if (!i.payments) i.payments = [];
-        i.payments.push({ amount: amt, date: new Date().toISOString(), note });
-        if (settle) i.settledShort = true;
-        i.editedAt = new Date().toISOString();
-        lsave();
-        scheduleSync();
-        closePayModal();
-        closeModal();
-        showToast(
-          settle
-            ? "✓ Record settled"
-            : "✓ Payment of " + fmt(amt) + " recorded",
-        );
-        renderHome();
-      }
       function closePayModal() {
         document.getElementById("pay-mbg").classList.remove("open");
       }
@@ -4167,11 +5056,17 @@
       function confirmClearAll() {
         document.getElementById("cfm-title").textContent = "Clear all records?";
         document.getElementById("cfm-msg").textContent =
-          "This will permanently delete ALL drying service records and expenses. This cannot be undone. Are you absolutely sure?";
+          "This will permanently delete ALL drying, sales and purchase records and expenses. This cannot be undone. Are you absolutely sure?";
         document.getElementById("cfm-ok").textContent = "Yes, clear everything";
         document.getElementById("cfm-ok").onclick = () => {
           // tombstone everything, otherwise the next sync pulls it all back
           state.items.forEach((x) => tombstone("service", x.id));
+          state.sales.forEach((x) => tombstone("sale", x.id));
+          state.purchases.forEach((x) => tombstone("purchase", x.id));
+          (state.adjustments || []).forEach((x) => tombstone("adjustment", x.id));
+          state.sales = [];
+          state.purchases = [];
+          state.adjustments = [];
           state.shop.expenses.forEach((x) => tombstone("expense", x.id));
           state.items = [];
           state.shop.expenses = [];
